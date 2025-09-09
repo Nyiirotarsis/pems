@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -110,7 +111,7 @@ const permissions: Record<UserRole, View[]> = {
   "Finance Manager": ["finance", "requests", "reports", "notifications"],
   "HR/Admin": ["reports", "notifications"],
   "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
-  "Director": ["reports", "notifications"],
+  "Director": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
   "IT": ["inventory", "assets", "transactions", "notifications", "requests"],
 };
 
@@ -121,12 +122,12 @@ const navItems: Record<
   inventory: {
     label: "Inventory",
     icon: PackageSearch,
-    forRoles: ["Store Manager", "CEO", "IT"],
+    forRoles: ["Store Manager", "CEO", "IT", "Director"],
   },
   assets: {
       label: "Assets",
       icon: Wrench,
-      forRoles: ["Store Manager", "CEO", "IT"],
+      forRoles: ["Store Manager", "CEO", "IT", "Director"],
   },
   transactions: {
     label: "Issue / Return",
@@ -136,12 +137,12 @@ const navItems: Record<
   requests: {
     label: "Requests",
     icon: BotMessageSquare,
-    forRoles: ["Store Manager", "Finance Manager", "CEO", "IT"],
+    forRoles: ["Store Manager", "Finance Manager", "CEO", "IT", "Director"],
   },
   finance: {
     label: "Finance",
     icon: Landmark,
-    forRoles: ["Finance Manager", "CEO"],
+    forRoles: ["Finance Manager", "CEO", "Director"],
   },
   reports: {
     label: "Reports",
@@ -1050,3 +1051,5 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
+
+    

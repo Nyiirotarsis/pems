@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -41,7 +42,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: "ceo",
+      username: "director",
       password: "123",
     },
   });
@@ -114,3 +115,5 @@ export function LoginForm() {
     </Card>
   );
 }
+
+    
