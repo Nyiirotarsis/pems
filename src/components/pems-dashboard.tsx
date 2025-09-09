@@ -109,9 +109,9 @@ const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications"],
   "Finance Manager": ["finance", "requests", "reports", "notifications"],
   "HR/Admin": ["reports", "notifications"],
-  "CEO": ["inventory", "assets", "requests", "reports", "notifications"],
+  "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
   "Director": ["reports", "notifications"],
-  "IT": ["inventory", "assets", "transactions", "notifications"],
+  "IT": ["inventory", "assets", "transactions", "notifications", "requests"],
 };
 
 const navItems: Record<
@@ -136,12 +136,12 @@ const navItems: Record<
   requests: {
     label: "Requests",
     icon: BotMessageSquare,
-    forRoles: ["Store Manager", "Finance Manager", "CEO"],
+    forRoles: ["Store Manager", "Finance Manager", "CEO", "IT"],
   },
   finance: {
     label: "Finance",
     icon: Landmark,
-    forRoles: ["Finance Manager"],
+    forRoles: ["Finance Manager", "CEO"],
   },
   reports: {
     label: "Reports",
@@ -262,7 +262,10 @@ export default function PEMSDashboard() {
                 const availableAssets = updatedAssets.filter(a => a.status === 'Available' && a.condition === 'Good').slice(0, quantity);
                 availableAssets.forEach(a => {
                     const asset = updatedAssets.find(ua => ua.id === a.id);
-                    if (asset) asset.status = 'Issued';
+                    if (asset) {
+                        asset.status = 'Issued';
+                        asset.assignedTo = role || 'Unknown'; // Assign to current role for demo
+                    }
                 });
             } else if (type === 'return') {
                  // This part needs more specific logic, for now we just assume a generic return.
@@ -274,6 +277,7 @@ export default function PEMSDashboard() {
                     if (asset) {
                         asset.status = 'Available';
                         asset.condition = condition || 'Good';
+                        delete asset.assignedTo;
                     }
                 });
             }
@@ -919,8 +923,8 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
 function ReportsView({ inventory }: { inventory: (InventoryItem & { available: number; total: number; })[] }) {
   const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
   const totalAvailable = inventory.reduce((sum, item) => sum + item.available, 0);
-  const mostStocked = inventory.reduce((max, item) => item.total > max.total ? item : max, inventory[0]);
-  const leastAvailable = inventory.reduce((min, item) => item.available < min.available ? item : min, inventory[0]);
+  const mostStocked = inventory.reduce((max, item) => item.total > max.total ? item : max, inventory[0] || {name: "N/A", total: 0});
+  const leastAvailable = inventory.reduce((min, item) => item.available < min.available ? item : min, inventory[0] || {name: "N/A", available: 0});
   
   return (
     <Card>

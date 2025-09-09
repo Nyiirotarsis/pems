@@ -2,9 +2,11 @@ import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice,
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT"];
 
+export const assetCategories = ["IT Equipment", "AV Equipment", "Office Furniture", "Vehicles", "Software"];
+
 export const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost", "Faulty"];
 
-export const USERS: User[] = [
+export const mockUsers: User[] = [
     { id: 1, username: 'ceo', password: '123', role: 'CEO' },
     { id: 2, username: 'director', password: '123', role: 'Director' },
     { id: 3, username: 'financemanager', password: '123', role: 'Finance Manager' },
@@ -13,17 +15,35 @@ export const USERS: User[] = [
     { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
 ];
 
-function generateAssets(equipmentId: number, name: string, count: number, faultyCount = 0): Asset[] {
+function generateAssets(equipmentId: number, name: string, count: number, { faultyCount = 0, issuedCount = 0, damagedCount = 0 } = {}): Asset[] {
     const assets: Asset[] = [];
     const namePrefix = name.substring(0, 3).toUpperCase();
+    let issuedCounter = 0;
     for (let i = 1; i <= count; i++) {
-        const isFaulty = i <= faultyCount;
+        let condition: Condition = 'Good';
+        let status: 'Available' | 'Issued' = 'Available';
+        let assignedTo: string | undefined = undefined;
+
+        if (i <= faultyCount) {
+            condition = 'Faulty';
+        } else if (i <= faultyCount + damagedCount) {
+            condition = 'Damaged';
+        }
+
+        if (condition === 'Good' && issuedCounter < issuedCount) {
+            status = 'Issued';
+            // Assign to a random user for variety
+            assignedTo = mockUsers[Math.floor(Math.random() * mockUsers.length)].username;
+            issuedCounter++;
+        }
+
         assets.push({
             id: `${namePrefix}-${equipmentId}-${String(i).padStart(4, '0')}`,
             equipmentId,
-            condition: isFaulty ? 'Faulty' : 'Good',
-            status: 'Available',
-            purchaseDate: '2023-01-15'
+            condition,
+            status,
+            assignedTo,
+            purchaseDate: `2023-0${Math.floor(Math.random() * 9) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`
         });
     }
     return assets;
@@ -34,42 +54,48 @@ export const initialInventory: InventoryItem[] = [
   {
     id: 1,
     name: "Microphone",
-    assets: generateAssets(1, "Microphone", 50, 2),
+    category: "AV Equipment",
+    assets: generateAssets(1, "Microphone", 50, { faultyCount: 2, issuedCount: 10 }),
     lastUpdated: "2023-10-26",
     transactions: [],
   },
   {
     id: 2,
     name: "Projector",
-    assets: generateAssets(2, "Projector", 20, 1),
+    category: "AV Equipment",
+    assets: generateAssets(2, "Projector", 20, { faultyCount: 1, issuedCount: 5 }),
     lastUpdated: "2023-10-25",
     transactions: [],
   },
   {
     id: 3,
     name: "Laptop",
-    assets: generateAssets(3, "Laptop", 100, 5),
+    category: "IT Equipment",
+    assets: generateAssets(3, "Laptop", 100, { faultyCount: 5, issuedCount: 40, damagedCount: 3 }),
     lastUpdated: "2023-10-27",
     transactions: [],
   },
   {
     id: 4,
     name: "Conference Speaker",
-    assets: generateAssets(4, "Conference Speaker", 30, 0),
+    category: "AV Equipment",
+    assets: generateAssets(4, "Conference Speaker", 30, { issuedCount: 8 }),
     lastUpdated: "2023-10-22",
     transactions: [],
   },
   {
     id: 5,
     name: "HDMI Cable (10ft)",
-    assets: generateAssets(5, "HDMI Cable", 200, 10),
+    category: "IT Equipment",
+    assets: generateAssets(5, "HDMI Cable", 200, { faultyCount: 10, damagedCount: 20 }),
     lastUpdated: "2023-10-27",
     transactions: [],
   },
   {
     id: 6,
     name: "Whiteboard",
-    assets: generateAssets(6, "Whiteboard", 15),
+    category: "Office Furniture",
+    assets: generateAssets(6, "Whiteboard", 15, { issuedCount: 2 }),
     lastUpdated: "2023-10-24",
     transactions: [],
   },
@@ -96,3 +122,5 @@ export const mockPayments: Payment[] = [
     { id: 'P001', invoiceNumber: 'INV-2024-001', date: '2024-07-25', amount: 1500, method: 'Bank' },
     { id: 'P002', invoiceNumber: 'INV-2024-003', date: '2024-07-26', amount: 1000, method: 'Mobile Money' },
 ];
+// Duplicate export of USERS removed to avoid conflicts
+export { USERS } from './mock-data-users';

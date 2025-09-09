@@ -15,11 +15,13 @@ export interface Asset {
   condition: Condition;
   status: 'Available' | 'Issued';
   purchaseDate: string;
+  assignedTo?: string; // Username of person it's assigned to
 }
 
 export interface InventoryItem {
   id: number;
   name: string;
+  category: string;
   assets: Asset[]; // Now tracks individual assets
   lastUpdated: string;
   transactions: Transaction[];
