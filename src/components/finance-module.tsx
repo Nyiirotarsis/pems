@@ -102,7 +102,7 @@ export function FinanceModule() {
                   Manage service or item quotations.
                 </CardDescription>
               </div>
-              <Button>
+              <Button disabled>
                 <FilePlus className="mr-2" /> Create Quotation
               </Button>
             </div>
@@ -147,7 +147,7 @@ export function FinanceModule() {
                   Track LPOs converted from approved quotations.
                 </CardDescription>
               </div>
-              <Button>
+              <Button disabled>
                 <FileText className="mr-2" /> Issue LPO
               </Button>
             </div>
@@ -190,7 +190,7 @@ export function FinanceModule() {
                   Manage and track supplier invoices.
                 </CardDescription>
               </div>
-              <Button>
+              <Button disabled>
                 <Receipt className="mr-2" /> Capture Invoice
               </Button>
             </div>
@@ -235,7 +235,7 @@ export function FinanceModule() {
                   Record and track payments made against invoices.
                 </CardDescription>
               </div>
-              <Button>
+              <Button disabled>
                 <DollarSign className="mr-2" /> Record Payment
               </Button>
             </div>
