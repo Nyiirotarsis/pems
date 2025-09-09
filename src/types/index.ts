@@ -1,3 +1,4 @@
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
 export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
@@ -89,4 +90,14 @@ export interface Payment {
     amount: number;
     method: "Bank" | "Cash" | "Mobile Money";
     receipt?: string;
+}
+
+// KPI Tracker Types
+export interface Kpi {
+    id: number;
+    userId: number;
+    category: string;
+    activityName: string;
+    description: string;
+    frequency: "Daily" | "Weekly" | "Monthly" | "Quarterly";
 }

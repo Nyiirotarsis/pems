@@ -1,4 +1,5 @@
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset } from "@/types";
+
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi } from "@/types";
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"];
 
@@ -122,5 +123,14 @@ export const mockPayments: Payment[] = [
     { id: 'P001', invoiceNumber: 'INV-2024-001', date: '2024-07-25', amount: 1500, method: 'Bank' },
     { id: 'P002', invoiceNumber: 'INV-2024-003', date: '2024-07-26', amount: 1000, method: 'Mobile Money' },
 ];
+
+export const mockKpis: Kpi[] = [
+    { id: 1, userId: 5, category: 'IT Support', activityName: 'Resolve Support Tickets', description: 'Resolve 95% of tier 1 support tickets within 24 hours.', frequency: 'Weekly' },
+    { id: 2, userId: 5, category: 'Infrastructure', activityName: 'Server Uptime', description: 'Maintain 99.9% server uptime across all production servers.', frequency: 'Monthly' },
+    { id: 3, userId: 6, category: 'Inventory Management', activityName: 'Stock Accuracy', description: 'Ensure physical stock count matches system records with 98% accuracy.', frequency: 'Quarterly' },
+    { id: 4, userId: 3, category: 'Financial Reporting', activityName: 'Monthly Closures', description: 'Complete monthly financial closure and reporting by the 5th working day.', frequency: 'Monthly' },
+    { id: 5, userId: 1, category: 'Strategic Growth', activityName: 'Market Expansion', description: 'Secure 2 new strategic partnerships in the designated new market.', frequency: 'Quarterly' },
+];
+
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';

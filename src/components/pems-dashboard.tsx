@@ -19,15 +19,17 @@ import {
   Check,
   LogOut,
   Landmark,
-  Wrench
+  Wrench,
+  ClipboardCheck,
+  PlusCircle,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, CONDITIONS } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification, Asset } from "@/types";
+import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers } from "@/lib/mock-data";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi } from "@/types";
 import { PEMSIcon } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,16 +105,17 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 
-type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance";
+type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi";
 
 const permissions: Record<UserRole, View[]> = {
-  "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications"],
-  "Finance Manager": ["finance", "requests", "reports", "notifications"],
-  "HR/Admin": ["reports", "notifications"],
-  "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
-  "Director": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
-  "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests"],
+  "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi"],
+  "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi"],
+  "HR/Admin": ["reports", "notifications", "kpi"],
+  "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance", "kpi"],
+  "Director": ["inventory", "assets", "requests", "reports", "notifications", "finance", "kpi"],
+  "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests", "kpi"],
 };
 
 const navItems: Record<
@@ -138,6 +141,11 @@ const navItems: Record<
     label: "Requests",
     icon: BotMessageSquare,
     forRoles: ["Store Manager", "Finance Manager", "CEO", "IT Managers", "Director"],
+  },
+  kpi: {
+    label: "KPI Tracker",
+    icon: ClipboardCheck,
+    forRoles: ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"],
   },
   finance: {
     label: "Finance",
@@ -174,6 +182,13 @@ const requestFormSchema = z.object({
   quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
 });
 
+const kpiFormSchema = z.object({
+    userId: z.string().min(1, "Please select a user."),
+    category: z.string().min(2, "Category is required."),
+    activityName: z.string().min(2, "Activity name is required."),
+    description: z.string().min(10, "Description must be at least 10 characters."),
+    frequency: z.enum(["Daily", "Weekly", "Monthly", "Quarterly"]),
+});
 
 export default function PEMSDashboard() {
   const { toast } = useToast();
@@ -181,6 +196,7 @@ export default function PEMSDashboard() {
   const [role, setRole] = React.useState<UserRole | null>(null);
   const [activeView, setActiveView] = React.useState<View>("inventory");
   const [inventory, setInventory] = React.useState<InventoryItem[]>(initialInventory);
+  const [kpis, setKpis] = React.useState<Kpi[]>(mockKpis);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
   
@@ -294,6 +310,19 @@ export default function PEMSDashboard() {
     );
   };
   
+  const addKpi = (values: z.infer<typeof kpiFormSchema>) => {
+      const newKpi: Kpi = {
+          id: Date.now(),
+          userId: parseInt(values.userId),
+          ...values,
+      };
+      setKpis(prev => [newKpi, ...prev]);
+      toast({
+        title: "KPI Added",
+        description: `A new KPI "${values.activityName}" has been added.`,
+      })
+  }
+
   const addNotification = (message: string, forRoles: UserRole[]) => {
     const newNotification: AppNotification = {
       id: Date.now(),
@@ -430,6 +459,7 @@ export default function PEMSDashboard() {
               />
             )}
             {activeView === "requests" && <RequestsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
+            {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} />}
             {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} />}
             {activeView === "notifications" && (
@@ -920,6 +950,173 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
     </Card>
   );
 }
+
+function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.infer<typeof kpiFormSchema>) => void }) {
+    const [open, setOpen] = React.useState(false);
+    const form = useForm<z.infer<typeof kpiFormSchema>>({
+        resolver: zodResolver(kpiFormSchema),
+        defaultValues: {
+            category: "",
+            activityName: "",
+            description: "",
+        },
+    });
+
+    const getUserDetails = (userId: number) => {
+        const user = mockUsers.find(u => u.id === userId);
+        return user ? { name: user.username, role: user.role } : { name: 'Unknown', role: 'Unknown' };
+    }
+
+    function onSubmit(values: z.infer<typeof kpiFormSchema>) {
+        onAddKpi(values);
+        form.reset();
+        setOpen(false);
+    }
+    
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <CardTitle className="font-headline">KPI Tracker</CardTitle>
+                        <CardDescription>Define and monitor Key Performance Indicators for staff.</CardDescription>
+                    </div>
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Add KPI
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle className="font-headline">Add New KPI</DialogTitle>
+                                <DialogDescription>Fill in the details for the new performance indicator.</DialogDescription>
+                            </DialogHeader>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="userId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>User</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a user" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {mockUsers.map((user) => (
+                                                            <SelectItem key={user.id} value={user.id.toString()}>
+                                                                {user.username} ({user.role})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="category"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Activity Category</FormLabel>
+                                                <FormControl><Input placeholder="e.g., Customer Service" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="activityName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Activity Name</FormLabel>
+                                                <FormControl><Input placeholder="e.g., Response Time" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>KPI Description</FormLabel>
+                                                <FormControl><Textarea placeholder="Describe the KPI..." {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="frequency"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Frequency</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select frequency" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {["Daily", "Weekly", "Monthly", "Quarterly"].map(f => (
+                                                            <SelectItem key={f} value={f}>{f}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <DialogFooter>
+                                        <DialogClose asChild><Button type="button" variant="secondary">Cancel</Button></DialogClose>
+                                        <Button type="submit">Save KPI</Button>
+                                    </DialogFooter>
+                                </form>
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Person</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Activity</TableHead>
+                            <TableHead>KPI Description</TableHead>
+                            <TableHead>Frequency</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {kpis.map((kpi) => {
+                            const user = getUserDetails(kpi.userId);
+                            return (
+                                <TableRow key={kpi.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{user.name}</div>
+                                        <div className="text-xs text-muted-foreground">{user.role}</div>
+                                    </TableCell>
+                                    <TableCell>{kpi.category}</TableCell>
+                                    <TableCell>{kpi.activityName}</TableCell>
+                                    <TableCell className="max-w-xs">{kpi.description}</TableCell>
+                                    <TableCell><Badge variant="secondary">{kpi.frequency}</Badge></TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    );
+}
+
 
 function ReportsView({ inventory }: { inventory: (InventoryItem & { available: number; total: number; })[] }) {
   const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
