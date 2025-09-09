@@ -15,6 +15,7 @@ import {
   FileText,
   Truck
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   mockQuotations,
   mockLPOs,
@@ -81,6 +82,7 @@ function StatusBadge({ status }: { status: FinancialStatus }) {
 
 
 export function FinanceModule() {
+  const router = useRouter();
   const [quotations, setQuotations] = React.useState<Quotation[]>(mockQuotations);
   const [lpos, setLpos] = React.useState<LPO[]>(mockLPOs);
   const [invoices, setInvoices] = React.useState<Invoice[]>(mockInvoices);
@@ -104,7 +106,7 @@ export function FinanceModule() {
                   Manage service or item quotations.
                 </CardDescription>
               </div>
-              <Button>
+              <Button onClick={() => router.push('/dashboard/finance/quotations/new')}>
                 <FilePlus className="mr-2" /> Create Quotation
               </Button>
             </div>
@@ -130,7 +132,7 @@ export function FinanceModule() {
                     <TableCell>${q.amount.toFixed(2)}</TableCell>
                     <TableCell><StatusBadge status={q.status} /></TableCell>
                     <TableCell className="text-right">
-                      <ItemActions item={q} />
+                      <ItemActions item={q} type="quotations"/>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -149,7 +151,7 @@ export function FinanceModule() {
                   Track LPOs converted from approved quotations.
                 </CardDescription>
               </div>
-              <Button>
+              <Button onClick={() => router.push('/dashboard/finance/lpos/new')}>
                 <FileText className="mr-2" /> Issue LPO
               </Button>
             </div>
@@ -174,7 +176,7 @@ export function FinanceModule() {
                             <TableCell>{lpo.date}</TableCell>
                             <TableCell>${lpo.amount.toFixed(2)}</TableCell>
                             <TableCell><StatusBadge status={lpo.status} /></TableCell>
-                            <TableCell className="text-right"><ItemActions item={lpo} /></TableCell>
+                            <TableCell className="text-right"><ItemActions item={lpo} type="lpos"/></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -192,7 +194,7 @@ export function FinanceModule() {
                   Manage and track supplier invoices.
                 </CardDescription>
               </div>
-              <Button>
+              <Button onClick={() => router.push('/dashboard/finance/invoices/new')}>
                 <Receipt className="mr-2" /> Capture Invoice
               </Button>
             </div>
@@ -219,7 +221,7 @@ export function FinanceModule() {
                             <TableCell>{inv.dueDate}</TableCell>
                             <TableCell>${inv.amount.toFixed(2)}</TableCell>
                             <TableCell><StatusBadge status={inv.status} /></TableCell>
-                            <TableCell className="text-right"><ItemActions item={inv} /></TableCell>
+                            <TableCell className="text-right"><ItemActions item={inv} type="invoices" /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -237,7 +239,7 @@ export function FinanceModule() {
                   Record and track payments made against invoices.
                 </CardDescription>
               </div>
-              <Button>
+              <Button onClick={() => router.push('/dashboard/finance/payments/new')}>
                 <DollarSign className="mr-2" /> Record Payment
               </Button>
             </div>
@@ -260,7 +262,7 @@ export function FinanceModule() {
                             <TableCell>{p.date}</TableCell>
                             <TableCell>${p.amount.toFixed(2)}</TableCell>
                             <TableCell>{p.method}</TableCell>
-                            <TableCell className="text-right"><ItemActions item={p} /></TableCell>
+                            <TableCell className="text-right"><ItemActions item={p} type="payments" /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -273,7 +275,25 @@ export function FinanceModule() {
 }
 
 
-function ItemActions({ item }: { item: any }) {
+function ItemActions({ item, type }: { item: any, type: string }) {
+    const router = useRouter();
+    
+    const handleAction = (action: 'edit' | 'attach' | 'delete') => {
+        switch(action) {
+            case 'edit':
+                router.push(`/dashboard/finance/${type}/${item.id}/edit`);
+                break;
+            case 'attach':
+                // We can open a modal for file upload here
+                alert(`Attach file for ${type} ${item.number || item.invoiceNumber}`);
+                break;
+            case 'delete':
+                // We can show a confirmation dialog here
+                alert(`Delete ${type} ${item.number || item.invoiceNumber}`);
+                break;
+        }
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -282,15 +302,15 @@ function ItemActions({ item }: { item: any }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                 <DropdownMenuItem>
+                 <DropdownMenuItem onClick={() => handleAction('edit')}>
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Edit</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAction('attach')}>
                     <Paperclip className="mr-2 h-4 w-4" />
                     <span>Attach File</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-500 focus:text-red-500">
+                <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => handleAction('delete')}>
                     <Trash2 className="mr-2 h-4 w-4" />
                     <span>Delete</span>
                 </DropdownMenuItem>
