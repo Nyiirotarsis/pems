@@ -103,12 +103,12 @@ import { Badge } from "@/components/ui/badge";
 type View = "inventory" | "transactions" | "requests" | "reports" | "notifications";
 
 const permissions: Record<UserRole, View[]> = {
-  "Store Manager": ["inventory", "transactions", "requests", "reports"],
+  "Store Manager": ["inventory", "transactions", "requests", "reports", "notifications"],
   "Finance Manager": ["requests", "reports", "notifications"],
   "HR/Admin": ["reports", "notifications"],
   CEO: ["inventory", "requests", "reports", "notifications"],
   Director: ["reports", "notifications"],
-  IT: ["inventory", "transactions"],
+  IT: ["inventory", "transactions", "notifications"],
 };
 
 const navItems: Record<
@@ -138,7 +138,7 @@ const navItems: Record<
   notifications: {
       label: "Notifications",
       icon: Bell,
-      forRoles: ["CEO", "Director", "Finance Manager", "HR/Admin"],
+      forRoles: ["CEO", "Director", "Finance Manager", "HR/Admin", "Store Manager", "IT"],
   }
 };
 
@@ -731,7 +731,7 @@ function RequestsView({ inventory, onNotify }: { inventory: InventoryItem[], onN
     setAiResponse(null);
     setInStock(null);
     
-    const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin"];
+    const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin", "IT"];
     onNotify(`A request was made for ${values.quantity} of "${values.item}".`, notificationRoles);
 
     const requestedItem = inventory.find(
