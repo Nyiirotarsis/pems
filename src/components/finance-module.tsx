@@ -104,7 +104,7 @@ export function FinanceModule() {
                   Manage service or item quotations.
                 </CardDescription>
               </div>
-              <Button disabled>
+              <Button>
                 <FilePlus className="mr-2" /> Create Quotation
               </Button>
             </div>
@@ -149,7 +149,7 @@ export function FinanceModule() {
                   Track LPOs converted from approved quotations.
                 </CardDescription>
               </div>
-              <Button disabled>
+              <Button>
                 <FileText className="mr-2" /> Issue LPO
               </Button>
             </div>
@@ -192,7 +192,7 @@ export function FinanceModule() {
                   Manage and track supplier invoices.
                 </CardDescription>
               </div>
-              <Button disabled>
+              <Button>
                 <Receipt className="mr-2" /> Capture Invoice
               </Button>
             </div>
@@ -237,7 +237,7 @@ export function FinanceModule() {
                   Record and track payments made against invoices.
                 </CardDescription>
               </div>
-              <Button disabled>
+              <Button>
                 <DollarSign className="mr-2" /> Record Payment
               </Button>
             </div>
@@ -282,15 +282,15 @@ function ItemActions({ item }: { item: any }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                 <DropdownMenuItem disabled>
+                 <DropdownMenuItem>
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Edit</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled>
+                <DropdownMenuItem>
                     <Paperclip className="mr-2 h-4 w-4" />
                     <span>Attach File</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled className="text-red-500 focus:text-red-500">
+                <DropdownMenuItem className="text-red-500 focus:text-red-500">
                     <Trash2 className="mr-2 h-4 w-4" />
                     <span>Delete</span>
                 </DropdownMenuItem>
