@@ -177,8 +177,9 @@ export default function PEMSDashboard() {
     } else {
       setRole(storedRole);
       // Set initial view based on role
-      const initialView = permissions[storedRole][0];
-      setActiveView(initialView);
+      if (permissions[storedRole].length > 0) {
+        setActiveView(permissions[storedRole][0]);
+      }
     }
   }, [router]);
   
@@ -283,11 +284,12 @@ export default function PEMSDashboard() {
         <SidebarContent>
           <SidebarMenu>
             {Object.entries(navItems).map(([key, item]) => {
+              const viewKey = key as View;
               if (item.forRoles.includes(role)) {
                 return (
                   <SidebarMenuItem key={key}>
                     <SidebarMenuButton
-                      onClick={() => handleViewChange(key as View)}
+                      onClick={() => handleViewChange(viewKey)}
                       isActive={activeView === key}
                     >
                       <item.icon />
