@@ -1,23 +1,444 @@
 
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { PlusCircle, Trash2, ArrowLeft } from "lucide-react";
+import { format } from "date-fns";
+
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const quotationItemSchema = z.object({
+  description: z.string().min(1, "Description is required."),
+  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
+  unitPrice: z.coerce.number().min(0, "Price must be a positive number."),
+});
+
+const quotationFormSchema = z.object({
+  quotationNumber: z.string().default("QUO-2025-001"),
+  date: z.date(),
+  clientName: z.string().min(2, "Client name is required."),
+  clientAddress: z.string().min(5, "Client address is required."),
+  clientEmail: z.string().email("Invalid email address."),
+  projectReference: z.string().min(2, "Project reference is required."),
+  preparedBy: z.string().default("Accountant Name"),
+  items: z.array(quotationItemSchema).min(1, "Please add at least one item."),
+  validFor: z.string().default("30 days"),
+  paymentTerms: z.string().default("50% upfront, 50% after event"),
+  deliveryTimeline: z.string().default("Within 5 days after confirmation"),
+});
+
+type QuotationFormValues = z.infer<typeof quotationFormSchema>;
 
 export default function NewQuotationPage() {
+  const { toast } = useToast();
+  const form = useForm<QuotationFormValues>({
+    resolver: zodResolver(quotationFormSchema),
+    defaultValues: {
+      quotationNumber: "QUO-2025-001",
+      date: new Date(),
+      clientName: "",
+      clientAddress: "",
+      clientEmail: "",
+      projectReference: "",
+      preparedBy: "Accountant Name", // Should be auto-filled with logged-in user
+      items: [{ description: "", quantity: 1, unitPrice: 0 }],
+      validFor: "30 days",
+      paymentTerms: "50% upfront, 50% after event",
+      deliveryTimeline: "Within 5 days after confirmation",
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "items",
+  });
+
+  const watchedItems = useWatch({
+    control: form.control,
+    name: "items",
+  });
+
+  const calculations = React.useMemo(() => {
+    const subtotal = watchedItems.reduce(
+      (acc, item) => acc + (item.quantity || 0) * (item.unitPrice || 0),
+      0
+    );
+    const tax = subtotal * 0.18;
+    const grandTotal = subtotal + tax;
+    return { subtotal, tax, grandTotal };
+  }, [watchedItems]);
+
+  function onSubmit(data: QuotationFormValues) {
+    console.log(data);
+    toast({
+      title: "Quotation Saved",
+      description: `Quotation ${data.quotationNumber} has been saved as a draft.`,
+    });
+  }
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <Card>
-        <CardHeader>
-          <CardTitle>Create New Quotation</CardTitle>
-          <CardDescription>Fill in the details to create a new quotation.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Quotation form will go here.</p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link href="/dashboard">Back to Dashboard</Link>
-          </Button>
-        </CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                 <div className="flex items-center gap-4">
+                  <Button asChild variant="outline" size="icon">
+                    <Link href="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+                  </Button>
+                  <div>
+                    <CardTitle className="font-headline text-2xl">
+                      Create New Quotation
+                    </CardTitle>
+                    <CardDescription>
+                      Fill in the details to generate a new quotation.
+                    </CardDescription>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                    <Button type="submit" variant="secondary">Save Draft</Button>
+                    <Button type="button" variant="outline" onClick={() => alert("Generate PDF clicked")}>Generate PDF</Button>
+                    <Button type="button" onClick={() => alert("Send to Client clicked")}>Send to Client</Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Header section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <FormField
+                  control={form.control}
+                  name="quotationNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quotation Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date</FormLabel>
+                       <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="projectReference"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event / Project Reference</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Corporate Launch" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="preparedBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prepared By</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+               {/* Client Details section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-2">
+                    <h3 className="font-semibold text-lg">Client Details</h3>
+                    <FormField
+                      control={form.control}
+                      name="clientName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Client Name / Company</FormLabel>
+                          <FormControl>
+                            <Input placeholder="ABC Media Ltd" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="clientEmail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Client Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="info@abcmedia.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                      control={form.control}
+                      name="clientAddress"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col h-full">
+                          <FormLabel>Client Address</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Plot 45, Kampala Road" className="flex-grow" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+              </div>
+
+              {/* Items Table section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Quotation Items</h3>
+                <div className="border rounded-md">
+                   <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-1/2">Item Description</TableHead>
+                        <TableHead>Qty</TableHead>
+                        <TableHead>Unit Price</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="w-[50px]"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {fields.map((field, index) => (
+                        <TableRow key={field.id}>
+                          <TableCell>
+                            <FormField
+                              control={form.control}
+                              name={`items.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input placeholder="e.g., LED Screen Hire" {...field} />
+                                  </FormControl>
+                                  <FormMessage/>
+                                </FormItem>
+                              )}
+                            />
+                          </TableCell>
+                           <TableCell>
+                             <FormField
+                              control={form.control}
+                              name={`items.${index}.quantity`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                   <FormMessage/>
+                                </FormItem>
+                              )}
+                            />
+                          </TableCell>
+                           <TableCell>
+                            <FormField
+                              control={form.control}
+                              name={`items.${index}.unitPrice`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                   <FormMessage/>
+                                </FormItem>
+                              )}
+                            />
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {(
+                              (watchedItems[index]?.quantity || 0) *
+                              (watchedItems[index]?.unitPrice || 0)
+                            ).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => remove(index)}
+                              disabled={fields.length <= 1}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => append({ description: "", quantity: 1, unitPrice: 0 })}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Item
+                </Button>
+              </div>
+
+               {/* Totals Section */}
+                <div className="flex justify-end">
+                    <div className="w-full max-w-sm space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Subtotal</span>
+                            <span className="font-medium">{calculations.subtotal.toLocaleString()}</span>
+                        </div>
+                         <div className="flex justify-between">
+                            <span className="text-muted-foreground">Tax (18% VAT)</span>
+                            <span className="font-medium">{calculations.tax.toLocaleString()}</span>
+                        </div>
+                         <div className="flex justify-between text-lg font-bold border-t pt-2">
+                            <span>Grand Total</span>
+                            <span>{calculations.grandTotal.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+              {/* Terms & Conditions section */}
+              <div>
+                 <h3 className="font-semibold text-lg mb-2">Terms & Conditions</h3>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="validFor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Quotation valid for</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                           <FormMessage/>
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="deliveryTimeline"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Delivery Timeline</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                           <FormMessage/>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="md:col-span-2">
+                       <FormField
+                          control={form.control}
+                          name="paymentTerms"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Payment Terms</FormLabel>
+                              <FormControl>
+                                <Textarea {...field} />
+                              </FormControl>
+                               <FormMessage/>
+                            </FormItem>
+                          )}
+                        />
+                    </div>
+                 </div>
+              </div>
+              
+            </CardContent>
+            <CardFooter>
+                 <div className="flex gap-2">
+                    <Button type="button" variant="outline">Attach Supporting Docs</Button>
+                 </div>
+            </CardFooter>
+          </form>
+        </Form>
       </Card>
     </div>
   );
 }
+
