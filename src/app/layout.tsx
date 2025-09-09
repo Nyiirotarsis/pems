@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'StockPilot',
+  title: 'PEMS',
   description: 'Manage your inventory with ease.',
 };
 

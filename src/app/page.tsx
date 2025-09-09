@@ -1,5 +1,5 @@
-import StockPilotDashboard from "@/components/stockpilot-dashboard";
+import PEMSDashboard from "@/components/pems-dashboard";
 
 export default function Home() {
-  return <StockPilotDashboard />;
+  return <PEMSDashboard />;
 }

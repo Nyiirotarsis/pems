@@ -1,4 +1,4 @@
-export function StockPilotIcon(props: React.SVGProps<SVGSVGElement>) {
+export function PEMSIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
