@@ -1,4 +1,4 @@
-export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT";
+export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
 export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
 

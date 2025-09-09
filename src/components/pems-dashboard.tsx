@@ -112,7 +112,7 @@ const permissions: Record<UserRole, View[]> = {
   "HR/Admin": ["reports", "notifications"],
   "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
   "Director": ["inventory", "assets", "requests", "reports", "notifications", "finance"],
-  "IT": ["inventory", "assets", "transactions", "notifications", "requests"],
+  "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests"],
 };
 
 const navItems: Record<
@@ -122,22 +122,22 @@ const navItems: Record<
   inventory: {
     label: "Inventory",
     icon: PackageSearch,
-    forRoles: ["Store Manager", "CEO", "IT", "Director"],
+    forRoles: ["Store Manager", "CEO", "IT Managers", "Director"],
   },
   assets: {
       label: "Assets",
       icon: Wrench,
-      forRoles: ["Store Manager", "CEO", "IT", "Director"],
+      forRoles: ["Store Manager", "CEO", "IT Managers", "Director"],
   },
   transactions: {
     label: "Issue / Return",
     icon: ArrowRightLeft,
-    forRoles: ["Store Manager", "IT"],
+    forRoles: ["Store Manager", "IT Managers"],
   },
   requests: {
     label: "Requests",
     icon: BotMessageSquare,
-    forRoles: ["Store Manager", "Finance Manager", "CEO", "IT", "Director"],
+    forRoles: ["Store Manager", "Finance Manager", "CEO", "IT Managers", "Director"],
   },
   finance: {
     label: "Finance",
@@ -152,7 +152,7 @@ const navItems: Record<
   notifications: {
       label: "Notifications",
       icon: Bell,
-      forRoles: ["Store Manager", "CEO", "Director", "Finance Manager", "HR/Admin", "IT"],
+      forRoles: ["Store Manager", "CEO", "Director", "Finance Manager", "HR/Admin", "IT Managers"],
   }
 };
 
@@ -791,7 +791,7 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
     setAiResponse(null);
     setInStock(null);
     
-    const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin", "IT"];
+    const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin", "IT Managers"];
     onNotify(`A request was made for ${values.quantity} of "${values.item}".`, notificationRoles);
 
     const requestedItem = inventory.find(
@@ -1051,5 +1051,3 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
-
-    
