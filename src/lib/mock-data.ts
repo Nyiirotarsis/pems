@@ -1,8 +1,8 @@
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset } from "@/types";
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT"];
 
-export const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost"];
+export const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost", "Faulty"];
 
 export const USERS: User[] = [
     { id: 1, username: 'ceo', password: '123', role: 'CEO' },
@@ -13,52 +13,63 @@ export const USERS: User[] = [
     { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
 ];
 
+function generateAssets(equipmentId: number, name: string, count: number, faultyCount = 0): Asset[] {
+    const assets: Asset[] = [];
+    const namePrefix = name.substring(0, 3).toUpperCase();
+    for (let i = 1; i <= count; i++) {
+        const isFaulty = i <= faultyCount;
+        assets.push({
+            id: `${namePrefix}-${equipmentId}-${String(i).padStart(4, '0')}`,
+            equipmentId,
+            condition: isFaulty ? 'Faulty' : 'Good',
+            status: 'Available',
+            purchaseDate: '2023-01-15'
+        });
+    }
+    return assets;
+}
+
+
 export const initialInventory: InventoryItem[] = [
   {
     id: 1,
     name: "Microphone",
-    total: 50,
-    available: 35,
+    assets: generateAssets(1, "Microphone", 50, 2),
     lastUpdated: "2023-10-26",
     transactions: [],
   },
   {
     id: 2,
     name: "Projector",
-    total: 20,
-    available: 18,
+    assets: generateAssets(2, "Projector", 20, 1),
     lastUpdated: "2023-10-25",
     transactions: [],
   },
   {
     id: 3,
     name: "Laptop",
-    total: 100,
-    available: 80,
+    assets: generateAssets(3, "Laptop", 100, 5),
     lastUpdated: "2023-10-27",
     transactions: [],
   },
   {
     id: 4,
     name: "Conference Speaker",
-    total: 30,
-    available: 30,
+    assets: generateAssets(4, "Conference Speaker", 30, 0),
     lastUpdated: "2023-10-22",
     transactions: [],
   },
   {
     id: 5,
     name: "HDMI Cable (10ft)",
-    total: 200,
-    available: 150,
+    assets: generateAssets(5, "HDMI Cable", 200, 10),
     lastUpdated: "2023-10-27",
     transactions: [],
   },
   {
     id: 6,
     name: "Whiteboard",
-    total: 15,
-    available: 12,
+    assets: generateAssets(6, "Whiteboard", 15),
     lastUpdated: "2023-10-24",
     transactions: [],
   },

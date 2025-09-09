@@ -17,7 +17,8 @@ import {
   Bell,
   Check,
   LogOut,
-  Landmark
+  Landmark,
+  Wrench
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,7 @@ import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification } from "@/types";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset } from "@/types";
 import { PEMSIcon } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -102,15 +103,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-type View = "inventory" | "transactions" | "requests" | "reports" | "notifications" | "finance";
+type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance";
 
 const permissions: Record<UserRole, View[]> = {
-  "Store Manager": ["inventory", "transactions", "requests", "reports", "notifications"],
+  "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications"],
   "Finance Manager": ["finance", "requests", "reports", "notifications"],
   "HR/Admin": ["reports", "notifications"],
-  "CEO": ["inventory", "requests", "reports", "notifications"],
+  "CEO": ["inventory", "assets", "requests", "reports", "notifications"],
   "Director": ["reports", "notifications"],
-  "IT": ["inventory", "transactions", "notifications"],
+  "IT": ["inventory", "assets", "transactions", "notifications"],
 };
 
 const navItems: Record<
@@ -121,6 +122,11 @@ const navItems: Record<
     label: "Inventory",
     icon: PackageSearch,
     forRoles: ["Store Manager", "CEO", "IT"],
+  },
+  assets: {
+      label: "Assets",
+      icon: Wrench,
+      forRoles: ["Store Manager", "CEO", "IT"],
   },
   transactions: {
     label: "Issue / Return",
@@ -189,14 +195,28 @@ export default function PEMSDashboard() {
       }
     }
   }, [router]);
+
+  const getInventoryTotals = (item: InventoryItem) => {
+    const total = item.assets.length;
+    const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
+    const faulty = item.assets.filter(a => a.condition === 'Faulty').length;
+    return { total, available, faulty };
+  };
   
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ).map(item => ({
+    ...item,
+    ...getInventoryTotals(item)
+  }));
   
   const handleViewChange = (view: View) => {
     if (role && permissions[role].includes(view)) {
-      setActiveView(view);
+        if (view === 'assets') {
+            router.push('/dashboard/assets');
+        } else {
+            setActiveView(view);
+        }
     }
   };
 
@@ -223,25 +243,46 @@ export default function PEMSDashboard() {
     setInventory((prevInventory) =>
       prevInventory.map((item) => {
         if (item.id === equipmentId) {
-          let newAvailable = item.available;
-          let newTotal = item.total;
-          if (type === "issue") {
-            newAvailable -= quantity;
-          } else if (type === "return") {
-            if (condition === "Good") {
-              newAvailable += quantity;
+            let updatedAssets = [...item.assets];
+            if(type === 'restock') {
+                const namePrefix = item.name.substring(0, 3).toUpperCase();
+                const lastAssetIdNum = item.assets.length > 0 ? parseInt(item.assets[item.assets.length - 1].id.split('-').pop() || '0') : 0;
+
+                for (let i = 1; i <= quantity; i++) {
+                    const newAsset: Asset = {
+                        id: `${namePrefix}-${item.id}-${String(lastAssetIdNum + i).padStart(4, '0')}`,
+                        equipmentId: item.id,
+                        condition: 'Good',
+                        status: 'Available',
+                        purchaseDate: new Date().toISOString().split("T")[0],
+                    };
+                    updatedAssets.push(newAsset);
+                }
+            } else if (type === 'issue') {
+                const availableAssets = updatedAssets.filter(a => a.status === 'Available' && a.condition === 'Good').slice(0, quantity);
+                availableAssets.forEach(a => {
+                    const asset = updatedAssets.find(ua => ua.id === a.id);
+                    if (asset) asset.status = 'Issued';
+                });
+            } else if (type === 'return') {
+                 // This part needs more specific logic, for now we just assume a generic return.
+                 // We'd need to know *which* assets are being returned to update them properly.
+                 // For now, let's find issued assets and mark them as available.
+                 const issuedAssets = updatedAssets.filter(a => a.status === 'Issued').slice(0, quantity);
+                 issuedAssets.forEach(a => {
+                    const asset = updatedAssets.find(ua => ua.id === a.id);
+                    if (asset) {
+                        asset.status = 'Available';
+                        asset.condition = condition || 'Good';
+                    }
+                });
             }
-            // If damaged or lost, available count doesn't increase but total might be adjusted later
-          } else if (type === "restock") {
-            newAvailable += quantity;
-            newTotal += quantity;
-          }
-          return {
-            ...item,
-            available: newAvailable,
-            total: newTotal,
-            lastUpdated: new Date().toISOString().split("T")[0],
-          };
+
+            return {
+                ...item,
+                assets: updatedAssets,
+                lastUpdated: new Date().toISOString().split("T")[0],
+            };
         }
         return item;
       })
@@ -364,7 +405,7 @@ export default function PEMSDashboard() {
             )}
             {activeView === "transactions" && (
               <TransactionsView 
-                inventory={inventory} 
+                inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} 
                 onIssue={(values) => {
                   const equipmentId = parseInt(values.equipmentId);
                   updateInventory(equipmentId, values.quantity, "issue");
@@ -383,9 +424,9 @@ export default function PEMSDashboard() {
                 }}
               />
             )}
-            {activeView === "requests" && <RequestsView inventory={inventory} onNotify={addNotification} />}
+            {activeView === "requests" && <RequestsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "finance" && <FinanceModule />}
-            {activeView === "reports" && <ReportsView inventory={inventory} />}
+            {activeView === "reports" && <ReportsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} />}
             {activeView === "notifications" && (
                 <NotificationsView
                     notifications={notifications.filter(n => n.forRoles.includes(role))}
@@ -399,7 +440,7 @@ export default function PEMSDashboard() {
   );
 }
 
-function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { inventory: InventoryItem[], searchQuery: string, setSearchQuery: (q: string) => void, onRestock: (values: z.infer<typeof restockFormSchema>) => void }) {
+function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { inventory: (InventoryItem & { available: number; total: number; faulty: number; })[], searchQuery: string, setSearchQuery: (q: string) => void, onRestock: (values: z.infer<typeof restockFormSchema>) => void }) {
   const [open, setOpen] = React.useState(false);
   const form = useForm<z.infer<typeof restockFormSchema>>({
     resolver: zodResolver(restockFormSchema),
@@ -439,7 +480,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle className="font-headline">Restock Inventory</DialogTitle>
-                  <DialogDescription>Log the receipt of new stock.</DialogDescription>
+                  <DialogDescription>Add new serialized assets to the inventory.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -512,6 +553,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
             <TableRow>
               <TableHead>Equipment</TableHead>
               <TableHead className="text-center">Available</TableHead>
+              <TableHead className="text-center">Faulty</TableHead>
               <TableHead className="text-center">Total</TableHead>
               <TableHead>Last Updated</TableHead>
             </TableRow>
@@ -526,13 +568,18 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                         {item.available}
                      </Badge>
                   </TableCell>
+                   <TableCell className="text-center">
+                     <Badge variant={item.faulty > 0 ? "destructive" : "outline"} className={cn(item.faulty > 0 && "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200")}>
+                        {item.faulty}
+                     </Badge>
+                  </TableCell>
                   <TableCell className="text-center">{item.total}</TableCell>
                   <TableCell>{item.lastUpdated}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center h-24">
+                <TableCell colSpan={5} className="text-center h-24">
                   No items match your search.
                 </TableCell>
               </TableRow>
@@ -544,7 +591,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
   );
 }
 
-function TransactionsView({ inventory, onIssue, onReturn }: { inventory: InventoryItem[], onIssue: (v: any) => void, onReturn: (v: any) => void }) {
+function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (InventoryItem & { available: number; total: number; })[], onIssue: (v: any) => void, onReturn: (v: any) => void }) {
   const issueForm = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: { quantity: 1, date: new Date() },
@@ -616,7 +663,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: Invento
   );
 }
 
-function TransactionFormFields({ form, inventory, type }: { form: any, inventory: InventoryItem[], type: 'issue' | 'return' }) {
+function TransactionFormFields({ form, inventory, type }: { form: any, inventory: (InventoryItem & { available: number; total: number; })[], type: 'issue' | 'return' }) {
   return (
     <>
       <FormField
@@ -724,7 +771,7 @@ function TransactionFormFields({ form, inventory, type }: { form: any, inventory
   );
 }
 
-function RequestsView({ inventory, onNotify }: { inventory: InventoryItem[], onNotify: (message: string, roles: UserRole[]) => void }) {
+function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { available: number; total: number; })[], onNotify: (message: string, roles: UserRole[]) => void }) {
   const [isPending, startTransition] = useTransition();
   const [aiResponse, setAiResponse] = React.useState<SuggestOutsourcingOptionsOutput | null>(null);
   const [inStock, setInStock] = React.useState<boolean | null>(null);
@@ -869,7 +916,7 @@ function RequestsView({ inventory, onNotify }: { inventory: InventoryItem[], onN
   );
 }
 
-function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
+function ReportsView({ inventory }: { inventory: (InventoryItem & { available: number; total: number; })[] }) {
   const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
   const totalAvailable = inventory.reduce((sum, item) => sum + item.available, 0);
   const mostStocked = inventory.reduce((max, item) => item.total > max.total ? item : max, inventory[0]);

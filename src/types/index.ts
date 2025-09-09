@@ -1,6 +1,6 @@
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT";
 
-export type Condition = "Good" | "Damaged" | "Lost";
+export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
 
 export interface User {
   id: number;
@@ -9,14 +9,25 @@ export interface User {
   role: UserRole;
 }
 
+export interface Asset {
+  id: string; // Engraved serial number
+  equipmentId: number;
+  condition: Condition;
+  status: 'Available' | 'Issued';
+  purchaseDate: string;
+}
+
 export interface InventoryItem {
   id: number;
   name: string;
-  total: number;
-  available: number;
+  assets: Asset[]; // Now tracks individual assets
   lastUpdated: string;
   transactions: Transaction[];
 }
+
+// Derived properties will be calculated on the fly, so we remove them from the core type.
+// total: number; 
+// available: number;
 
 export interface Transaction {
   type: 'issue' | 'return' | 'restock';
@@ -24,6 +35,7 @@ export interface Transaction {
   quantity: number;
   condition?: Condition;
   receivedBy?: string;
+  assetIds?: string[];
 }
 
 export interface AppNotification {
