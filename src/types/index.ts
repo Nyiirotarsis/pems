@@ -25,3 +25,11 @@ export interface Transaction {
   condition?: Condition;
   receivedBy?: string;
 }
+
+export interface AppNotification {
+  id: number;
+  message: string;
+  date: string;
+  read: boolean;
+  forRoles: UserRole[];
+}

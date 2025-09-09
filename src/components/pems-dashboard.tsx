@@ -14,12 +14,14 @@ import {
   PackagePlus,
   Calendar as CalendarIcon,
   Search,
+  Bell,
+  Check,
 } from "lucide-react";
 import { useTransition } from "react";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition } from "@/types";
+import type { UserRole, InventoryItem, Condition, AppNotification } from "@/types";
 import { PEMSIcon } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -96,14 +98,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-type View = "inventory" | "transactions" | "requests" | "reports";
+type View = "inventory" | "transactions" | "requests" | "reports" | "notifications";
 
 const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "transactions", "requests", "reports"],
-  "Finance Manager": ["requests", "reports"],
-  "HR/Admin": ["reports"],
-  CEO: ["inventory", "requests", "reports"],
-  Director: ["reports"],
+  "Finance Manager": ["requests", "reports", "notifications"],
+  "HR/Admin": ["reports", "notifications"],
+  CEO: ["inventory", "requests", "reports", "notifications"],
+  Director: ["reports", "notifications"],
   IT: ["inventory", "transactions"],
 };
 
@@ -131,6 +133,11 @@ const navItems: Record<
     icon: FileText,
     forRoles: ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director"],
   },
+  notifications: {
+      label: "Notifications",
+      icon: Bell,
+      forRoles: ["CEO", "Director", "Finance Manager", "HR/Admin"],
+  }
 };
 
 const transactionFormSchema = z.object({
@@ -158,6 +165,7 @@ export default function PEMSDashboard() {
   const [activeView, setActiveView] = React.useState<View>("inventory");
   const [inventory, setInventory] = React.useState<InventoryItem[]>(initialInventory);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
 
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -211,6 +219,25 @@ export default function PEMSDashboard() {
     );
   };
   
+  const addNotification = (message: string, forRoles: UserRole[]) => {
+    const newNotification: AppNotification = {
+      id: Date.now(),
+      message,
+      date: new Date().toISOString(),
+      read: false,
+      forRoles,
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const markNotificationAsRead = (id: number) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  const unreadCount = notifications.filter(n => n.forRoles.includes(role) && !n.read).length;
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -235,6 +262,9 @@ export default function PEMSDashboard() {
                     >
                       <item.icon />
                       <span>{item.label}</span>
+                      {key === 'notifications' && unreadCount > 0 && (
+                        <Badge className="ml-auto">{unreadCount}</Badge>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -310,8 +340,14 @@ export default function PEMSDashboard() {
                 }}
               />
             )}
-            {activeView === "requests" && <RequestsView inventory={inventory} />}
+            {activeView === "requests" && <RequestsView inventory={inventory} onNotify={addNotification} />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
+            {activeView === "notifications" && (
+                <NotificationsView
+                    notifications={notifications.filter(n => n.forRoles.includes(role))}
+                    onMarkAsRead={markNotificationAsRead}
+                />
+            )}
           </main>
         </div>
       </SidebarInset>
@@ -644,7 +680,7 @@ function TransactionFormFields({ form, inventory, type }: { form: any, inventory
   );
 }
 
-function RequestsView({ inventory }: { inventory: InventoryItem[] }) {
+function RequestsView({ inventory, onNotify }: { inventory: InventoryItem[], onNotify: (message: string, roles: UserRole[]) => void }) {
   const [isPending, startTransition] = useTransition();
   const [aiResponse, setAiResponse] = React.useState<SuggestOutsourcingOptionsOutput | null>(null);
   const [inStock, setInStock] = React.useState<boolean | null>(null);
@@ -658,6 +694,9 @@ function RequestsView({ inventory }: { inventory: InventoryItem[] }) {
   function onSubmit(values: z.infer<typeof requestFormSchema>) {
     setAiResponse(null);
     setInStock(null);
+    
+    const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin"];
+    onNotify(`A request was made for ${values.quantity} of "${values.item}".`, notificationRoles);
 
     const requestedItem = inventory.find(
       (item) => item.name.toLowerCase() === values.item.toLowerCase()
@@ -811,7 +850,7 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalAvailable}</div>
-              <p className="text-xs text-muted-foreground">{Math.round((totalAvailable/totalItems) * 100)}% of stock on hand</p>
+              <p className="text-xs text-muted-foreground">{totalItems > 0 ? Math.round((totalAvailable/totalItems) * 100) : 0}% of stock on hand</p>
             </CardContent>
           </Card>
           <Card>
@@ -820,8 +859,8 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
               <PackagePlus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{mostStocked?.name}</div>
-              <p className="text-xs text-muted-foreground">{mostStocked?.total} total units</p>
+              <div className="text-2xl font-bold">{mostStocked?.name || 'N/A'}</div>
+              <p className="text-xs text-muted-foreground">{mostStocked?.total || 0} total units</p>
             </CardContent>
           </Card>
           <Card>
@@ -830,8 +869,8 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
               <PackageSearch className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{leastAvailable?.name}</div>
-              <p className="text-xs text-muted-foreground">{leastAvailable?.available} units available</p>
+              <div className="text-2xl font-bold">{leastAvailable?.name || 'N/A'}</div>
+              <p className="text-xs text-muted-foreground">{leastAvailable?.available || 0} units available</p>
             </CardContent>
           </Card>
         </div>
@@ -856,7 +895,7 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
                     <div className="h-2.5 w-full rounded-full bg-secondary">
                         <div 
                           className="h-2.5 rounded-full bg-primary" 
-                          style={{ width: `${(item.available/item.total)*100}%` }}
+                          style={{ width: `${item.total > 0 ? (item.available/item.total)*100 : 0}%` }}
                         />
                     </div>
                   </TableCell>
@@ -865,6 +904,42 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
             </TableBody>
           </Table>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function NotificationsView({ notifications, onMarkAsRead }: { notifications: AppNotification[], onMarkAsRead: (id: number) => void }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-headline">Notifications</CardTitle>
+        <CardDescription>Recent alerts and updates.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {notifications.length === 0 ? (
+          <div className="text-center text-muted-foreground py-12">
+            <Bell className="mx-auto h-12 w-12" />
+            <p className="mt-4">No notifications yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {notifications.map(n => (
+              <div key={n.id} className={cn("flex items-start gap-4 p-4 rounded-lg border", n.read ? "bg-secondary/50" : "bg-card")}>
+                <div className="flex-1">
+                  <p className={cn("text-sm", !n.read && "font-semibold")}>{n.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{format(new Date(n.date), "PPP p")}</p>
+                </div>
+                {!n.read && (
+                  <Button variant="ghost" size="sm" onClick={() => onMarkAsRead(n.id)}>
+                    <Check className="mr-2 h-4 w-4" />
+                    Mark as Read
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
