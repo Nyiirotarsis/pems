@@ -652,7 +652,7 @@ function RequestsView({ inventory }: { inventory: InventoryItem[] }) {
 
   const form = useForm<z.infer<typeof requestFormSchema>>({
     resolver: zodResolver(requestFormSchema),
-    defaultValues: { quantity: 1 },
+    defaultValues: { item: "", quantity: 1 },
   });
 
   function onSubmit(values: z.infer<typeof requestFormSchema>) {
