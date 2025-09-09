@@ -35,7 +35,7 @@ export interface AppNotification {
 }
 
 // Finance Module Types
-export type FinancialStatus = "Pending" | "Approved" | "Rejected" | "Paid" | "Partially Paid" | "Delivered";
+export type FinancialStatus = "Pending" | "Approved" | "Rejected" | "Paid" | "Partially Paid" | "Delivered" | "Unpaid";
 
 export interface Quotation {
   id: string;

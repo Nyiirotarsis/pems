@@ -56,6 +56,7 @@ const statusColors: Record<FinancialStatus, string> = {
     Paid: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700",
     "Partially Paid": "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-700",
     Delivered: "bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-700",
+    Unpaid: "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700",
 };
 
 const statusIcons: Record<FinancialStatus, React.ElementType> = {
@@ -65,6 +66,7 @@ const statusIcons: Record<FinancialStatus, React.ElementType> = {
     Paid: DollarSign,
     "Partially Paid": DollarSign,
     Delivered: Truck,
+    Unpaid: Clock,
 };
 
 function StatusBadge({ status }: { status: FinancialStatus }) {
@@ -272,9 +274,6 @@ export function FinanceModule() {
 
 
 function ItemActions({ item }: { item: any }) {
-    const canEdit = item.status === "Pending";
-    const canDelete = item.status === "Pending" || item.status === "Rejected";
-
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -283,15 +282,15 @@ function ItemActions({ item }: { item: any }) {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                 <DropdownMenuItem disabled={!canEdit}>
+                 <DropdownMenuItem disabled>
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Edit</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem disabled>
                     <Paperclip className="mr-2 h-4 w-4" />
                     <span>Attach File</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled={!canDelete} className="text-red-500 focus:text-red-500">
+                <DropdownMenuItem disabled className="text-red-500 focus:text-red-500">
                     <Trash2 className="mr-2 h-4 w-4" />
                     <span>Delete</span>
                 </DropdownMenuItem>
