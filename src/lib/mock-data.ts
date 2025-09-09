@@ -10,7 +10,7 @@ export const USERS: User[] = [
     { id: 3, username: 'accountant', password: 'password', role: 'Finance Manager' },
     { id: 4, username: 'hr', password: 'password', role: 'HR/Admin' },
     { id: 5, username: 'it', password: 'password', role: 'IT' },
-    { id: 6, username: 'storemanager', password: 'password', role: 'Store Manager' },
+    { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
 ];
 
 export const initialInventory: InventoryItem[] = [
