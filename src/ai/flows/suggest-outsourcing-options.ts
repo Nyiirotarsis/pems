@@ -38,12 +38,35 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestOutsourcingOptionsOutputSchema},
   prompt: `You are a helpful assistant that suggests outsourcing options for equipment when it is not available in the inventory.
 
-  Provide a list of potential vendors, budgetary estimates, and contact information for the following item and quantity:
+  You must provide a list of 3 potential vendors, budgetary estimates, and contact information for the following item and quantity.
 
   Item: {{item}}
   Quantity: {{quantity}}
 
-  Format your response as a JSON array of objects with vendor, estimate, and contact fields.
+  You must format your response as a valid JSON object that conforms to the following Zod schema. Do not include any other text or formatting.
+  Your output must be a single JSON object that can be parsed by JSON.parse.
+
+  Schema:
+  \`\`\`json
+  {
+    "type": "object",
+    "properties": {
+      "suggestions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "vendor": { "type": "string" },
+            "estimate": { "type": "string" },
+            "contact": { "type": "string" }
+          },
+          "required": ["vendor", "estimate", "contact"]
+        }
+      }
+    },
+    "required": ["suggestions"]
+  }
+  \`\`\`
   `,
 });
 
@@ -55,6 +78,9 @@ const suggestOutsourcingOptionsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      return {suggestions: []};
+    }
+    return output;
   }
 );
