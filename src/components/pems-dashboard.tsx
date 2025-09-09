@@ -17,9 +17,11 @@ import {
   Bell,
   Check,
   LogOut,
+  Landmark
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS } from "@/lib/mock-data";
@@ -100,15 +102,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-type View = "inventory" | "transactions" | "requests" | "reports" | "notifications";
+type View = "inventory" | "transactions" | "requests" | "reports" | "notifications" | "finance";
 
 const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "transactions", "requests", "reports", "notifications"],
-  "Finance Manager": ["requests", "reports", "notifications"],
+  "Finance Manager": ["finance", "requests", "reports", "notifications"],
   "HR/Admin": ["reports", "notifications"],
-  CEO: ["inventory", "requests", "reports", "notifications"],
-  Director: ["reports", "notifications"],
-  IT: ["inventory", "transactions", "notifications"],
+  "CEO": ["inventory", "requests", "reports", "notifications"],
+  "Director": ["reports", "notifications"],
+  "IT": ["inventory", "transactions", "notifications"],
 };
 
 const navItems: Record<
@@ -130,6 +132,11 @@ const navItems: Record<
     icon: BotMessageSquare,
     forRoles: ["Store Manager", "Finance Manager", "CEO"],
   },
+  finance: {
+    label: "Finance",
+    icon: Landmark,
+    forRoles: ["Finance Manager"],
+  },
   reports: {
     label: "Reports",
     icon: FileText,
@@ -138,7 +145,7 @@ const navItems: Record<
   notifications: {
       label: "Notifications",
       icon: Bell,
-      forRoles: ["CEO", "Director", "Finance Manager", "HR/Admin", "Store Manager", "IT"],
+      forRoles: ["Store Manager", "CEO", "Director", "Finance Manager", "HR/Admin", "IT"],
   }
 };
 
@@ -377,6 +384,7 @@ export default function PEMSDashboard() {
               />
             )}
             {activeView === "requests" && <RequestsView inventory={inventory} onNotify={addNotification} />}
+            {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
             {activeView === "notifications" && (
                 <NotificationsView
