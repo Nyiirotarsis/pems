@@ -1,5 +1,5 @@
-import PEMSDashboard from "@/components/pems-dashboard";
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  return <PEMSDashboard />;
+  redirect('/login');
 }

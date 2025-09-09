@@ -1,8 +1,17 @@
-import type { UserRole, Condition, InventoryItem } from "@/types";
+import type { UserRole, Condition, InventoryItem, User } from "@/types";
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT"];
 
 export const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost"];
+
+export const USERS: User[] = [
+    { id: 1, username: 'ceo', password: 'password', role: 'CEO' },
+    { id: 2, username: 'director', password: 'password', role: 'Director' },
+    { id: 3, username: 'accountant', password: 'password', role: 'Finance Manager' },
+    { id: 4, username: 'hr', password: 'password', role: 'HR/Admin' },
+    { id: 5, username: 'it', password: 'password', role: 'IT' },
+    { id: 6, username: 'storemanager', password: 'password', role: 'Store Manager' },
+];
 
 export const initialInventory: InventoryItem[] = [
   {

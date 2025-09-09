@@ -2,6 +2,13 @@ export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" 
 
 export type Condition = "Good" | "Damaged" | "Lost";
 
+export interface User {
+  id: number;
+  username: string;
+  password?: string; // Should not be sent to client
+  role: UserRole;
+}
+
 export interface InventoryItem {
   id: number;
   name: string;
