@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -13,6 +14,7 @@ import {
   Package,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   initialInventory,
   mockUsers,
@@ -91,6 +93,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function AssetsPage() {
+  const router = useRouter();
   const [assets, setAssets] = React.useState<AssetWithDetails[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("All");
 
@@ -159,9 +162,11 @@ export default function AssetsPage() {
                 <FileDown className="mr-2" />
                 Export
               </Button>
-              <Button>
-                <PlusCircle className="mr-2" />
-                Add Asset
+              <Button asChild>
+                <Link href="/dashboard/assets/new">
+                    <PlusCircle className="mr-2" />
+                    Add Asset
+                </Link>
               </Button>
             </div>
           </div>
@@ -202,7 +207,7 @@ export default function AssetsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => router.push(`/dashboard/assets/${asset.id}/edit`)}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
