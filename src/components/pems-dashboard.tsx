@@ -16,8 +16,10 @@ import {
   Search,
   Bell,
   Check,
+  LogOut,
 } from "lucide-react";
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS } from "@/lib/mock-data";
@@ -161,28 +163,47 @@ const requestFormSchema = z.object({
 
 export default function PEMSDashboard() {
   const { toast } = useToast();
-  const [role, setRole] = React.useState<UserRole>("Store Manager");
+  const router = useRouter();
+  const [role, setRole] = React.useState<UserRole | null>(null);
   const [activeView, setActiveView] = React.useState<View>("inventory");
   const [inventory, setInventory] = React.useState<InventoryItem[]>(initialInventory);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
-
+  
+  React.useEffect(() => {
+    const storedRole = localStorage.getItem("userRole") as UserRole | null;
+    if (!storedRole || !ROLES.includes(storedRole)) {
+      router.push("/login");
+    } else {
+      setRole(storedRole);
+      // Set initial view based on role
+      const initialView = permissions[storedRole][0];
+      setActiveView(initialView);
+    }
+  }, [router]);
+  
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
   const handleViewChange = (view: View) => {
-    if (permissions[role].includes(view)) {
+    if (role && permissions[role].includes(view)) {
       setActiveView(view);
     }
   };
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
+    localStorage.setItem("userRole", newRole);
     // If the current view is not available for the new role, switch to the first available view
     if (!permissions[newRole].includes(activeView)) {
       setActiveView(permissions[newRole][0]);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userRole");
+    router.push("/login");
   };
 
   const updateInventory = (
@@ -236,6 +257,15 @@ export default function PEMSDashboard() {
     );
   };
 
+  if (!role) {
+    // You can render a loading spinner here while checking for authentication
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   const unreadCount = notifications.filter(n => n.forRoles.includes(role) && !n.read).length;
 
   return (
@@ -279,7 +309,7 @@ export default function PEMSDashboard() {
               <AvatarImage src={`https://i.pravatar.cc/150?u=${role.replace(/\s/g, "")}`} />
               <AvatarFallback>{role.charAt(0)}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col text-sm">
+            <div className="flex flex-col text-sm flex-1">
                 <Select value={role} onValueChange={(v) => handleRoleChange(v as UserRole)}>
                   <SelectTrigger className="border-0 p-0 h-auto focus:ring-0 shadow-none font-semibold">
                     <SelectValue />
@@ -292,6 +322,10 @@ export default function PEMSDashboard() {
                 </Select>
               <span className="text-xs text-muted-foreground">Viewing as {role}</span>
             </div>
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="shrink-0">
+                <LogOut className="size-4" />
+                <span className="sr-only">Log Out</span>
+            </Button>
           </div>
         </SidebarFooter>
       </Sidebar>

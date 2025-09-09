@@ -42,14 +42,17 @@ export function LoginForm() {
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "storemanager",
-      password: "",
+      password: "123",
     },
   });
 
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
       const result = await handleLogin(values);
-      if (result.success) {
+      if (result.success && result.user) {
+        // Store user role in localStorage for session persistence
+        localStorage.setItem("userRole", result.user.role);
+
         toast({
           title: "Login Successful",
           description: `Welcome back, ${result.user?.role}!`,
