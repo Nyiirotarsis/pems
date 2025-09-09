@@ -824,20 +824,31 @@ function RequestsView({ inventory, onNotify }: { inventory: InventoryItem[], onN
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BotMessageSquare className="h-5 w-5 text-primary" />
-                    Outsourcing Suggestions
+                    Outsourcing Plan
                   </CardTitle>
-                  <CardDescription>This item is unavailable. Here are some AI-powered outsourcing suggestions.</CardDescription>
+                  <CardDescription>This item is unavailable. Here is a suggested outsourcing plan.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {aiResponse.suggestions.map((s, i) => (
-                      <div key={i} className="p-4 border rounded-lg">
-                        <h3 className="font-semibold">{s.vendor}</h3>
-                        <p className="text-sm text-muted-foreground">Budgetary Estimate: <span className="font-medium text-foreground">{s.estimate}</span></p>
-                        <p className="text-sm text-muted-foreground">Contact: <span className="font-medium text-foreground">{s.contact}</span></p>
-                      </div>
-                    ))}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Source</TableHead>
+                        <TableHead>Equipment</TableHead>
+                        <TableHead className="text-center">Quantity</TableHead>
+                        <TableHead className="text-right">Cost</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {aiResponse.suggestions.map((s, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-medium">{s.source}</TableCell>
+                          <TableCell>{s.equipment}</TableCell>
+                          <TableCell className="text-center">{s.quantity}</TableCell>
+                          <TableCell className="text-right font-medium">{s.cost}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             )}
