@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -277,6 +278,7 @@ export function FinanceModule() {
 
 function ItemActions({ item, type }: { item: any, type: string }) {
     const router = useRouter();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
     
     const handleAction = (action: 'edit' | 'attach' | 'delete') => {
         switch(action) {
@@ -284,8 +286,7 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                 router.push(`/dashboard/finance/${type}/${item.id}/edit`);
                 break;
             case 'attach':
-                // We can open a modal for file upload here
-                alert(`Attach file for ${type} ${item.number || item.invoiceNumber}`);
+                fileInputRef.current?.click();
                 break;
             case 'delete':
                 // We can show a confirmation dialog here
@@ -293,28 +294,47 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                 break;
         }
     }
+    
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            console.log(`Attaching ${file.name} to ${type} ${item.id}`);
+            // Here you would typically upload the file to a server
+            alert(`File "${file.name}" selected for attachment.`);
+        }
+    };
+
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                 <DropdownMenuItem onClick={() => handleAction('edit')}>
-                    <Edit className="mr-2 h-4 w-4" />
-                    <span>Edit</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleAction('attach')}>
-                    <Paperclip className="mr-2 h-4 w-4" />
-                    <span>Attach File</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => handleAction('delete')}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    <span>Delete</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+            />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleAction('edit')}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        <span>Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAction('attach')}>
+                        <Paperclip className="mr-2 h-4 w-4" />
+                        <span>Attach File</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => handleAction('delete')}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </>
     )
 }

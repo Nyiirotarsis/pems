@@ -64,6 +64,7 @@ const quotationFormSchema = z.object({
   validFor: z.string().default("30 days"),
   paymentTerms: z.string().default("50% upfront, 50% after event"),
   deliveryTimeline: z.string().default("Within 5 days after confirmation"),
+  attachment: z.any().optional(),
 });
 
 type QuotationFormValues = z.infer<typeof quotationFormSchema>;
@@ -91,6 +92,8 @@ export default function NewQuotationPage() {
     control: form.control,
     name: "items",
   });
+  
+  const fileRef = form.register("attachment");
 
   const watchedItems = useWatch({
     control: form.control,
@@ -431,9 +434,23 @@ export default function NewQuotationPage() {
               
             </CardContent>
             <CardFooter>
-                 <div className="flex gap-2">
-                    <Button type="button" variant="outline">Attach Supporting Docs</Button>
-                 </div>
+                <FormField
+                    control={form.control}
+                    name="attachment"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Attach Supporting Document</FormLabel>
+                            <FormControl>
+                            <Input 
+                                type="file" 
+                                {...fileRef}
+                                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                            />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
             </CardFooter>
           </form>
         </Form>
@@ -441,4 +458,3 @@ export default function NewQuotationPage() {
     </div>
   );
 }
-
