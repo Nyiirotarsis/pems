@@ -477,7 +477,7 @@ export default function PEMSDashboard() {
                 }}
               />
             )}
-            {activeView === "requests" && <RequestsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
+            {activeView === "requests" && <RequestsView role={role} inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} />}
             {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
@@ -825,10 +825,11 @@ function TransactionFormFields({ form, inventory, type }: { form: any, inventory
   );
 }
 
-function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { available: number; total: number; })[], onNotify: (message: string, roles: UserRole[]) => void }) {
+function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem & { available: number; total: number; })[], onNotify: (message: string, roles: UserRole[]) => void, role: UserRole | null }) {
   const [isPending, startTransition] = useTransition();
   const [aiResponse, setAiResponse] = React.useState<SuggestOutsourcingOptionsOutput | null>(null);
   const [inStock, setInStock] = React.useState<boolean | null>(null);
+  const [outOfStockMessage, setOutOfStockMessage] = React.useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof requestFormSchema>>({
@@ -839,6 +840,7 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
   function onSubmit(values: z.infer<typeof requestFormSchema>) {
     setAiResponse(null);
     setInStock(null);
+    setOutOfStockMessage(null);
     
     const notificationRoles: UserRole[] = ["CEO", "Director", "Finance Manager", "HR/Admin", "IT Managers"];
     onNotify(`A request was made for ${values.quantity} of "${values.item}".`, notificationRoles);
@@ -851,18 +853,23 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
       setInStock(true);
     } else {
       setInStock(false);
-      startTransition(async () => {
-        const response = await handleSuggestOutsourcing({ item: values.item, quantity: values.quantity });
-        if (response.suggestions && response.suggestions.length > 0) {
-          setAiResponse(response);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not fetch outsourcing suggestions. Please try again.",
-          });
-        }
-      });
+      const availableCount = requestedItem?.available || 0;
+      if (role === 'Store Manager' || role === 'IT Managers') {
+          setOutOfStockMessage(`The number of available equipment is ${availableCount} which is less than requested. Please contact the Finance Manager for outsourcing.`);
+      } else {
+        startTransition(async () => {
+          const response = await handleSuggestOutsourcing({ item: values.item, quantity: values.quantity });
+          if (response.suggestions && response.suggestions.length > 0) {
+            setAiResponse(response);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Could not fetch outsourcing suggestions. Please try again.",
+            });
+          }
+        });
+      }
     }
   }
 
@@ -929,6 +936,19 @@ function RequestsView({ inventory, onNotify }: { inventory: (InventoryItem & { a
                   </CardDescription>
                 </CardHeader>
               </Card>
+            )}
+            {outOfStockMessage && (
+                 <Card className="w-full bg-orange-50 border-orange-200 dark:bg-orange-950 dark:border-orange-800">
+                    <CardHeader>
+                        <CardTitle className="text-orange-800 dark:text-orange-300 flex items-center gap-2">
+                            <PackageSearch className="h-5 w-5" />
+                            Insufficient Stock
+                        </CardTitle>
+                        <CardDescription className="text-orange-700 dark:text-orange-400">
+                           {outOfStockMessage}
+                        </CardDescription>
+                    </CardHeader>
+                 </Card>
             )}
             {aiResponse && aiResponse.suggestions.length > 0 && (
                <Card className="w-full">
