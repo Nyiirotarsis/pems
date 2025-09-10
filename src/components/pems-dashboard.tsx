@@ -408,13 +408,13 @@ export default function PEMSDashboard() {
   const directorNav = (
     <>
       <Collapsible className="w-full">
-        <CollapsibleTrigger className="w-full">
+        <CollapsibleTrigger asChild>
           <SidebarMenuButton className="justify-between">
             <div className="flex items-center gap-2">
               <Package />
               <span>Operations</span>
             </div>
-            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:-rotate-90" />
+            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
@@ -426,14 +426,14 @@ export default function PEMSDashboard() {
         </CollapsibleContent>
       </Collapsible>
       <Collapsible className="w-full">
-        <CollapsibleTrigger className="w-full">
-          <SidebarMenuButton className="justify-between">
-            <div className="flex items-center gap-2">
-              <ClipboardCheck />
-              <span>Planning</span>
-            </div>
-            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:-rotate-90" />
-          </SidebarMenuButton>
+        <CollapsibleTrigger asChild>
+            <SidebarMenuButton className="justify-between">
+                <div className="flex items-center gap-2">
+                <ClipboardCheck />
+                <span>Planning</span>
+                </div>
+                <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+            </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
           <SidebarMenuSub>
@@ -968,11 +968,7 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
             if (response.suggestions && response.suggestions.length > 0) {
               setAiResponse(response);
             } else {
-              toast({
-                variant: "destructive",
-                title: "Suggestion Error",
-                description: "Could not fetch outsourcing suggestions. Please contact the Finance Manager directly.",
-              });
+              setOutOfStockMessage("This item is unavailable, and we could not fetch outsourcing suggestions at this time. Please contact the Finance Manager directly.");
             }
           } catch(e) {
              toast({
