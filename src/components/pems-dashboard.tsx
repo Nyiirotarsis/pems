@@ -126,6 +126,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance";
 
