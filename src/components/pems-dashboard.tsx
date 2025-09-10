@@ -855,7 +855,7 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
       setInStock(false);
       const availableCount = requestedItem?.available || 0;
       if (role === 'Store Manager' || role === 'IT Managers') {
-          setOutOfStockMessage(`The number of available equipment is ${availableCount} which is less than requested. Please contact the Finance Manager for outsourcing.`);
+          setOutOfStockMessage(`The number of available equipment is ${availableCount}, which is less than requested. Please contact the Finance Manager for outsourcing.`);
       } else {
         startTransition(async () => {
           const response = await handleSuggestOutsourcing({ item: values.item, quantity: values.quantity });
@@ -1380,3 +1380,6 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
+
+
+    
