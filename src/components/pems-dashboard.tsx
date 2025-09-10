@@ -26,6 +26,7 @@ import {
   BarChart,
   PieChartIcon,
   UserCheck,
+  ChevronRight,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -67,6 +68,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarInset,
   SidebarTrigger,
   SidebarFooter,
@@ -127,6 +130,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance";
 
@@ -156,7 +160,7 @@ const navItems: Record<
   transactions: {
     label: "Issue / Return",
     icon: ArrowRightLeft,
-    forRoles: ["Store Manager", "IT Managers"],
+    forRoles: ["Store Manager", "IT Managers", "Director"],
   },
   requests: {
     label: "Requests",
@@ -401,6 +405,94 @@ export default function PEMSDashboard() {
 
   const unreadCount = notifications.filter(n => n.forRoles.includes(role) && !n.read).length;
 
+  const directorNav = (
+    <>
+      <Collapsible className="w-full">
+        <CollapsibleTrigger className="w-full">
+          <SidebarMenuButton className="justify-between">
+            <div className="flex items-center gap-2">
+              <Package />
+              <span>Operations</span>
+            </div>
+            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:-rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            <SidebarMenuSubButton onClick={() => handleViewChange("inventory")} isActive={activeView === "inventory"}>Inventory</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("assets")} isActive={activeView === "assets"}>Assets</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("transactions")} isActive={activeView === "transactions"}>Issue / Return</SidebarMenuSubButton>
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </Collapsible>
+      <Collapsible className="w-full">
+        <CollapsibleTrigger className="w-full">
+          <SidebarMenuButton className="justify-between">
+            <div className="flex items-center gap-2">
+              <ClipboardCheck />
+              <span>Planning</span>
+            </div>
+            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:-rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            <SidebarMenuSubButton onClick={() => handleViewChange("requests")} isActive={activeView === "requests"}>Requests</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("kpi")} isActive={activeViev === "kpi"}>KPI Tracker</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("attendance")} isActive={activeView === "attendance"}>Attendance</SidebarMenuSubButton>
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {['finance', 'reports', 'notifications'].map(key => {
+        const viewKey = key as View;
+        const item = navItems[viewKey];
+        if (item.forRoles.includes(role)) {
+          return (
+            <SidebarMenuItem key={key}>
+              <SidebarMenuButton
+                onClick={() => handleViewChange(viewKey)}
+                isActive={activeView === key}
+              >
+                <item.icon />
+                <span>{item.label}</span>
+                {key === 'notifications' && unreadCount > 0 && (
+                  <Badge className="ml-auto">{unreadCount}</Badge>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        }
+        return null;
+      })}
+    </>
+  );
+
+  const defaultNav = (
+    <>
+      {Object.entries(navItems).map(([key, item]) => {
+        const viewKey = key as View;
+        if (item.forRoles.includes(role)) {
+          return (
+            <SidebarMenuItem key={key}>
+              <SidebarMenuButton
+                onClick={() => handleViewChange(viewKey)}
+                isActive={activeView === key}
+              >
+                <item.icon />
+                <span>{item.label}</span>
+                {key === 'notifications' && unreadCount > 0 && (
+                  <Badge className="ml-auto">{unreadCount}</Badge>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        }
+        return null;
+      })}
+    </>
+  );
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -415,26 +507,7 @@ export default function PEMSDashboard() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {Object.entries(navItems).map(([key, item]) => {
-              const viewKey = key as View;
-              if (item.forRoles.includes(role)) {
-                return (
-                  <SidebarMenuItem key={key}>
-                    <SidebarMenuButton
-                      onClick={() => handleViewChange(viewKey)}
-                      isActive={activeView === key}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                      {key === 'notifications' && unreadCount > 0 && (
-                        <Badge className="ml-auto">{unreadCount}</Badge>
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              }
-              return null;
-            })}
+            {role === 'Director' ? directorNav : defaultNav}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -1625,3 +1698,5 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
+
+    
