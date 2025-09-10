@@ -1,5 +1,6 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi } from "@/types";
+
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord } from "@/types";
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"];
 
@@ -130,6 +131,14 @@ export const mockKpis: Kpi[] = [
     { id: 3, userId: 6, category: 'Inventory Management', activityName: 'Stock Accuracy', description: 'Ensure physical stock count matches system records with 98% accuracy.', frequency: 'Quarterly' },
     { id: 4, userId: 3, category: 'Financial Reporting', activityName: 'Monthly Closures', description: 'Complete monthly financial closure and reporting by the 5th working day.', frequency: 'Monthly' },
     { id: 5, userId: 1, category: 'Strategic Growth', activityName: 'Market Expansion', description: 'Secure 2 new strategic partnerships in the designated new market.', frequency: 'Quarterly' },
+];
+
+export const mockAttendance: AttendanceRecord[] = [
+    { id: 1, userId: 3, date: '2024-07-28', status: 'Present' },
+    { id: 2, userId: 4, date: '2024-07-28', status: 'Present' },
+    { id: 3, userId: 5, date: '2024-07-28', status: 'Late', notes: 'Arrived at 9:15 AM' },
+    { id: 4, userId: 6, date: '2024-07-28', status: 'Present' },
+    { id: 5, userId: 1, date: '2024-07-28', status: 'On Leave' },
 ];
 
 // Duplicate export of USERS removed to avoid conflicts

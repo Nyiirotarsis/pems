@@ -1,4 +1,5 @@
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
 export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
@@ -100,4 +101,15 @@ export interface Kpi {
     activityName: string;
     description: string;
     frequency: "Daily" | "Weekly" | "Monthly" | "Quarterly";
+}
+
+// Attendance Types
+export type AttendanceStatus = "Present" | "Absent" | "Late" | "On Leave";
+
+export interface AttendanceRecord {
+  id: number;
+  userId: number;
+  date: string;
+  status: AttendanceStatus;
+  notes?: string;
 }

@@ -25,14 +25,15 @@ import {
   PlusCircle,
   BarChart,
   PieChartIcon,
+  UserCheck,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi } from "@/types";
+import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance } from "@/lib/mock-data";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus } from "@/types";
 import { PEMSIcon } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -124,15 +125,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi";
+type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance";
 
 const permissions: Record<UserRole, View[]> = {
-  "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi"],
+  "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi", "attendance"],
   "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi"],
   "HR/Admin": ["reports", "notifications", "kpi"],
-  "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi"],
-  "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi"],
+  "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
+  "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
   "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests", "kpi"],
 };
 
@@ -164,6 +166,11 @@ const navItems: Record<
     label: "KPI Tracker",
     icon: ClipboardCheck,
     forRoles: ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"],
+  },
+  attendance: {
+    label: "Attendance",
+    icon: UserCheck,
+    forRoles: ["Store Manager", "CEO", "Director"],
   },
   finance: {
     label: "Finance",
@@ -208,6 +215,13 @@ const kpiFormSchema = z.object({
     frequency: z.enum(["Daily", "Weekly", "Monthly", "Quarterly"]),
 });
 
+const attendanceFormSchema = z.object({
+    userId: z.string().min(1, "Please select a user."),
+    date: z.date(),
+    status: z.enum(["Present", "Absent", "Late", "On Leave"], { required_error: "Please select a status."}),
+    notes: z.string().optional(),
+});
+
 export default function PEMSDashboard() {
   const { toast } = useToast();
   const router = useRouter();
@@ -215,6 +229,7 @@ export default function PEMSDashboard() {
   const [activeView, setActiveView] = React.useState<View>("inventory");
   const [inventory, setInventory] = React.useState<InventoryItem[]>(initialInventory);
   const [kpis, setKpis] = React.useState<Kpi[]>(mockKpis);
+  const [attendance, setAttendance] = React.useState<AttendanceRecord[]>(mockAttendance);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
   
@@ -341,6 +356,21 @@ export default function PEMSDashboard() {
         description: `A new KPI "${values.activityName}" has been added.`,
       })
   }
+
+  const addAttendanceRecord = (values: z.infer<typeof attendanceFormSchema>) => {
+    const newRecord: AttendanceRecord = {
+        id: Date.now(),
+        userId: parseInt(values.userId),
+        date: format(values.date, "yyyy-MM-dd"),
+        status: values.status,
+        notes: values.notes,
+    };
+    setAttendance(prev => [newRecord, ...prev]);
+    toast({
+        title: "Attendance Recorded",
+        description: `Attendance for ${mockUsers.find(u => u.id.toString() === values.userId)?.username} on ${format(values.date, "PPP")} has been logged as ${values.status}.`,
+    });
+  };
 
   const addNotification = (message: string, forRoles: UserRole[]) => {
     const newNotification: AppNotification = {
@@ -479,6 +509,7 @@ export default function PEMSDashboard() {
             )}
             {activeView === "requests" && <RequestsView role={role} inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} />}
+            {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} />}
             {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
             {activeView === "notifications" && (
@@ -858,14 +889,22 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
           setOutOfStockMessage(`The number of available equipment is ${availableCount}, which is less than requested. Please contact the Finance Manager for outsourcing.`);
       } else {
         startTransition(async () => {
-          const response = await handleSuggestOutsourcing({ item: values.item, quantity: values.quantity });
-          if (response.suggestions && response.suggestions.length > 0) {
-            setAiResponse(response);
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Could not fetch outsourcing suggestions. Please try again.",
+          try {
+            const response = await handleSuggestOutsourcing({ item: values.item, quantity: values.quantity });
+            if (response.suggestions && response.suggestions.length > 0) {
+              setAiResponse(response);
+            } else {
+              toast({
+                variant: "destructive",
+                title: "Suggestion Error",
+                description: "Could not fetch outsourcing suggestions. Please contact the Finance Manager directly.",
+              });
+            }
+          } catch(e) {
+             toast({
+                variant: "destructive",
+                title: "Error",
+                description: "An unexpected error occurred while fetching suggestions.",
             });
           }
         });
@@ -1156,6 +1195,211 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
     );
 }
 
+function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRecord[], onAddRecord: (values: z.infer<typeof attendanceFormSchema>) => void }) {
+    const form = useForm<z.infer<typeof attendanceFormSchema>>({
+        resolver: zodResolver(attendanceFormSchema),
+        defaultValues: {
+            date: new Date(),
+            notes: "",
+        },
+    });
+
+    const getUserDetails = (userId: number) => {
+        return mockUsers.find(u => u.id === userId);
+    };
+
+    function onSubmit(values: z.infer<typeof attendanceFormSchema>) {
+        onAddRecord(values);
+        form.reset({
+            date: new Date(),
+            userId: undefined,
+            status: undefined,
+            notes: "",
+        });
+    }
+
+    const statusColors: Record<AttendanceStatus, string> = {
+        Present: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300",
+        Late: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300",
+        Absent: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300",
+        "On Leave": "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+    };
+
+    return (
+        <Tabs defaultValue="log">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="log">Log Attendance</TabsTrigger>
+                <TabsTrigger value="records">View Records</TabsTrigger>
+            </TabsList>
+            <TabsContent value="log">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline">Log Daily Attendance</CardTitle>
+                        <CardDescription>Select the user and mark their attendance for the day.</CardDescription>
+                    </CardHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                            <CardContent className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={form.control}
+                                        name="userId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>User</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a user" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {mockUsers.map((user) => (
+                                                            <SelectItem key={user.id} value={user.id.toString()}>
+                                                                {user.username} ({user.role})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="date"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                            <FormLabel>Date</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "w-full pl-3 text-left font-normal",
+                                                        !field.value && "text-muted-foreground"
+                                                    )}
+                                                    >
+                                                    {field.value ? (
+                                                        format(field.value, "PPP")
+                                                    ) : (
+                                                        <span>Pick a date</span>
+                                                    )}
+                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    initialFocus
+                                                />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage />
+                                            </FormItem>
+                                        )}
+                                        />
+                                </div>
+                                 <FormField
+                                    control={form.control}
+                                    name="status"
+                                    render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>Status</FormLabel>
+                                        <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex flex-col space-y-1"
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <RadioGroupItem value="Present" id="s-present" />
+                                                <Label htmlFor="s-present">Present</Label>
+                                            </div>
+                                             <div className="flex items-center space-x-3">
+                                                <RadioGroupItem value="Late" id="s-late" />
+                                                <Label htmlFor="s-late">Late</Label>
+                                            </div>
+                                             <div className="flex items-center space-x-3">
+                                                <RadioGroupItem value="Absent" id="s-absent" />
+                                                <Label htmlFor="s-absent">Absent</Label>
+                                            </div>
+                                            <div className="flex items-center space-x-3">
+                                                <RadioGroupItem value="On Leave" id="s-leave" />
+                                                <Label htmlFor="s-leave">On Leave</Label>
+                                            </div>
+                                        </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="notes"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Notes (Optional)</FormLabel>
+                                            <FormControl>
+                                                <Textarea placeholder="e.g., Arrived late due to traffic" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </CardContent>
+                            <CardFooter>
+                                <Button type="submit">Save Record</Button>
+                            </CardFooter>
+                        </form>
+                    </Form>
+                </Card>
+            </TabsContent>
+            <TabsContent value="records">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline">Attendance History</CardTitle>
+                        <CardDescription>A log of all recorded attendance.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>User</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Notes</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {attendance.map((record) => {
+                                    const user = getUserDetails(record.userId);
+                                    return (
+                                        <TableRow key={record.id}>
+                                            <TableCell>
+                                                <div className="font-medium">{user?.username}</div>
+                                                <div className="text-xs text-muted-foreground">{user?.role}</div>
+                                            </TableCell>
+                                            <TableCell>{format(new Date(record.date), "PPP")}</TableCell>
+                                            <TableCell>
+                                                <Badge className={cn("capitalize", statusColors[record.status])} variant="outline">{record.status}</Badge>
+                                            </TableCell>
+                                            <TableCell>{record.notes || 'N/A'}</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+        </Tabs>
+    );
+}
 
 function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
   
@@ -1380,6 +1624,3 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
-
-
-    
