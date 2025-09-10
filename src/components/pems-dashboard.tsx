@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -22,13 +23,15 @@ import {
   Wrench,
   ClipboardCheck,
   PlusCircle,
+  BarChart,
+  PieChartIcon,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers } from "@/lib/mock-data";
+import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories } from "@/lib/mock-data";
 import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi } from "@/types";
 import { PEMSIcon } from "@/components/icons";
 
@@ -36,6 +39,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
+
+import {
+  Bar,
+  CartesianGrid,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+  BarChart as RechartsBarChart,
+} from "recharts";
 
 import { handleSuggestOutsourcing } from "@/app/actions";
 import type { SuggestOutsourcingOptionsOutput } from "@/ai/flows/suggest-outsourcing-options";
@@ -106,6 +123,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi";
 
@@ -216,8 +234,9 @@ export default function PEMSDashboard() {
   const getInventoryTotals = (item: InventoryItem) => {
     const total = item.assets.length;
     const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
+    const issued = item.assets.filter(a => a.status === 'Issued').length;
     const faulty = item.assets.filter(a => a.condition === 'Faulty').length;
-    return { total, available, faulty };
+    return { total, available, issued, faulty };
   };
   
   const filteredInventory = inventory.filter((item) =>
@@ -461,7 +480,7 @@ export default function PEMSDashboard() {
             {activeView === "requests" && <RequestsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} />}
             {activeView === "finance" && <FinanceModule />}
-            {activeView === "reports" && <ReportsView inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} />}
+            {activeView === "reports" && <ReportsView inventory={inventory} />}
             {activeView === "notifications" && (
                 <NotificationsView
                     notifications={notifications.filter(n => n.forRoles.includes(role))}
@@ -1118,98 +1137,191 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
 }
 
 
-function ReportsView({ inventory }: { inventory: (InventoryItem & { available: number; total: number; })[] }) {
-  const totalItems = inventory.reduce((sum, item) => sum + item.total, 0);
-  const totalAvailable = inventory.reduce((sum, item) => sum + item.available, 0);
-  const mostStocked = inventory.reduce((max, item) => item.total > max.total ? item : max, inventory[0] || {name: "N/A", total: 0});
-  const leastAvailable = inventory.reduce((min, item) => item.available < min.available ? item : min, inventory[0] || {name: "N/A", available: 0});
+function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
   
+  const getInventoryTotals = (item: InventoryItem) => {
+    const total = item.assets.length;
+    const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
+    const issued = item.assets.filter(a => a.status === 'Issued').length;
+    const faulty = item.assets.filter(a => a.condition === 'Faulty').length;
+    return { total, available, issued, faulty };
+  };
+
+  const inventoryWithTotals = inventory.map(item => ({
+    ...item,
+    ...getInventoryTotals(item)
+  }));
+  
+  const totalItems = inventoryWithTotals.reduce((sum, item) => sum + item.total, 0);
+  const totalAvailable = inventoryWithTotals.reduce((sum, item) => sum + item.available, 0);
+  const mostStocked = inventoryWithTotals.reduce((max, item) => item.total > max.total ? item : max, inventoryWithTotals[0] || {name: "N/A", total: 0});
+  const leastAvailable = inventoryWithTotals.reduce((min, item) => item.available < min.available ? item : min, inventoryWithTotals[0] || {name: "N/A", available: 0});
+
+  const categoryTotals = assetCategories.map(category => {
+    const total = inventory
+        .filter(item => item.category === category)
+        .reduce((sum, item) => sum + item.assets.length, 0);
+    return { name: category, value: total };
+  }).filter(c => c.value > 0);
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="font-headline">Inventory Report</CardTitle>
-            <CardDescription>A summary of the current inventory status.</CardDescription>
-          </div>
-          <Button variant="outline" onClick={() => window.print()}>Print Report</Button>
+    <Tabs defaultValue="summary">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="font-headline text-3xl font-semibold">Reports</h1>
+          <p className="text-muted-foreground">A summary of the current inventory status.</p>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-              <Warehouse className="h-4 w-4 text-muted-foreground" />
+        <TabsList>
+            <TabsTrigger value="summary"><PieChartIcon className="mr-2" /> Summary</TabsTrigger>
+            <TabsTrigger value="details"><FileText className="mr-2" /> Detailed</TabsTrigger>
+        </TabsList>
+      </div>
+
+       <TabsContent value="summary">
+         <div className="grid gap-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Items</CardTitle>
+                    <Warehouse className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                    <div className="text-2xl font-bold">{totalItems}</div>
+                    <p className="text-xs text-muted-foreground">Across all equipment types</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Items Available</CardTitle>
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                    <div className="text-2xl font-bold">{totalAvailable}</div>
+                    <p className="text-xs text-muted-foreground">{totalItems > 0 ? Math.round((totalAvailable/totalItems) * 100) : 0}% of stock on hand</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Most Stocked Item</CardTitle>
+                    <PackagePlus className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                    <div className="text-2xl font-bold">{mostStocked?.name || 'N/A'}</div>
+                    <p className="text-xs text-muted-foreground">{mostStocked?.total || 0} total units</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Lowest Stock Item</CardTitle>
+                    <PackageSearch className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                    <div className="text-2xl font-bold">{leastAvailable?.name || 'N/A'}</div>
+                    <p className="text-xs text-muted-foreground">{leastAvailable?.available || 0} units available</p>
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Asset Status by Type</CardTitle>
+                   <CardDescription>A breakdown of asset status for each equipment type.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={{}} className="min-h-[300px] w-full">
+                    <RechartsBarChart data={inventoryWithTotals}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                      <YAxis />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Legend />
+                      <Bar dataKey="available" fill="var(--color-chart-2)" radius={4} name="Available" />
+                      <Bar dataKey="issued" fill="var(--color-chart-1)" radius={4} name="Issued" />
+                      <Bar dataKey="faulty" fill="var(--color-chart-5)" radius={4} name="Faulty" />
+                    </RechartsBarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+               <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Asset Distribution by Category</CardTitle>
+                  <CardDescription>Shows the proportion of assets in each category.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                   <ChartContainer config={{}} className="min-h-[300px] w-full max-w-sm">
+                      <PieChart>
+                          <Tooltip content={<ChartTooltipContent />} />
+                          <Legend />
+                          <Pie
+                              data={categoryTotals}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={120}
+                              labelLine={false}
+                               label={({ percent, name }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          >
+                              {categoryTotals.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                          </Pie>
+                      </PieChart>
+                   </ChartContainer>
+                </CardContent>
+              </Card>
+            </div>
+         </div>
+      </TabsContent>
+      <TabsContent value="details">
+        <Card>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                    <CardTitle className="font-headline">Detailed Stock Report</CardTitle>
+                    <CardDescription>A detailed breakdown of all items in the inventory.</CardDescription>
+                </div>
+                <Button variant="outline" onClick={() => window.print()}>Print Report</Button>
+                </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalItems}</div>
-              <p className="text-xs text-muted-foreground">Across all equipment types</p>
+                 <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>Equipment</TableHead>
+                        <TableHead>Available</TableHead>
+                        <TableHead>Issued</TableHead>
+                        <TableHead>Faulty</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead className="w-[150px]">Stock Level</TableHead>
+                    </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {inventoryWithTotals.map(item => (
+                        <TableRow key={item.id}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.available}</TableCell>
+                        <TableCell>{item.issued}</TableCell>
+                        <TableCell>{item.faulty}</TableCell>
+                        <TableCell>{item.total}</TableCell>
+                        <TableCell>
+                            <div className="h-2.5 w-full rounded-full bg-secondary">
+                                <div 
+                                className="h-2.5 rounded-full bg-primary" 
+                                style={{ width: `${item.total > 0 ? (item.available/item.total)*100 : 0}%` }}
+                                />
+                            </div>
+                        </TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
             </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Items Available</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalAvailable}</div>
-              <p className="text-xs text-muted-foreground">{totalItems > 0 ? Math.round((totalAvailable/totalItems) * 100) : 0}% of stock on hand</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Most Stocked Item</CardTitle>
-              <PackagePlus className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{mostStocked?.name || 'N/A'}</div>
-              <p className="text-xs text-muted-foreground">{mostStocked?.total || 0} total units</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Lowest Stock Item</CardTitle>
-              <PackageSearch className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{leastAvailable?.name || 'N/A'}</div>
-              <p className="text-xs text-muted-foreground">{leastAvailable?.available || 0} units available</p>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="mt-6">
-          <h3 className="font-headline text-lg mb-2">Detailed Stock Levels</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Equipment</TableHead>
-                <TableHead>Available</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead className="w-[100px]">Stock Level</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inventory.map(item => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.available}</TableCell>
-                  <TableCell>{item.total}</TableCell>
-                  <TableCell>
-                    <div className="h-2.5 w-full rounded-full bg-secondary">
-                        <div 
-                          className="h-2.5 rounded-full bg-primary" 
-                          style={{ width: `${item.total > 0 ? (item.available/item.total)*100 : 0}%` }}
-                        />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 }
 
