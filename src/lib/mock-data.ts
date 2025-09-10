@@ -110,8 +110,24 @@ export const mockQuotations: Quotation[] = [
 ];
 
 export const mockLPOs: LPO[] = [
-    { id: 'L001', number: 'LPO-2024-001', supplier: 'Tech Solutions Ltd.', date: '2024-07-02', amount: 1500, status: 'Delivered' },
-    { id: 'L002', number: 'LPO-2024-002', supplier: 'Creative Designs Inc.', date: '2024-07-08', amount: 3200, status: 'Pending' },
+    { 
+        id: 'L001', 
+        number: 'LPO-2024-001', 
+        supplier: 'Tech Solutions Ltd.', 
+        date: '2024-07-02', 
+        items: [{ description: 'Cat6 Ethernet Cables', quantity: 50, unitPrice: 30 }],
+        amount: 1500, 
+        status: 'Delivered' 
+    },
+    { 
+        id: 'L002', 
+        number: 'LPO-2024-002', 
+        supplier: 'Creative Designs Inc.', 
+        date: '2024-07-08', 
+        items: [{ description: 'Stage Backdrop Banner', quantity: 1, unitPrice: 3200 }],
+        amount: 3200, 
+        status: 'Pending' 
+    },
 ];
 
 export const mockInvoices: Invoice[] = [

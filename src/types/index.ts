@@ -63,12 +63,19 @@ export interface Quotation {
   file?: string;
 }
 
+interface LpoItem {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+}
+
 export interface LPO {
     id: string;
     number: string;
     supplier: string;
     date: string;
-    amount: number;
+    items: LpoItem[];
+    amount: number; // This can be calculated from items, but storing for simplicity
     status: "Pending" | "Delivered";
     file?: string;
 }
