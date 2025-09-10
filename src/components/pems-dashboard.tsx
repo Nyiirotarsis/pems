@@ -438,7 +438,7 @@ export default function PEMSDashboard() {
         <CollapsibleContent>
           <SidebarMenuSub>
             <SidebarMenuSubButton onClick={() => handleViewChange("requests")} isActive={activeView === "requests"}>Requests</SidebarMenuSubButton>
-            <SidebarMenuSubButton onClick={() => handleViewChange("kpi")} isActive={activeViev === "kpi"}>KPI Tracker</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("kpi")} isActive={activeView === "kpi"}>KPI Tracker</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("attendance")} isActive={activeView === "attendance"}>Attendance</SidebarMenuSubButton>
           </SidebarMenuSub>
         </CollapsibleContent>
