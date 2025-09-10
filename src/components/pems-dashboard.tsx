@@ -131,8 +131,8 @@ const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi"],
   "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi"],
   "HR/Admin": ["reports", "notifications", "kpi"],
-  "CEO": ["inventory", "assets", "requests", "reports", "notifications", "finance", "kpi"],
-  "Director": ["inventory", "assets", "requests", "reports", "notifications", "finance", "kpi"],
+  "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi"],
+  "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi"],
   "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests", "kpi"],
 };
 
@@ -916,7 +916,7 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
           <CardFooter className="flex flex-col items-start gap-4">
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Check Availability
+              <span>Check Availability</span>
             </Button>
             {isPending && (
               <div className="text-sm text-muted-foreground flex items-center">
