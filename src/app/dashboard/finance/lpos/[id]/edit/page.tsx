@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -80,7 +81,8 @@ const lpoFormSchema = z.object({
 
 type LpoFormValues = z.infer<typeof lpoFormSchema>;
 
-export default function EditLpoPage({ params }: { params: { id: string } }) {
+export default function EditLpoPage() {
+  const params = useParams<{ id: string }>();
   const { toast } = useToast();
   const lpo = React.useMemo(() => mockLPOs.find(l => l.id === params.id), [params.id]);
 

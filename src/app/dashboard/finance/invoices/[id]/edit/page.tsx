@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -66,7 +67,8 @@ const invoiceFormSchema = z.object({
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
 
-export default function EditInvoicePage({ params }: { params: { id: string } }) {
+export default function EditInvoicePage() {
+  const params = useParams<{ id: string }>();
   const { toast } = useToast();
   const invoice = React.useMemo(() => mockInvoices.find(inv => inv.id === params.id), [params.id]);
 

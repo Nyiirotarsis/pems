@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -81,7 +82,8 @@ const quotationFormSchema = z.object({
 
 type QuotationFormValues = z.infer<typeof quotationFormSchema>;
 
-export default function EditQuotationPage({ params }: { params: { id: string } }) {
+export default function EditQuotationPage() {
+  const params = useParams<{ id: string }>();
   const { toast } = useToast();
   const quotation = React.useMemo(() => mockQuotations.find(q => q.id === params.id), [params.id]);
 

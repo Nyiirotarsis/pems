@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -67,7 +68,8 @@ const assetFormSchema = z.object({
 
 type AssetFormValues = z.infer<typeof assetFormSchema>;
 
-export default function EditAssetPage({ params }: { params: { id: string } }) {
+export default function EditAssetPage() {
+  const params = useParams<{ id: string }>();
   const { toast } = useToast();
   
   // Find the asset from mock data
