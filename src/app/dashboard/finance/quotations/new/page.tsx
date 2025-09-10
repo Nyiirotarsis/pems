@@ -41,6 +41,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -139,7 +150,23 @@ export default function NewQuotationPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button type="submit" variant="secondary">Save Draft</Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="secondary">Save Draft</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action will save the quotation as a draft.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                     <Button type="button" variant="outline" onClick={() => alert("Generate PDF clicked")}>Generate PDF</Button>
                     <Button type="button" onClick={() => alert("Send to Client clicked")}>Send to Client</Button>
                 </div>
@@ -331,8 +358,7 @@ export default function NewQuotationPage() {
                                 </FormItem>
                               )}
                             />
-                          </TableCell>
-                          <TableCell className="text-right font-medium">
+                          </TableCell>                          <TableCell className="text-right font-medium">
                             {(
                               (watchedItems[index]?.quantity || 0) *
                               (watchedItems[index]?.unitPrice || 0)

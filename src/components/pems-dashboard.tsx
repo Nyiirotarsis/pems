@@ -124,6 +124,17 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -600,7 +611,6 @@ export default function PEMSDashboard() {
 }
 
 function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { inventory: (InventoryItem & { available: number; total: number; faulty: number; })[], searchQuery: string, setSearchQuery: (q: string) => void, onRestock: (values: z.infer<typeof restockFormSchema>) => void }) {
-  const [open, setOpen] = React.useState(false);
   const form = useForm<z.infer<typeof restockFormSchema>>({
     resolver: zodResolver(restockFormSchema),
     defaultValues: { quantity: 1, receivedBy: "" },
@@ -609,7 +619,6 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
   function onSubmit(values: z.infer<typeof restockFormSchema>) {
     onRestock(values);
     form.reset();
-    setOpen(false);
   }
 
   return (
@@ -630,7 +639,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog>
               <DialogTrigger asChild>
                 <Button>
                   <PackagePlus className="mr-2 h-4 w-4" /> Restock
@@ -694,10 +703,23 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                       )}
                     />
                     <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
-                      </DialogClose>
-                      <Button type="submit">Log Restock</Button>
+                      <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button>Log Restock</Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will add {form.getValues().quantity} new asset(s) to the inventory.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                     </DialogFooter>
                   </form>
                 </Form>
@@ -794,7 +816,23 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                 <TransactionFormFields form={issueForm} inventory={inventory} type="issue" />
               </CardContent>
               <CardFooter>
-                <Button type="submit">Issue Item</Button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button>Issue Item</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action will mark {issueForm.getValues().quantity} item(s) as issued.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={issueForm.handleSubmit(handleIssueSubmit)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               </CardFooter>
             </form>
           </Form>
@@ -812,7 +850,23 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                 <TransactionFormFields form={returnForm} inventory={inventory} type="return" />
               </CardContent>
               <CardFooter>
-                <Button type="submit">Receive Item</Button>
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button>Receive Item</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action will return {returnForm.getValues().quantity} item(s) to the inventory.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={returnForm.handleSubmit(handleReturnSubmit)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               </CardFooter>
             </form>
           </Form>
@@ -1100,7 +1154,6 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
 }
 
 function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.infer<typeof kpiFormSchema>) => void }) {
-    const [open, setOpen] = React.useState(false);
     const form = useForm<z.infer<typeof kpiFormSchema>>({
         resolver: zodResolver(kpiFormSchema),
         defaultValues: {
@@ -1118,7 +1171,6 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
     function onSubmit(values: z.infer<typeof kpiFormSchema>) {
         onAddKpi(values);
         form.reset();
-        setOpen(false);
     }
     
     return (
@@ -1129,7 +1181,7 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                         <CardTitle className="font-headline">KPI Tracker</CardTitle>
                         <CardDescription>Define and monitor Key Performance Indicators for staff.</CardDescription>
                     </div>
-                    <Dialog open={open} onOpenChange={setOpen}>
+                    <Dialog>
                         <DialogTrigger asChild>
                             <Button>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Add KPI
@@ -1222,8 +1274,23 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                         )}
                                     />
                                     <DialogFooter>
-                                        <DialogClose asChild><Button type="button" variant="secondary">Cancel</Button></DialogClose>
-                                        <Button type="submit">Save KPI</Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button>Save KPI</Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will add a new KPI for the selected user.
+                                                </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </DialogFooter>
                                 </form>
                             </Form>
@@ -1423,7 +1490,23 @@ function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRec
                                 />
                             </CardContent>
                             <CardFooter>
-                                <Button type="submit">Save Record</Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button>Save Record</Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This will log the attendance record for the selected user.
+                                        </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </CardFooter>
                         </form>
                     </Form>
