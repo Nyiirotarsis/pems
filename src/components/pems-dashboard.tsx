@@ -35,7 +35,7 @@ import { FinanceModule } from "@/components/finance-module";
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance } from "@/lib/mock-data";
 import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus } from "@/types";
-import { PEMSIcon } from "@/components/icons";
+import { PacificEventsLogo } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -508,11 +508,11 @@ export default function PEMSDashboard() {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-3">
-            <PEMSIcon className="size-8 text-primary" />
+          <div className="flex items-center gap-3 px-3">
+            <PacificEventsLogo className="size-10" />
             <div className="flex flex-col">
-              <h2 className="font-headline text-xl font-semibold">PEMS</h2>
-              <p className="text-xs text-muted-foreground">Inventory Manager</p>
+              <h2 className="font-headline text-lg font-semibold">Pacific Events</h2>
+              <p className="text-xs text-muted-foreground">Event Management System</p>
             </div>
           </div>
         </SidebarHeader>

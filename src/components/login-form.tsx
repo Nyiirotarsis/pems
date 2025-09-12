@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { PEMSIcon } from "@/components/icons";
+import { PacificEventsLogo } from "@/components/icons";
 import { handleLogin } from "@/app/actions";
 
 const loginFormSchema = z.object({
@@ -72,8 +72,8 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
-        <PEMSIcon className="mx-auto size-12 text-primary" />
-        <CardTitle className="font-headline mt-4">PEMS Login</CardTitle>
+        <PacificEventsLogo className="mx-auto h-20 w-auto" />
+        <CardTitle className="font-headline mt-4">Pacific Events Login</CardTitle>
         <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
       </CardHeader>
       <CardContent>

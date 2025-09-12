@@ -1,21 +1,34 @@
-export function PEMSIcon(props: React.SVGProps<SVGSVGElement>) {
+export function PacificEventsLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      viewBox="0 0 200 60"
+      width="200"
+      height="60"
     >
-      <path d="M12 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2h-4Z" />
-      <path d="m14 16-2 2 2 2" />
-      <path d="M4 12a2 2 0 0 0-2-2V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a2 2 0 0 0-2 2H4Z" />
-      <path d="m6 8-2 2 2 2" />
+      <defs>
+        <style>
+          {`
+            .pacific-font { font-family: 'Times New Roman', serif; font-size: 32px; fill: #005A87; font-weight: bold; }
+            .events-font { font-family: 'Arial', sans-serif; font-size: 14px; fill: #005A87; letter-spacing: 2px; }
+            .wave { fill: #005A87; }
+          `}
+        </style>
+      </defs>
+      
+      <text x="5" y="35" className="pacific-font">Pa</text>
+      
+      <g transform="translate(60, 5)">
+        <path d="M-5.5,23.5 C-1.5,13.5 12.5,13.5 12.5,23.5 C12.5,33.5 -1.5,33.5 -5.5,23.5 Z" fill="#FFFFFF"/>
+        <path d="M-1,28 C2,23 5,22 8,24" stroke="#005A87" strokeWidth="1.5" fill="none" />
+        <path d="M-2,25 C1,20 6,19 9,21" stroke="#005A87" strokeWidth="1.5" fill="none" />
+         <path d="M-3,22 C0,17 7,16 10,18" stroke="#005A87" strokeWidth="1.5" fill="none" />
+      </g>
+      
+      <text x="38" y="35" className="pacific-font">cific</text>
+      
+      <text x="63" y="50" className="events-font">EVENTS</text>
     </svg>
   );
 }
