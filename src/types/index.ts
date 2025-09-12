@@ -1,5 +1,6 @@
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
 export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
@@ -120,3 +121,26 @@ export interface AttendanceRecord {
   status: AttendanceStatus;
   notes?: string;
 }
+
+// New detailed quotation type
+export interface QuotationItem {
+  description: string;
+  quantity: number;
+  days: number;
+  unitCost: number;
+}
+
+export interface DetailedQuotation {
+  id: string;
+  number: string;
+  quotationDate: string;
+  clientName: string;
+  venue: string;
+  eventDate: string;
+  items: QuotationItem[];
+  terms: string;
+  validity: string;
+  status: FinancialStatus;
+}
+
+    
