@@ -29,45 +29,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
-import { handleLogin } from "@/app/actions";
 
-const loginFormSchema = z.object({
-  username: z.string().min(1, "Please enter your username."),
-  password: z.string().min(1, "Please enter your password."),
+const signupFormSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters long."),
 });
 
-export function LoginForm() {
+export function SignupForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = React.useTransition();
 
-  const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<z.infer<typeof signupFormSchema>>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
-      username: "it",
-      password: "123",
+      email: "",
+      password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginFormSchema>) {
-    startTransition(async () => {
-      const result = await handleLogin(values);
-      if (result.success && result.user) {
-        // Store user role in localStorage for session persistence
-        localStorage.setItem("userRole", result.user.role);
+  function onSubmit(values: z.infer<typeof signupFormSchema>) {
+    startTransition(() => {
+      // In a real application, you would handle the signup logic here,
+      // such as calling an API endpoint.
+      console.log(values);
+      
+      toast({
+        title: "Sign Up Submitted",
+        description: "A verification code has been sent to your email.",
+      });
 
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${result.user?.role}!`,
-        });
-        router.push("/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: result.error || "Invalid username or password.",
-        });
-      }
+      // For this prototype, we'll just redirect to the login page
+      // after a short delay.
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     });
   }
 
@@ -75,20 +71,20 @@ export function LoginForm() {
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
         <PacificEventsLogo className="mx-auto h-20 w-auto" />
-        <CardTitle className="font-headline mt-4">Login</CardTitle>
-        <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
+        <CardTitle className="font-headline mt-4">Create an Account</CardTitle>
+        <CardDescription>Enter your details to sign up.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., storemanager" {...field} />
+                    <Input placeholder="name@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,16 +105,16 @@ export function LoginForm() {
             />
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
+              Sign Up
             </Button>
           </form>
         </Form>
       </CardContent>
-       <CardFooter className="flex justify-center text-sm">
+      <CardFooter className="flex justify-center text-sm">
         <p>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold text-primary hover:underline">
-            Sign up
+          Already have an account?{' '}
+          <Link href="/login" className="font-semibold text-primary hover:underline">
+            Login
           </Link>
         </p>
       </CardFooter>
