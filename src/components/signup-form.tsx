@@ -51,7 +51,7 @@ export function SignupForm() {
   function onSubmit(values: z.infer<typeof signupFormSchema>) {
     startTransition(() => {
       // In a real application, you would handle the signup logic here,
-      // such as calling an API endpoint.
+      // such as calling an API endpoint and then sending an OTP.
       console.log(values);
       
       toast({
@@ -59,11 +59,8 @@ export function SignupForm() {
         description: "A verification code has been sent to your email.",
       });
 
-      // For this prototype, we'll just redirect to the login page
-      // after a short delay.
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      // For this prototype, we'll redirect to the verify page.
+      router.push(`/signup/verify?email=${encodeURIComponent(values.email)}`);
     });
   }
 
