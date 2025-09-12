@@ -147,3 +147,30 @@ export interface DetailedQuotation {
   validity: string;
   status: FinancialStatus;
 }
+
+
+// Field Staff Payment Types
+export interface FieldStaff {
+    id: number;
+    name: string;
+    role: string;
+    contact: string;
+}
+
+export type FieldPaymentStatus = 'Pending' | 'Paid' | 'Acknowledged';
+
+export interface FieldPaymentRequest {
+    id: number;
+    staffId: number;
+    staffName: string;
+    workDescription: string;
+    daysWorked: number;
+    rate: number;
+    totalAmount: number;
+    status: FieldPaymentStatus;
+    requestDate: string;
+    paymentDate?: string;
+    receiptFile?: string;
+}
+
+    

@@ -1,6 +1,7 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest } from "@/types";
+import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"];
 
@@ -157,5 +158,35 @@ export const mockAttendance: AttendanceRecord[] = [
     { id: 5, userId: 1, date: '2024-07-28', status: 'On Leave' },
 ];
 
+export const mockFieldPaymentRequests: FieldPaymentRequest[] = [
+    {
+        id: 1,
+        staffId: 1,
+        staffName: "John Power",
+        workDescription: "Stage setup for Judiciary event",
+        daysWorked: 2,
+        rate: 150000,
+        totalAmount: 300000,
+        status: 'Paid',
+        requestDate: "2024-07-25",
+        paymentDate: "2024-07-26",
+    },
+    {
+        id: 2,
+        staffId: 2,
+        staffName: "Alice Sound",
+        workDescription: "Sound engineering for music concert",
+        daysWorked: 1,
+        rate: 250000,
+        totalAmount: 250000,
+        status: 'Pending',
+        requestDate: "2024-07-28",
+    }
+];
+
+
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';
+export { mockFieldStaff } from './mock-field-staff';
+
+    

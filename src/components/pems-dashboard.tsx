@@ -28,14 +28,15 @@ import {
   UserCheck,
   ChevronRight,
   MoreVertical,
+  Users,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus, KpiStatus } from "@/types";
+import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance, mockFieldPaymentRequests, mockFieldStaff } from "@/lib/mock-data";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus, KpiStatus, FieldPaymentRequest, FieldPaymentStatus } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -149,8 +150,8 @@ type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "
 
 const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi", "attendance"],
-  "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi"],
-  "HR/Admin": ["reports", "notifications", "kpi"],
+  "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi", "attendance"],
+  "HR/Admin": ["reports", "notifications", "kpi", "attendance"],
   "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
   "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
   "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests", "kpi"],
@@ -188,7 +189,7 @@ const navItems: Record<
   attendance: {
     label: "Attendance",
     icon: UserCheck,
-    forRoles: ["Store Manager", "CEO", "Director"],
+    forRoles: ["Store Manager", "CEO", "Director", "HR/Admin", "Finance Manager"],
   },
   finance: {
     label: "Finance",
@@ -242,6 +243,15 @@ const attendanceFormSchema = z.object({
     notes: z.string().optional(),
 });
 
+const fieldPaymentRequestSchema = z.object({
+    staffId: z.string().min(1, "Please select a staff member."),
+    workDescription: z.string().min(5, "Please provide a brief work description."),
+    daysWorked: z.coerce.number().min(0.5, "Please enter a valid number of days."),
+    rate: z.coerce.number().min(1, "Please enter a valid rate."),
+    requestDate: z.date(),
+})
+
+
 export default function PEMSDashboard() {
   const { toast } = useToast();
   const router = useRouter();
@@ -250,6 +260,7 @@ export default function PEMSDashboard() {
   const [inventory, setInventory] = React.useState<InventoryItem[]>(initialInventory);
   const [kpis, setKpis] = React.useState<Kpi[]>(mockKpis);
   const [attendance, setAttendance] = React.useState<AttendanceRecord[]>(mockAttendance);
+  const [fieldPayments, setFieldPayments] = React.useState<FieldPaymentRequest[]>(mockFieldPaymentRequests);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
   
@@ -407,6 +418,49 @@ export default function PEMSDashboard() {
         description: `Attendance for ${mockUsers.find(u => u.id.toString() === values.userId)?.username} on ${format(values.date, "PPP")} has been logged as ${values.status}.`,
     });
   };
+
+  const addFieldPaymentRequest = (values: z.infer<typeof fieldPaymentRequestSchema>) => {
+    const staffMember = mockFieldStaff.find(s => s.id === parseInt(values.staffId));
+    if (!staffMember) return;
+
+    const newRequest: FieldPaymentRequest = {
+        id: fieldPayments.length + 1,
+        staffId: parseInt(values.staffId),
+        staffName: staffMember.name,
+        workDescription: values.workDescription,
+        daysWorked: values.daysWorked,
+        rate: values.rate,
+        totalAmount: values.daysWorked * values.rate,
+        status: 'Pending',
+        requestDate: format(values.requestDate, "yyyy-MM-dd"),
+    };
+    setFieldPayments(prev => [newRequest, ...prev]);
+    addNotification(`New payment request for ${staffMember.name} (UGX ${newRequest.totalAmount.toLocaleString()}) needs approval.`, ['Finance Manager']);
+    toast({
+        title: "Payment Request Submitted",
+        description: `Requisition for ${staffMember.name} has been sent to Finance.`,
+    });
+  };
+
+  const updateFieldPaymentStatus = (id: number, status: FieldPaymentStatus) => {
+    setFieldPayments(prev => prev.map(p => {
+      if (p.id === id) {
+        const updatedPayment = { ...p, status };
+        if (status === 'Paid') {
+          updatedPayment.paymentDate = format(new Date(), "yyyy-MM-dd");
+          addNotification(`Payment for ${p.staffName} has been processed. Please acknowledge and upload receipt.`, ['CEO']);
+        }
+        if (status === 'Acknowledged') {
+            // In a real app, this would trigger a file upload dialog
+             updatedPayment.receiptFile = 'receipt_placeholder.pdf';
+             addNotification(`CEO has acknowledged payment for ${p.staffName}.`, ['Finance Manager']);
+        }
+        return updatedPayment;
+      }
+      return p;
+    }));
+  };
+
 
   const addNotification = (message: string, forRoles: UserRole[]) => {
     const newNotification: AppNotification = {
@@ -614,7 +668,7 @@ export default function PEMSDashboard() {
             )}
             {activeView === "requests" && <RequestsView role={role} inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} onCompleteKpi={completeKpi} />}
-            {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} />}
+            {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} role={role} fieldPayments={fieldPayments} onAddFieldPayment={addFieldPaymentRequest} onUpdateFieldPaymentStatus={updateFieldPaymentStatus} />}
             {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
             {activeView === "notifications" && (
@@ -736,7 +790,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
+                              <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -849,7 +903,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => issueForm.handleSubmit(handleIssueSubmit)()}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={issueForm.handleSubmit(handleIssueSubmit)}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -883,7 +937,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => returnForm.handleSubmit(handleReturnSubmit)()}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={returnForm.handleSubmit(handleReturnSubmit)}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -1375,7 +1429,7 @@ function KpiTrackerView({ kpis, onAddKpi, onCompleteKpi }: { kpis: Kpi[], onAddK
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
+                                                <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -1471,7 +1525,198 @@ function KpiTrackerView({ kpis, onAddKpi, onCompleteKpi }: { kpis: Kpi[], onAddK
     );
 }
 
-function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRecord[], onAddRecord: (values: z.infer<typeof attendanceFormSchema>) => void }) {
+function AttendanceView({ attendance, onAddRecord, role, fieldPayments, onAddFieldPayment, onUpdateFieldPaymentStatus }: { attendance: AttendanceRecord[], onAddRecord: (values: z.infer<typeof attendanceFormSchema>) => void, role: UserRole | null, fieldPayments: FieldPaymentRequest[], onAddFieldPayment: (values: z.infer<typeof fieldPaymentRequestSchema>) => void, onUpdateFieldPaymentStatus: (id: number, status: FieldPaymentStatus) => void; }) {
+    const defaultTab = role === 'CEO' ? "field_payments" : "records";
+    const paymentForm = useForm<z.infer<typeof fieldPaymentRequestSchema>>({
+        resolver: zodResolver(fieldPaymentRequestSchema),
+        defaultValues: {
+            requestDate: new Date(),
+            daysWorked: 1,
+            rate: 0,
+        },
+    });
+    
+    function handlePaymentSubmit(values: z.infer<typeof fieldPaymentRequestSchema>) {
+        onAddFieldPayment(values);
+        paymentForm.reset({
+            requestDate: new Date(),
+            daysWorked: 1,
+            rate: 0,
+            staffId: undefined,
+            workDescription: "",
+        });
+    }
+
+    const isFinance = role === 'Finance Manager';
+
+    const paymentStatusColors: Record<FieldPaymentStatus, string> = {
+        Pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300",
+        Paid: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300",
+        Acknowledged: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
+    };
+    
+    const paymentByStaff = fieldPayments.reduce((acc, p) => {
+        if (p.status === 'Paid' || p.status === 'Acknowledged') {
+            acc[p.staffName] = (acc[p.staffName] || 0) + p.totalAmount;
+        }
+        return acc;
+    }, {} as Record<string, number>);
+
+    const paymentChartData = Object.entries(paymentByStaff).map(([name, amount]) => ({ name, amount }));
+
+
+    return (
+        <Tabs defaultValue={defaultTab} className="w-full">
+            <TabsList className={cn("grid w-full", role === 'CEO' || isFinance ? "grid-cols-3" : "grid-cols-2")}>
+                <TabsTrigger value="records">Staff Attendance</TabsTrigger>
+                <TabsTrigger value="log">Log Attendance</TabsTrigger>
+                 {(role === 'CEO' || isFinance) && <TabsTrigger value="field_payments">Field Payments</TabsTrigger>}
+            </TabsList>
+            <TabsContent value="log">
+                <StaffAttendanceLogForm onAddRecord={onAddRecord} />
+            </TabsContent>
+            <TabsContent value="records">
+                <StaffAttendanceRecords attendance={attendance} />
+            </TabsContent>
+             {(role === 'CEO' || isFinance) && (
+                <TabsContent value="field_payments">
+                    <div className="grid gap-6">
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <Card className="md:col-span-2">
+                                <CardHeader>
+                                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                        <div>
+                                            <CardTitle className="font-headline">Field Staff Payments</CardTitle>
+                                            <CardDescription>Create and track payment requisitions for casual workers.</CardDescription>
+                                        </div>
+                                        {role === 'CEO' &&
+                                            <Dialog>
+                                                <DialogTrigger asChild><Button><PlusCircle className="mr-2"/>New Request</Button></DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>New Field Payment Request</DialogTitle>
+                                                        <DialogDescription>Fill in the details to send a payment requisition to finance.</DialogDescription>
+                                                    </DialogHeader>
+                                                     <Form {...paymentForm}>
+                                                        <form onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)} className="space-y-4">
+                                                             <FormField
+                                                                control={paymentForm.control}
+                                                                name="staffId"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Staff Member</FormLabel>
+                                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                            <FormControl><SelectTrigger><SelectValue placeholder="Select a staff member" /></SelectTrigger></FormControl>
+                                                                            <SelectContent>
+                                                                                {mockFieldStaff.map((s) => (<SelectItem key={s.id} value={s.id.toString()}>{s.name} ({s.role})</SelectItem>))}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={paymentForm.control}
+                                                                name="workDescription"
+                                                                render={({ field }) => (<FormItem><FormLabel>Work Description</FormLabel><FormControl><Input placeholder="e.g., Stage setup for Judiciary event" {...field} /></FormControl><FormMessage /></FormItem>)}
+                                                            />
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <FormField control={paymentForm.control} name="daysWorked" render={({ field }) => (<FormItem><FormLabel>Days/Units</FormLabel><FormControl><Input type="number" step="0.5" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                                                                <FormField control={paymentForm.control} name="rate" render={({ field }) => (<FormItem><FormLabel>Rate (UGX)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)}/>
+                                                            </div>
+                                                             <FormField
+                                                                control={paymentForm.control}
+                                                                name="requestDate"
+                                                                render={({ field }) => (
+                                                                    <FormItem className="flex flex-col">
+                                                                    <FormLabel>Request Date</FormLabel>
+                                                                    <Popover>
+                                                                        <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>
+                                                                            {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
+                                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/></PopoverContent>
+                                                                    </Popover>
+                                                                    <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <DialogFooter>
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger asChild><Button type="button">Submit Request</Button></AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                                            <AlertDialogDescription>This will send a payment requisition to the finance department.</AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                            <AlertDialogAction onClick={paymentForm.handleSubmit(handlePaymentSubmit)}>Continue</AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
+                                                            </DialogFooter>
+                                                        </form>
+                                                     </Form>
+                                                </DialogContent>
+                                            </Dialog>
+                                        }
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader><TableRow><TableHead>Staff</TableHead><TableHead>Description</TableHead><TableHead>Amount</TableHead><TableHead>Status</TableHead><TableHead>Requested</TableHead><TableHead>Paid</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+                                        <TableBody>
+                                            {fieldPayments.map(p => (
+                                                <TableRow key={p.id}>
+                                                    <TableCell className="font-medium">{p.staffName}</TableCell>
+                                                    <TableCell>{p.workDescription}</TableCell>
+                                                    <TableCell>UGX {p.totalAmount.toLocaleString()}</TableCell>
+                                                    <TableCell><Badge className={paymentStatusColors[p.status]}>{p.status}</Badge></TableCell>
+                                                    <TableCell>{format(new Date(p.requestDate), 'PPP')}</TableCell>
+                                                    <TableCell>{p.paymentDate ? format(new Date(p.paymentDate), 'PPP') : 'N/A'}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                                            <DropdownMenuContent>
+                                                                {isFinance && p.status === 'Pending' && <DropdownMenuItem onSelect={() => onUpdateFieldPaymentStatus(p.id, 'Paid')}>Mark as Paid</DropdownMenuItem>}
+                                                                {role === 'CEO' && p.status === 'Paid' && <DropdownMenuItem onSelect={() => onUpdateFieldPaymentStatus(p.id, 'Acknowledged')}>Acknowledge & Upload Receipt</DropdownMenuItem>}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader><CardTitle>Payments by Staff</CardTitle><CardDescription>Total amounts paid out to field staff.</CardDescription></CardHeader>
+                                <CardContent>
+                                    <ChartContainer config={{}} className="min-h-[250px] w-full">
+                                        <RechartsBarChart data={paymentChartData} layout="vertical" margin={{left: 20, right: 20}}>
+                                            <CartesianGrid horizontal={false} />
+                                            <XAxis type="number" dataKey="amount" tickFormatter={(val) => `UGX ${val/1000}k`} />
+                                            <YAxis dataKey="name" type="category" width={80} />
+                                            <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} content={<ChartTooltipContent />} />
+                                            <Bar dataKey="amount" fill="hsl(var(--chart-1))" radius={4} />
+                                        </RechartsBarChart>
+                                    </ChartContainer>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </TabsContent>
+             )}
+        </Tabs>
+    );
+}
+
+function StaffAttendanceLogForm({ onAddRecord }: { onAddRecord: (values: z.infer<typeof attendanceFormSchema>) => void }) {
     const form = useForm<z.infer<typeof attendanceFormSchema>>({
         resolver: zodResolver(attendanceFormSchema),
         defaultValues: {
@@ -1479,10 +1724,6 @@ function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRec
             notes: "",
         },
     });
-
-    const getUserDetails = (userId: number) => {
-        return mockUsers.find(u => u.id === userId);
-    };
 
     function onSubmit(values: z.infer<typeof attendanceFormSchema>) {
         onAddRecord(values);
@@ -1494,204 +1735,203 @@ function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRec
         });
     }
 
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Log Daily Attendance</CardTitle>
+                <CardDescription>Select the user and mark their attendance for the day.</CardDescription>
+            </CardHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                                control={form.control}
+                                name="userId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>User</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a user" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {mockUsers.map((user) => (
+                                                    <SelectItem key={user.id} value={user.id.toString()}>
+                                                        {user.username} ({user.role})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="date"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                    <FormLabel>Date</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full pl-3 text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                            >
+                                            {field.value ? (
+                                                format(field.value, "PPP")
+                                            ) : (
+                                                <span>Pick a date</span>
+                                            )}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                        </PopoverContent>
+                                    </Popover>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                        </div>
+                            <FormField
+                            control={form.control}
+                            name="status"
+                            render={({ field }) => (
+                            <FormItem className="space-y-3">
+                                <FormLabel>Status</FormLabel>
+                                <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex flex-col space-y-1"
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Present" id="s-present" />
+                                        <Label htmlFor="s-present">Present</Label>
+                                    </div>
+                                        <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Late" id="s-late" />
+                                        <Label htmlFor="s-late">Late</Label>
+                                    </div>
+                                        <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="Absent" id="s-absent" />
+                                        <Label htmlFor="s-absent">Absent</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="On Leave" id="s-leave" />
+                                        <Label htmlFor="s-leave">On Leave</Label>
+                                    </div>
+                                </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="notes"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Notes (Optional)</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="e.g., Arrived late due to traffic" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                    <CardFooter>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button type="button">Save Record</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will log the attendance record for the selected user.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </CardFooter>
+                </form>
+            </Form>
+        </Card>
+    )
+}
+
+function StaffAttendanceRecords({ attendance }: { attendance: AttendanceRecord[] }) {
+    const getUserDetails = (userId: number) => {
+        return mockUsers.find(u => u.id === userId);
+    };
+
     const statusColors: Record<AttendanceStatus, string> = {
         Present: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300",
         Late: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300",
         Absent: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300",
         "On Leave": "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300",
     };
-
     return (
-        <Tabs defaultValue="log">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="log">Log Attendance</TabsTrigger>
-                <TabsTrigger value="records">View Records</TabsTrigger>
-            </TabsList>
-            <TabsContent value="log">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline">Log Daily Attendance</CardTitle>
-                        <CardDescription>Select the user and mark their attendance for the day.</CardDescription>
-                    </CardHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <CardContent className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="userId"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>User</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Select a user" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {mockUsers.map((user) => (
-                                                            <SelectItem key={user.id} value={user.id.toString()}>
-                                                                {user.username} ({user.role})
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="date"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-col">
-                                            <FormLabel>Date</FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-full pl-3 text-left font-normal",
-                                                        !field.value && "text-muted-foreground"
-                                                    )}
-                                                    >
-                                                    {field.value ? (
-                                                        format(field.value, "PPP")
-                                                    ) : (
-                                                        <span>Pick a date</span>
-                                                    )}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    initialFocus
-                                                />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormMessage />
-                                            </FormItem>
-                                        )}
-                                        />
-                                </div>
-                                 <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
-                                    <FormItem className="space-y-3">
-                                        <FormLabel>Status</FormLabel>
-                                        <FormControl>
-                                        <RadioGroup
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            className="flex flex-col space-y-1"
-                                        >
-                                            <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="Present" id="s-present" />
-                                                <Label htmlFor="s-present">Present</Label>
-                                            </div>
-                                             <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="Late" id="s-late" />
-                                                <Label htmlFor="s-late">Late</Label>
-                                            </div>
-                                             <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="Absent" id="s-absent" />
-                                                <Label htmlFor="s-absent">Absent</Label>
-                                            </div>
-                                            <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="On Leave" id="s-leave" />
-                                                <Label htmlFor="s-leave">On Leave</Label>
-                                            </div>
-                                        </RadioGroup>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="notes"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Notes (Optional)</FormLabel>
-                                            <FormControl>
-                                                <Textarea placeholder="e.g., Arrived late due to traffic" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </CardContent>
-                            <CardFooter>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button type="button">Save Record</Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This will log the attendance record for the selected user.
-                                        </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </CardFooter>
-                        </form>
-                    </Form>
-                </Card>
-            </TabsContent>
-            <TabsContent value="records">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline">Attendance History</CardTitle>
-                        <CardDescription>A log of all recorded attendance.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>User</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Notes</TableHead>
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Attendance History</CardTitle>
+                <CardDescription>A log of all recorded attendance.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>User</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Notes</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {attendance.map((record) => {
+                            const user = getUserDetails(record.userId);
+                            return (
+                                <TableRow key={record.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{user?.username}</div>
+                                        <div className="text-xs text-muted-foreground">{user?.role}</div>
+                                    </TableCell>
+                                    <TableCell>{format(new Date(record.date), "PPP")}</TableCell>
+                                    <TableCell>
+                                        <Badge className={cn("capitalize", statusColors[record.status])} variant="outline">{record.status}</Badge>
+                                    </TableCell>
+                                    <TableCell>{record.notes || 'N/A'}</TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {attendance.map((record) => {
-                                    const user = getUserDetails(record.userId);
-                                    return (
-                                        <TableRow key={record.id}>
-                                            <TableCell>
-                                                <div className="font-medium">{user?.username}</div>
-                                                <div className="text-xs text-muted-foreground">{user?.role}</div>
-                                            </TableCell>
-                                            <TableCell>{format(new Date(record.date), "PPP")}</TableCell>
-                                            <TableCell>
-                                                <Badge className={cn("capitalize", statusColors[record.status])} variant="outline">{record.status}</Badge>
-                                            </TableCell>
-                                            <TableCell>{record.notes || 'N/A'}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-            </TabsContent>
-        </Tabs>
-    );
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    )
 }
+
 
 function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
   
@@ -1720,7 +1960,7 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
     return { name: category, value: total };
   }).filter(c => c.value > 0);
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+  const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
   return (
     <Tabs defaultValue="summary">
@@ -1916,3 +2156,6 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
+
+
+    
