@@ -148,7 +148,7 @@ export default function NewQuotationPage() {
                 <div className="flex gap-2">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="secondary">Save Draft</Button>
+                            <Button variant="secondary" type="button">Save Draft</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
@@ -159,7 +159,7 @@ export default function NewQuotationPage() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                            <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
@@ -499,5 +499,3 @@ export default function NewQuotationPage() {
     </div>
   );
 }
-
-    

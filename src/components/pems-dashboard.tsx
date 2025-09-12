@@ -705,7 +705,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                     <DialogFooter>
                       <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button>Log Restock</Button>
+                            <Button type="button">Log Restock</Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
@@ -716,7 +716,7 @@ function InventoryView({ inventory, searchQuery, setSearchQuery, onRestock }: { 
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                              <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -818,7 +818,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
               <CardFooter>
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button>Issue Item</Button>
+                        <Button type="button">Issue Item</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -829,7 +829,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={issueForm.handleSubmit(handleIssueSubmit)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => issueForm.handleSubmit(handleIssueSubmit)()}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -852,7 +852,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
               <CardFooter>
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button>Receive Item</Button>
+                        <Button type="button">Receive Item</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -863,7 +863,7 @@ function TransactionsView({ inventory, onIssue, onReturn }: { inventory: (Invent
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={returnForm.handleSubmit(handleReturnSubmit)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => returnForm.handleSubmit(handleReturnSubmit)()}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -1276,7 +1276,7 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                     <DialogFooter>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button>Save KPI</Button>
+                                                <Button type="button">Save KPI</Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
@@ -1287,7 +1287,7 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -1492,7 +1492,7 @@ function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRec
                             <CardFooter>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button>Save Record</Button>
+                                        <Button type="button">Save Record</Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
@@ -1503,7 +1503,7 @@ function AttendanceView({ attendance, onAddRecord }: { attendance: AttendanceRec
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                                        <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>
@@ -1777,5 +1777,3 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
     </Card>
   );
 }
-
-    

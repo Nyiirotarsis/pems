@@ -271,7 +271,7 @@ export default function NewInvoicePage() {
             <CardFooter>
               <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button>
+                    <Button type="button">
                       <Receipt className="mr-2" />
                       Save Invoice
                     </Button>
@@ -285,7 +285,7 @@ export default function NewInvoicePage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                      <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

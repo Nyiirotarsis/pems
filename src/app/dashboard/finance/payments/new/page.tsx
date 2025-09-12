@@ -228,7 +228,7 @@ export default function NewPaymentPage() {
             <CardFooter>
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button>
+                        <Button type="button">
                             <DollarSign className="mr-2" />
                             Record Payment
                         </Button>
@@ -242,7 +242,7 @@ export default function NewPaymentPage() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

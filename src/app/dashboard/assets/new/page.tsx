@@ -219,7 +219,7 @@ export default function NewAssetPage() {
             <CardFooter>
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button>
+                        <Button type="button">
                             <PlusCircle className="mr-2" />
                             Save Asset
                         </Button>
@@ -233,7 +233,7 @@ export default function NewAssetPage() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

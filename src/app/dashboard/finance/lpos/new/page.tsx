@@ -333,7 +333,7 @@ export default function NewLpoPage() {
             <CardFooter>
               <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button>
+                    <Button type="button">
                       <FileText className="mr-2" />
                       Save LPO
                     </Button>
@@ -347,7 +347,7 @@ export default function NewLpoPage() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                      <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

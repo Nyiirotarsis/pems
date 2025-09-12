@@ -237,7 +237,7 @@ export default function EditAssetPage() {
             <CardFooter>
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button>
+                        <Button type="button">
                             <Save className="mr-2" />
                             Save Changes
                         </Button>
@@ -251,7 +251,7 @@ export default function EditAssetPage() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={form.handleSubmit(onSubmit)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => form.handleSubmit(onSubmit)()}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
