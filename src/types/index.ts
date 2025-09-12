@@ -1,6 +1,5 @@
 
 
-
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
 export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
@@ -102,6 +101,8 @@ export interface Payment {
 }
 
 // KPI Tracker Types
+export type KpiStatus = "Pending" | "In Progress" | "Completed";
+
 export interface Kpi {
     id: number;
     userId: number;
@@ -109,6 +110,10 @@ export interface Kpi {
     activityName: string;
     description: string;
     frequency: "Daily" | "Weekly" | "Monthly" | "Quarterly";
+    startDate: string;
+    endDate: string;
+    status: KpiStatus;
+    finishedDate?: string;
 }
 
 // Attendance Types
@@ -142,5 +147,3 @@ export interface DetailedQuotation {
   validity: string;
   status: FinancialStatus;
 }
-
-    

@@ -27,6 +27,7 @@ import {
   PieChartIcon,
   UserCheck,
   ChevronRight,
+  MoreVertical,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -34,7 +35,7 @@ import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus } from "@/types";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus, KpiStatus } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -142,6 +143,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type View = "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance";
 
@@ -229,6 +231,8 @@ const kpiFormSchema = z.object({
     activityName: z.string().min(2, "Activity name is required."),
     description: z.string().min(10, "Description must be at least 10 characters."),
     frequency: z.enum(["Daily", "Weekly", "Monthly", "Quarterly"]),
+    startDate: z.date(),
+    endDate: z.date(),
 });
 
 const attendanceFormSchema = z.object({
@@ -365,6 +369,9 @@ export default function PEMSDashboard() {
           id: Date.now(),
           userId: parseInt(values.userId),
           ...values,
+          startDate: format(values.startDate, "yyyy-MM-dd"),
+          endDate: format(values.endDate, "yyyy-MM-dd"),
+          status: 'Pending',
       };
       setKpis(prev => [newKpi, ...prev]);
       toast({
@@ -372,6 +379,19 @@ export default function PEMSDashboard() {
         description: `A new KPI "${values.activityName}" has been added.`,
       })
   }
+
+  const completeKpi = (kpiId: number) => {
+    setKpis(prev => prev.map(kpi => 
+        kpi.id === kpiId 
+        ? { ...kpi, status: 'Completed', finishedDate: format(new Date(), "yyyy-MM-dd") } 
+        : kpi
+    ));
+    toast({
+        title: "KPI Completed",
+        description: `The KPI has been marked as completed.`
+    });
+  }
+
 
   const addAttendanceRecord = (values: z.infer<typeof attendanceFormSchema>) => {
     const newRecord: AttendanceRecord = {
@@ -593,7 +613,7 @@ export default function PEMSDashboard() {
               />
             )}
             {activeView === "requests" && <RequestsView role={role} inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
-            {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} />}
+            {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} onCompleteKpi={completeKpi} />}
             {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} />}
             {activeView === "finance" && <FinanceModule />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
@@ -1153,13 +1173,15 @@ function RequestsView({ inventory, onNotify, role }: { inventory: (InventoryItem
   );
 }
 
-function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.infer<typeof kpiFormSchema>) => void }) {
+function KpiTrackerView({ kpis, onAddKpi, onCompleteKpi }: { kpis: Kpi[], onAddKpi: (values: z.infer<typeof kpiFormSchema>) => void, onCompleteKpi: (kpiId: number) => void }) {
     const form = useForm<z.infer<typeof kpiFormSchema>>({
         resolver: zodResolver(kpiFormSchema),
         defaultValues: {
             category: "",
             activityName: "",
             description: "",
+            startDate: new Date(),
+            endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
         },
     });
 
@@ -1172,9 +1194,23 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
         onAddKpi(values);
         form.reset();
     }
+
+    const kpiStatusData = [
+        { status: 'Pending', count: kpis.filter(k => k.status === 'Pending').length, fill: "hsl(var(--chart-5))" },
+        { status: 'In Progress', count: kpis.filter(k => k.status === 'In Progress').length, fill: "hsl(var(--chart-3))" },
+        { status: 'Completed', count: kpis.filter(k => k.status === 'Completed').length, fill: "hsl(var(--chart-2))" }
+    ].filter(d => d.count > 0);
+    
+    const kpiStatusColors: Record<KpiStatus, string> = {
+      "Pending": "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
+      "In Progress": "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700",
+      "Completed": "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
+    }
     
     return (
-        <Card>
+      <div className="grid gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="md:col-span-2">
             <CardHeader>
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                     <div>
@@ -1187,7 +1223,7 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                 <PlusCircle className="mr-2 h-4 w-4" /> Add KPI
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
+                        <DialogContent className="sm:max-w-md">
                             <DialogHeader>
                                 <DialogTitle className="font-headline">Add New KPI</DialogTitle>
                                 <DialogDescription>Fill in the details for the new performance indicator.</DialogDescription>
@@ -1220,22 +1256,22 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                     />
                                     <FormField
                                         control={form.control}
-                                        name="category"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Activity Category</FormLabel>
-                                                <FormControl><Input placeholder="e.g., Customer Service" {...field} /></FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
                                         name="activityName"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Activity Name</FormLabel>
                                                 <FormControl><Input placeholder="e.g., Response Time" {...field} /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <FormField
+                                        control={form.control}
+                                        name="category"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Activity Category</FormLabel>
+                                                <FormControl><Input placeholder="e.g., Customer Service" {...field} /></FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -1251,6 +1287,58 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                             </FormItem>
                                         )}
                                     />
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <FormField
+                                          control={form.control}
+                                          name="startDate"
+                                          render={({ field }) => (
+                                              <FormItem>
+                                                  <FormLabel>Start Date</FormLabel>
+                                                  <Popover>
+                                                      <PopoverTrigger asChild>
+                                                      <FormControl>
+                                                          <Button
+                                                          variant={"outline"}
+                                                          className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>
+                                                          {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
+                                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                          </Button>
+                                                      </FormControl>
+                                                      </PopoverTrigger>
+                                                      <PopoverContent className="w-auto p-0" align="start">
+                                                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/>
+                                                      </PopoverContent>
+                                                  </Popover>
+                                                  <FormMessage />
+                                              </FormItem>
+                                          )}
+                                      />
+                                       <FormField
+                                          control={form.control}
+                                          name="endDate"
+                                          render={({ field }) => (
+                                              <FormItem>
+                                                  <FormLabel>End Date</FormLabel>
+                                                  <Popover>
+                                                      <PopoverTrigger asChild>
+                                                      <FormControl>
+                                                          <Button
+                                                          variant={"outline"}
+                                                          className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>
+                                                          {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
+                                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                          </Button>
+                                                      </FormControl>
+                                                      </PopoverTrigger>
+                                                      <PopoverContent className="w-auto p-0" align="start">
+                                                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus/>
+                                                      </PopoverContent>
+                                                  </Popover>
+                                                  <FormMessage />
+                                              </FormItem>
+                                          )}
+                                      />
+                                    </div>
                                     <FormField
                                         control={form.control}
                                         name="frequency"
@@ -1303,10 +1391,11 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                     <TableHeader>
                         <TableRow>
                             <TableHead>Person</TableHead>
-                            <TableHead>Category</TableHead>
                             <TableHead>Activity</TableHead>
-                            <TableHead>KPI Description</TableHead>
-                            <TableHead>Frequency</TableHead>
+                            <TableHead>Timeline</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Finished Date</TableHead>
+                            <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1318,17 +1407,67 @@ function KpiTrackerView({ kpis, onAddKpi }: { kpis: Kpi[], onAddKpi: (values: z.
                                         <div className="font-medium">{user.name}</div>
                                         <div className="text-xs text-muted-foreground">{user.role}</div>
                                     </TableCell>
-                                    <TableCell>{kpi.category}</TableCell>
-                                    <TableCell>{kpi.activityName}</TableCell>
-                                    <TableCell className="max-w-xs">{kpi.description}</TableCell>
-                                    <TableCell><Badge variant="secondary">{kpi.frequency}</Badge></TableCell>
+                                    <TableCell>
+                                        <div className="font-medium">{kpi.activityName}</div>
+                                        <div className="text-xs text-muted-foreground">{kpi.category}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="text-sm">{format(new Date(kpi.startDate), 'dd MMM')} - {format(new Date(kpi.endDate), 'dd MMM, yyyy')}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Badge variant="outline" className={cn("capitalize", kpiStatusColors[kpi.status])}>{kpi.status}</Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                      {kpi.finishedDate ? format(new Date(kpi.finishedDate), "PPP") : 'N/A'}
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                       <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                              <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent>
+                                               <DropdownMenuItem onSelect={() => onCompleteKpi(kpi.id)} disabled={kpi.status === 'Completed'}>
+                                                  <Check className="mr-2 h-4 w-4" />
+                                                  Mark as Completed
+                                               </DropdownMenuItem>
+                                          </DropdownMenuContent>
+                                      </DropdownMenu>
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}
                     </TableBody>
                 </Table>
             </CardContent>
-        </Card>
+          </Card>
+          <Card>
+             <CardHeader>
+                <CardTitle className="font-headline">KPI Status Overview</CardTitle>
+                <CardDescription>A summary of the status of all assigned KPIs.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               <ChartContainer config={{}} className="min-h-[250px] w-full">
+                    <RechartsBarChart data={kpiStatusData} layout="vertical" margin={{ left: 10, right: 30 }}>
+                       <CartesianGrid horizontal={false} />
+                       <XAxis type="number" hide />
+                       <YAxis 
+                         dataKey="status" 
+                         type="category" 
+                         tickLine={false} 
+                         axisLine={false} 
+                         tickMargin={10} 
+                         width={80}
+                       />
+                       <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} content={<ChartTooltipContent />} />
+                       <Bar dataKey="count" radius={5}>
+                          {kpiStatusData.map(d => <Cell key={d.status} fill={d.fill} />)}
+                       </Bar>
+                    </RechartsBarChart>
+               </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     );
 }
 
