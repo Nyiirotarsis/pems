@@ -57,6 +57,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { mockQuotations } from "@/lib/mock-data";
+import { PacificEventsLogo } from "@/components/icons";
 
 
 const quotationItemSchema = z.object({
@@ -202,7 +203,8 @@ export default function EditQuotationPage() {
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h3 className="font-bold text-lg">Pacific Events Limited</h3>
+                        <PacificEventsLogo className="h-16 w-auto" />
+                        <h3 className="font-bold text-lg mt-4">Pacific Events Limited</h3>
                         <p className="text-sm text-muted-foreground">Plot 663 Mugema Road, Lugala</p>
                         <p className="text-sm text-muted-foreground">TIN No.: 1042521004</p>
                         <p className="text-sm text-muted-foreground">Phone: +256 779 696774</p>
