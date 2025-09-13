@@ -41,6 +41,7 @@ export function OtpForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const code = searchParams.get("code");
+  const role = searchParams.get("role");
   const { toast } = useToast();
   const [isPending, startTransition] = React.useTransition();
 
@@ -61,6 +62,7 @@ export function OtpForm() {
     startTransition(() => {
       // In a real application, you would verify the OTP against a stored value.
       // For this prototype, we'll assume the code is correct if it matches the one from the URL.
+      // Also, you'd save the new user to the database here.
       if (values.code !== code) {
         toast({
             variant: "destructive",
@@ -72,7 +74,7 @@ export function OtpForm() {
       
       toast({
         title: "Account Verified",
-        description: "Your account has been successfully created. Please log in.",
+        description: `Your ${role} account has been successfully created. Please log in.`,
       });
 
       setTimeout(() => {
