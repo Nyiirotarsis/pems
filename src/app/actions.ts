@@ -24,3 +24,17 @@ export async function handleLogin(credentials: {username: string, password: stri
   }
   return { success: false, error: 'Invalid credentials' };
 }
+
+export async function handleSignup(data: {email: string; password: string, role: string}): Promise<{success: boolean; error?: string}> {
+    const existingUser = USERS.find(u => u.username === data.email);
+
+    if (existingUser) {
+        return { success: false, error: 'User already exists' };
+    }
+
+    // In a real app, you'd save the new user to the database here.
+    // For this prototype, we are not persisting the new user.
+    console.log('New user would be created:', data);
+    
+    return { success: true };
+}

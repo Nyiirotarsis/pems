@@ -37,6 +37,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
 import { ROLES } from "@/lib/mock-data";
+import { handleSignup } from "@/app/actions";
 
 const signupFormSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -61,15 +62,21 @@ export function SignupForm() {
 
   function onSubmit(values: z.infer<typeof signupFormSchema>) {
     startTransition(async () => {
-      // In a real app, you would save the new user to the database here.
-      console.log("New user created:", values);
+      const result = await handleSignup(values);
 
-      toast({
-        title: "Account Created",
-        description: `Your ${values.role} account has been successfully created. Please log in.`,
-      });
-
-      router.push('/login');
+      if (result.success) {
+        toast({
+          title: "Account Created",
+          description: `Your ${values.role} account has been successfully created. Please log in.`,
+        });
+        router.push('/login');
+      } else {
+        toast({
+            variant: "destructive",
+            title: "Sign-up Failed",
+            description: result.error || "An unexpected error occurred.",
+        });
+      }
     });
   }
 
