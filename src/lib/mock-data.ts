@@ -131,16 +131,17 @@ export const mockLPOs: LPO[] = [
     },
 ];
 
-export const mockInvoices: Invoice[] = [
-    { id: 'I001', number: 'INV-2024-001', supplier: 'Tech Solutions Ltd.', date: '2024-07-15', dueDate: '2024-08-15', amount: 1500, status: 'Paid' },
-    { id: 'I002', number: 'INV-2024-002', supplier: 'Global Logistics', date: '2024-07-20', dueDate: '2024-08-20', amount: 8000, status: 'Unpaid' },
-    { id: 'I003', number: 'INV-2024-003', supplier: 'Office Supreme', date: '2024-07-22', dueDate: '2024-08-22', amount: 2200, status: 'Partially Paid' },
-];
-
 export const mockPayments: Payment[] = [
     { id: 'P001', invoiceNumber: 'INV-2024-001', date: '2024-07-25', amount: 1500, method: 'Bank' },
     { id: 'P002', invoiceNumber: 'INV-2024-003', date: '2024-07-26', amount: 1000, method: 'Mobile Money' },
 ];
+
+export const mockInvoices: Invoice[] = [
+    { id: 'I001', number: 'INV-2024-001', supplier: 'Tech Solutions Ltd.', date: '2024-07-15', dueDate: '2024-08-15', amount: 1500, status: 'Paid', payments: mockPayments.filter(p => p.invoiceNumber === 'INV-2024-001') },
+    { id: 'I002', number: 'INV-2024-002', supplier: 'Global Logistics', date: '2024-07-20', dueDate: '2024-08-20', amount: 8000, status: 'Unpaid', payments: [] },
+    { id: 'I003', number: 'INV-2024-003', supplier: 'Office Supreme', date: '2024-07-22', dueDate: '2024-08-22', amount: 2200, status: 'Partially Paid', payments: mockPayments.filter(p => p.invoiceNumber === 'INV-2024-003') },
+];
+
 
 export const mockKpis: Kpi[] = [
     { id: 1, userId: 5, category: 'IT Support', activityName: 'Resolve Support Tickets', description: 'Resolve 95% of tier 1 support tickets within 24 hours.', frequency: 'Weekly', startDate: '2024-07-01', endDate: '2024-09-30', status: 'In Progress' },

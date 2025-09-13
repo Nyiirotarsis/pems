@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Calendar as CalendarIcon, DollarSign, Paperclip } from "lucide-react";
@@ -53,8 +53,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { mockInvoices } from "@/lib/mock-data";
-
+import { mockInvoices, mockPayments } from "@/lib/mock-data";
+import { updateInvoiceStatus } from "@/app/actions";
 
 const paymentFormSchema = z.object({
   invoiceNumber: z.string().min(1, "Please select an invoice."),
@@ -77,14 +77,55 @@ export default function NewPaymentPage() {
   });
   
   const fileRef = form.register("receipt");
+  
+  const watchedInvoiceNumber = useWatch({
+    control: form.control,
+    name: "invoiceNumber",
+  });
+  
+  const watchedAmount = useWatch({
+    control: form.control,
+    name: "amount",
+  });
 
-  function onSubmit(data: PaymentFormValues) {
-    console.log(data);
+  const selectedInvoice = React.useMemo(() => {
+    return mockInvoices.find(i => i.number === watchedInvoiceNumber);
+  }, [watchedInvoiceNumber]);
+
+  const paidAmount = React.useMemo(() => {
+    if (!selectedInvoice) return 0;
+    return mockPayments
+      .filter(p => p.invoiceNumber === selectedInvoice.number)
+      .reduce((acc, p) => acc + p.amount, 0);
+  }, [selectedInvoice]);
+
+  const balance = selectedInvoice ? selectedInvoice.amount - paidAmount : 0;
+  const newBalance = balance - (watchedAmount || 0);
+
+  async function onSubmit(data: PaymentFormValues) {
+    // In a real app, this would be a DB transaction
+    const newPayment = {
+      id: `P${String(mockPayments.length + 1).padStart(3, '0')}`,
+      date: format(data.paymentDate, "yyyy-MM-dd"),
+      ...data
+    };
+    mockPayments.push(newPayment);
+
+    const allPaymentsForInvoice = mockPayments.filter(p => p.invoiceNumber === data.invoiceNumber);
+    await updateInvoiceStatus(data.invoiceNumber, allPaymentsForInvoice);
+    
     toast({
       title: "Payment Recorded",
       description: `Payment of ${data.amount} for invoice ${data.invoiceNumber} has been recorded.`,
     });
-    form.reset();
+
+    form.reset({
+        paymentDate: new Date(),
+        amount: 0,
+        invoiceNumber: '',
+        method: undefined,
+        receipt: undefined
+    });
   }
 
   return (
@@ -114,7 +155,7 @@ export default function NewPaymentPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Invoice</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select an invoice to pay" />
@@ -123,7 +164,7 @@ export default function NewPaymentPage() {
                         <SelectContent>
                           {mockInvoices.filter(i => i.status !== 'Paid').map((invoice) => (
                             <SelectItem key={invoice.id} value={invoice.number}>
-                              {invoice.number} ({invoice.supplier}) - ${invoice.amount}
+                              {invoice.number} ({invoice.supplier}) - Amount: ${invoice.amount.toLocaleString()}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -132,6 +173,26 @@ export default function NewPaymentPage() {
                     </FormItem>
                   )}
                 />
+                
+                {selectedInvoice && (
+                    <Card className="bg-muted/50">
+                        <CardContent className="p-4 grid grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <p className="font-medium text-muted-foreground">Total Amount</p>
+                                <p className="font-bold text-lg">${selectedInvoice.amount.toLocaleString()}</p>
+                            </div>
+                             <div>
+                                <p className="font-medium text-muted-foreground">Current Balance</p>
+                                <p className="font-bold text-lg text-destructive">${balance.toLocaleString()}</p>
+                            </div>
+                             <div>
+                                <p className="font-medium text-muted-foreground">New Balance</p>
+                                <p className="font-bold text-lg text-green-600">${newBalance.toLocaleString()}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -140,7 +201,7 @@ export default function NewPaymentPage() {
                         <FormItem>
                           <FormLabel>Amount Paid</FormLabel>
                           <FormControl>
-                            <Input type="number" placeholder="1500.00" {...field} />
+                            <Input type="number" placeholder="0.00" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -191,7 +252,7 @@ export default function NewPaymentPage() {
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Payment Method</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select payment method" />

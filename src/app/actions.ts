@@ -2,8 +2,8 @@
 
 import { suggestOutsourcingOptions } from '@/ai/flows/suggest-outsourcing-options';
 import type { SuggestOutsourcingOptionsInput } from '@/ai/flows/suggest-outsourcing-options';
-import { USERS } from '@/lib/mock-data';
-import type { User } from '@/types';
+import { USERS, mockInvoices } from '@/lib/mock-data';
+import type { User, Invoice } from '@/types';
 
 export async function handleSuggestOutsourcing(input: SuggestOutsourcingOptionsInput) {
   try {
@@ -37,4 +37,24 @@ export async function handleSignup(data: {email: string; password: string, role:
     console.log('New user would be created:', data);
     
     return { success: true };
+}
+
+export async function updateInvoiceStatus(invoiceNumber: string, payments: { amount: number }[]): Promise<{ success: boolean; invoice?: Invoice }> {
+  const invoice = mockInvoices.find(inv => inv.number === invoiceNumber);
+  if (!invoice) {
+    return { success: false };
+  }
+
+  const totalPaid = payments.reduce((acc, p) => acc + p.amount, 0);
+  
+  if (totalPaid >= invoice.amount) {
+    invoice.status = "Paid";
+  } else if (totalPaid > 0) {
+    invoice.status = "Partially Paid";
+  } else {
+    invoice.status = "Unpaid";
+  }
+
+  // In a real app, this would save to a DB. Here we're mutating mock data.
+  return { success: true, invoice };
 }

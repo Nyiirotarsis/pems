@@ -92,6 +92,7 @@ export interface Invoice {
     dueDate: string;
     amount: number;
     status: "Paid" | "Unpaid" | "Partially Paid";
+    payments: Payment[];
     file?: string;
 }
 
@@ -186,5 +187,3 @@ export interface ReportsViewProps {
     invoices: Invoice[];
     payments: Payment[];
 }
-
-    
