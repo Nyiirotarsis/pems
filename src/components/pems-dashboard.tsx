@@ -42,7 +42,8 @@ import { PacificEventsLogo } from "@/components/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { format } from "date-fns";
+import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, isWithinInterval } from "date-fns";
+
 
 import {
   Bar,
@@ -1933,17 +1934,11 @@ function StaffAttendanceRecords({ attendance }: { attendance: AttendanceRecord[]
 }
 
 
-interface ReportsViewProps {
-    inventory: InventoryItem[];
-    role: UserRole | null;
-    quotations: Quotation[];
-    lpos: LPO[];
-    invoices: Invoice[];
-    payments: Payment[];
-}
+type TimeFilter = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
 
 function ReportsView({ inventory, role, quotations, lpos, invoices, payments }: ReportsViewProps) {
-  
+  const [timeFilter, setTimeFilter] = React.useState<TimeFilter>('monthly');
+
   const getInventoryTotals = (item: InventoryItem) => {
     const total = item.assets.length;
     const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
@@ -1968,33 +1963,62 @@ function ReportsView({ inventory, role, quotations, lpos, invoices, payments }: 
         .reduce((sum, item) => sum + item.assets.length, 0);
     return { name: category, value: total };
   }).filter(c => c.value > 0);
-  
-  // Financial chart data
+
+  // Financial chart data filtering
+  const now = new Date();
+  const dateRanges: Record<TimeFilter, Interval> = {
+      daily: { start: subDays(now, 1), end: now },
+      weekly: { start: startOfWeek(now), end: endOfWeek(now) },
+      monthly: { start: startOfMonth(now), end: endOfMonth(now) },
+      quarterly: { start: startOfQuarter(now), end: endOfQuarter(now) },
+      yearly: { start: startOfYear(now), end: endOfYear(now) }
+  };
+  const selectedInterval = dateRanges[timeFilter];
+
+  const filteredQuotations = quotations.filter(q => isWithinInterval(new Date(q.date), selectedInterval));
+  const filteredLPOs = lpos.filter(l => isWithinInterval(new Date(l.date), selectedInterval));
+  const filteredInvoices = invoices.filter(i => isWithinInterval(new Date(i.date), selectedInterval));
+  const filteredPayments = payments.filter(p => isWithinInterval(new Date(p.date), selectedInterval));
+
   const quotationStatusData = (["Approved", "Rejected", "Pending"] as FinancialStatus[]).map(status => ({
     name: status,
-    value: quotations.filter(q => q.status === status).length,
+    value: filteredQuotations.filter(q => q.status === status).length,
   })).filter(d => d.value > 0);
   
   const lpoStatusData = (["Delivered", "Pending"] as const).map(status => ({
       name: status,
-      count: lpos.filter(l => l.status === status).length,
+      count: filteredLPOs.filter(l => l.status === status).length,
   }));
   
   const invoiceStatusData = (["Paid", "Unpaid", "Partially Paid"] as const).map(status => ({
       name: status,
-      count: invoices.filter(i => i.status === status).length,
+      count: filteredInvoices.filter(i => i.status === status).length,
   }));
   
-  const paymentsByMonth = payments.reduce((acc, p) => {
-    const month = format(new Date(p.date), 'MMM yyyy');
-    acc[month] = (acc[month] || 0) + p.amount;
+  const paymentsByTime = filteredPayments.reduce((acc, p) => {
+      let key: string;
+      switch(timeFilter) {
+          case 'daily':
+          case 'weekly':
+              key = format(new Date(p.date), 'EEE'); // Day of week
+              break;
+          case 'monthly':
+              key = format(new Date(p.date), 'dd'); // Day of month
+              break;
+          case 'quarterly':
+          case 'yearly':
+              key = format(new Date(p.date), 'MMM'); // Month
+              break;
+      }
+    acc[key] = (acc[key] || 0) + p.amount;
     return acc;
   }, {} as Record<string, number>);
 
-  const paymentChartData = Object.entries(paymentsByMonth).map(([name, total]) => ({ name, total }));
-
+  const paymentChartData = Object.entries(paymentsByTime).map(([name, total]) => ({ name, total }));
 
   const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
+
+  const showFinanceReports = role === 'Finance Manager' || role === 'Director';
 
   return (
     <Tabs defaultValue="summary">
@@ -2006,7 +2030,7 @@ function ReportsView({ inventory, role, quotations, lpos, invoices, payments }: 
         <TabsList>
             <TabsTrigger value="summary"><PieChartIcon className="mr-2" /> Inventory Summary</TabsTrigger>
             <TabsTrigger value="details"><FileText className="mr-2" /> Detailed Stock</TabsTrigger>
-            {role === 'Finance Manager' && <TabsTrigger value="finance"><Landmark className="mr-2"/> Finance</TabsTrigger>}
+            {showFinanceReports && <TabsTrigger value="finance"><Landmark className="mr-2"/> Finance</TabsTrigger>}
         </TabsList>
       </div>
 
@@ -2153,6 +2177,19 @@ function ReportsView({ inventory, role, quotations, lpos, invoices, payments }: 
         </Card>
       </TabsContent>
        <TabsContent value="finance">
+          <div className="flex items-center justify-end space-x-2 mb-4">
+              {(['daily', 'weekly', 'monthly', 'quarterly', 'yearly'] as TimeFilter[]).map(filter => (
+                  <Button
+                      key={filter}
+                      variant={timeFilter === filter ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTimeFilter(filter)}
+                      className="capitalize"
+                  >
+                      {filter}
+                  </Button>
+              ))}
+          </div>
          <div className="grid gap-6">
             <div className="grid gap-6 md:grid-cols-2">
                <Card>
