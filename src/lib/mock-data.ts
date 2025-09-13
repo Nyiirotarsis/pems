@@ -3,7 +3,7 @@
 import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
-export const ROLES: UserRole[] = ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"];
+export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin"];
 
 export const assetCategories = ["IT Equipment", "AV Equipment", "Office Furniture", "Vehicles", "Software"];
 

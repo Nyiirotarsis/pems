@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
-import { generateAndSendOtp } from "@/ai/flows/generate-otp";
 import { ROLES } from "@/lib/mock-data";
 
 const signupFormSchema = z.object({
@@ -62,28 +61,15 @@ export function SignupForm() {
 
   function onSubmit(values: z.infer<typeof signupFormSchema>) {
     startTransition(async () => {
-      try {
-        const otpResponse = await generateAndSendOtp({ email: values.email });
-        const { code } = otpResponse;
+      // In a real app, you would save the new user to the database here.
+      console.log("New user created:", values);
 
-        toast({
-          title: "Sign Up Submitted",
-          description: `An OTP has been generated. Please use it to verify your account.`,
-        });
+      toast({
+        title: "Account Created",
+        description: `Your ${values.role} account has been successfully created. Please log in.`,
+      });
 
-        router.push(
-          `/signup/verify?email=${encodeURIComponent(
-            values.email
-          )}&code=${code}&role=${encodeURIComponent(values.role)}`
-        );
-      } catch (error) {
-        console.error("OTP Generation failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: "Could not generate an OTP. Please try again.",
-        });
-      }
+      router.push('/login');
     });
   }
 
@@ -129,7 +115,7 @@ export function SignupForm() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
-                      onClick={() => setShowPassword((prev) => !prev)}
+                      onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff /> : <Eye />}
                     </Button>
