@@ -35,8 +35,8 @@ import { useRouter } from "next/navigation";
 import { FinanceModule } from "@/components/finance-module";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance, mockFieldPaymentRequests, mockFieldStaff } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus, KpiStatus, FieldPaymentRequest, FieldPaymentStatus } from "@/types";
+import { initialInventory, ROLES, CONDITIONS, mockKpis, mockUsers, assetCategories, mockAttendance, mockFieldPaymentRequests, mockFieldStaff, mockQuotations, mockLPOs, mockInvoices, mockPayments } from "@/lib/mock-data";
+import type { UserRole, InventoryItem, Condition, AppNotification, Asset, Kpi, AttendanceRecord, AttendanceStatus, KpiStatus, FieldPaymentRequest, FieldPaymentStatus, Quotation, LPO, Invoice, Payment, FinancialStatus } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -670,7 +670,7 @@ export default function PEMSDashboard() {
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} onCompleteKpi={completeKpi} />}
             {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} role={role} fieldPayments={fieldPayments} onAddFieldPayment={addFieldPaymentRequest} onUpdateFieldPaymentStatus={updateFieldPaymentStatus} />}
             {activeView === "finance" && <FinanceModule role={role} />}
-            {activeView === "reports" && <ReportsView inventory={inventory} />}
+            {activeView === "reports" && <ReportsView inventory={inventory} role={role} quotations={mockQuotations} lpos={mockLPOs} invoices={mockInvoices} payments={mockPayments} />}
             {activeView === "notifications" && (
                 <NotificationsView
                     notifications={notifications.filter(n => n.forRoles.includes(role))}
@@ -1933,7 +1933,16 @@ function StaffAttendanceRecords({ attendance }: { attendance: AttendanceRecord[]
 }
 
 
-function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
+interface ReportsViewProps {
+    inventory: InventoryItem[];
+    role: UserRole | null;
+    quotations: Quotation[];
+    lpos: LPO[];
+    invoices: Invoice[];
+    payments: Payment[];
+}
+
+function ReportsView({ inventory, role, quotations, lpos, invoices, payments }: ReportsViewProps) {
   
   const getInventoryTotals = (item: InventoryItem) => {
     const total = item.assets.length;
@@ -1959,6 +1968,31 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
         .reduce((sum, item) => sum + item.assets.length, 0);
     return { name: category, value: total };
   }).filter(c => c.value > 0);
+  
+  // Financial chart data
+  const quotationStatusData = (["Approved", "Rejected", "Pending"] as FinancialStatus[]).map(status => ({
+    name: status,
+    value: quotations.filter(q => q.status === status).length,
+  })).filter(d => d.value > 0);
+  
+  const lpoStatusData = (["Delivered", "Pending"] as const).map(status => ({
+      name: status,
+      count: lpos.filter(l => l.status === status).length,
+  }));
+  
+  const invoiceStatusData = (["Paid", "Unpaid", "Partially Paid"] as const).map(status => ({
+      name: status,
+      count: invoices.filter(i => i.status === status).length,
+  }));
+  
+  const paymentsByMonth = payments.reduce((acc, p) => {
+    const month = format(new Date(p.date), 'MMM yyyy');
+    acc[month] = (acc[month] || 0) + p.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const paymentChartData = Object.entries(paymentsByMonth).map(([name, total]) => ({ name, total }));
+
 
   const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
@@ -1967,11 +2001,12 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h1 className="font-headline text-3xl font-semibold">Reports</h1>
-          <p className="text-muted-foreground">A summary of the current inventory status.</p>
+          <p className="text-muted-foreground">A summary of the current inventory and financial status.</p>
         </div>
         <TabsList>
-            <TabsTrigger value="summary"><PieChartIcon className="mr-2" /> Summary</TabsTrigger>
-            <TabsTrigger value="details"><FileText className="mr-2" /> Detailed</TabsTrigger>
+            <TabsTrigger value="summary"><PieChartIcon className="mr-2" /> Inventory Summary</TabsTrigger>
+            <TabsTrigger value="details"><FileText className="mr-2" /> Detailed Stock</TabsTrigger>
+            {role === 'Finance Manager' && <TabsTrigger value="finance"><Landmark className="mr-2"/> Finance</TabsTrigger>}
         </TabsList>
       </div>
 
@@ -2117,6 +2152,84 @@ function ReportsView({ inventory }: { inventory: InventoryItem[] }) {
             </CardContent>
         </Card>
       </TabsContent>
+       <TabsContent value="finance">
+         <div className="grid gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
+               <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Quotation Status</CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                   <ChartContainer config={{}} className="min-h-[250px] w-full max-w-xs">
+                      <PieChart>
+                          <Tooltip content={<ChartTooltipContent />} />
+                          <Legend />
+                          <Pie data={quotationStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                             {quotationStatusData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                          </Pie>
+                      </PieChart>
+                   </ChartContainer>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">LPO Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={{}} className="min-h-[250px] w-full">
+                    <RechartsBarChart data={lpoStatusData} layout="vertical" margin={{ left: 10 }}>
+                       <CartesianGrid horizontal={false} />
+                       <XAxis type="number" hide />
+                       <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={80}/>
+                       <Tooltip cursor={{ fill: 'hsl(var(--muted))' }} content={<ChartTooltipContent />} />
+                       <Bar dataKey="count" radius={5}>
+                          {lpoStatusData.map((d, i) => <Cell key={d.name} fill={COLORS[i+1 % COLORS.length]} />)}
+                       </Bar>
+                    </RechartsBarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            </div>
+             <div className="grid gap-6 md:grid-cols-2">
+               <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Invoice Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={{}} className="min-h-[250px] w-full">
+                    <RechartsBarChart data={invoiceStatusData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                      <YAxis />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="count" radius={4}>
+                         {invoiceStatusData.map((d, i) => <Cell key={d.name} fill={COLORS[i % COLORS.length]} />)}
+                      </Bar>
+                    </RechartsBarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="font-headline">Payments Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={{}} className="min-h-[250px] w-full">
+                    <RechartsBarChart data={paymentChartData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                      <YAxis tickFormatter={(val) => `UGX ${val/1000}k`} />
+                      <Tooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="total" name="Total Payments" fill="var(--color-chart-2)" radius={4} />
+                    </RechartsBarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            </div>
+         </div>
+       </TabsContent>
     </Tabs>
   );
 }
@@ -2157,5 +2270,7 @@ function NotificationsView({ notifications, onMarkAsRead }: { notifications: App
   );
 }
 
+
+    
 
     

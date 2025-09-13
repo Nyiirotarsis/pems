@@ -177,4 +177,14 @@ export interface FieldPaymentRequest {
     receiptFile?: string;
 }
 
+// Reports View
+export interface ReportsViewProps {
+    inventory: InventoryItem[];
+    role: UserRole | null;
+    quotations: Quotation[];
+    lpos: LPO[];
+    invoices: Invoice[];
+    payments: Payment[];
+}
+
     
