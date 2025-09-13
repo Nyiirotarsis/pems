@@ -12,12 +12,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const GenerateOtpInputSchema = z.object({
+const GenerateOtpInputSchema = z.object({
   email: z.string().email().describe('The email address to send the OTP to.'),
 });
 export type GenerateOtpInput = z.infer<typeof GenerateOtpInputSchema>;
 
-export const GenerateOtpOutputSchema = z.object({
+const GenerateOtpOutputSchema = z.object({
   code: z.string().length(6).describe('The 6-digit OTP code.'),
 });
 export type GenerateOtpOutput = z.infer<typeof GenerateOtpOutputSchema>;
