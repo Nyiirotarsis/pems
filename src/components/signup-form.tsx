@@ -151,9 +151,14 @@ export function SignupForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign Up
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isPending}
+              data-pending={isPending}
+            >
+              <Loader2 className="mr-2 h-4 w-4 animate-spin hidden data-[pending=true]:inline-block" />
+              <span className="data-[pending=true]:hidden">Sign Up</span>
             </Button>
           </form>
         </Form>

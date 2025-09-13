@@ -114,7 +114,7 @@ export function LoginForm() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
-                      onClick={() => setShowPassword((prev) => !prev)}
+                      onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff /> : <Eye />}
                     </Button>
@@ -123,9 +123,14 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isPending}
+              data-pending={isPending}
+            >
+              <Loader2 className="mr-2 h-4 w-4 animate-spin hidden data-[pending=true]:inline-block" />
+              <span className="data-[pending=true]:hidden">Sign In</span>
             </Button>
           </form>
         </Form>
