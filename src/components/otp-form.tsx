@@ -29,6 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const otpFormSchema = z.object({
   code: z.string().min(6, "Please enter the 6-digit code.").max(6),
@@ -38,20 +40,35 @@ export function OtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const code = searchParams.get("code");
   const { toast } = useToast();
   const [isPending, startTransition] = React.useTransition();
 
   const form = useForm<z.infer<typeof otpFormSchema>>({
     resolver: zodResolver(otpFormSchema),
     defaultValues: {
-      code: "",
+      code: code || "",
     },
   });
+  
+  React.useEffect(() => {
+    if (code) {
+      form.setValue("code", code);
+    }
+  }, [code, form]);
 
   function onSubmit(values: z.infer<typeof otpFormSchema>) {
     startTransition(() => {
-      // In a real application, you would verify the OTP here.
-      console.log(values);
+      // In a real application, you would verify the OTP against a stored value.
+      // For this prototype, we'll assume the code is correct if it matches the one from the URL.
+      if (values.code !== code) {
+        toast({
+            variant: "destructive",
+            title: "Invalid Code",
+            description: "The OTP code you entered is incorrect. Please try again."
+        });
+        return;
+      }
       
       toast({
         title: "Account Verified",
@@ -73,7 +90,16 @@ export function OtpForm() {
             Enter the 6-digit code sent to <span className="font-semibold text-foreground">{email || 'your email'}</span>.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {code && (
+            <Alert>
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Demo OTP</AlertTitle>
+                <AlertDescription>
+                    In a real app, this code would be sent to your email. For this prototype, your OTP is: <span className="font-bold">{code}</span>
+                </AlertDescription>
+            </Alert>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -99,9 +125,9 @@ export function OtpForm() {
        <CardFooter className="flex justify-center text-sm">
         <p>
           Didn't receive a code?{' '}
-          <Link href="#" className="font-semibold text-primary hover:underline">
+          <button type="button" className="font-semibold text-primary hover:underline" onClick={() => alert("Resend functionality would be implemented here.")}>
             Resend
-          </Link>
+          </button>
         </p>
       </CardFooter>
     </Card>

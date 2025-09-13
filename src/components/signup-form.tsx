@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
+import { generateAndSendOtp } from "@/ai/flows/generate-otp";
 
 const signupFormSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -49,18 +50,28 @@ export function SignupForm() {
   });
 
   function onSubmit(values: z.infer<typeof signupFormSchema>) {
-    startTransition(() => {
-      // In a real application, you would handle the signup logic here,
-      // such as calling an API endpoint and then sending an OTP.
-      console.log(values);
-      
-      toast({
-        title: "Sign Up Submitted",
-        description: "A verification code has been sent to your email.",
-      });
+    startTransition(async () => {
+      try {
+        // 1. Generate the OTP
+        const otpResponse = await generateAndSendOtp({ email: values.email });
+        const { code } = otpResponse;
 
-      // For this prototype, we'll redirect to the verify page.
-      router.push(`/signup/verify?email=${encodeURIComponent(values.email)}`);
+        toast({
+          title: "Sign Up Submitted",
+          description: `An OTP has been generated. Please use it to verify your account.`,
+        });
+
+        // 2. Redirect to the verify page with the email and OTP
+        router.push(`/signup/verify?email=${encodeURIComponent(values.email)}&code=${code}`);
+
+      } catch (error) {
+        console.error("OTP Generation failed:", error);
+        toast({
+          variant: "destructive",
+          title: "Sign Up Failed",
+          description: "Could not generate an OTP. Please try again.",
+        });
+      }
     });
   }
 
