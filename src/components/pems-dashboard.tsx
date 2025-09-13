@@ -669,7 +669,7 @@ export default function PEMSDashboard() {
             {activeView === "requests" && <RequestsView role={role} inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} onNotify={addNotification} />}
             {activeView === "kpi" && <KpiTrackerView kpis={kpis} onAddKpi={addKpi} onCompleteKpi={completeKpi} />}
             {activeView === "attendance" && <AttendanceView attendance={attendance} onAddRecord={addAttendanceRecord} role={role} fieldPayments={fieldPayments} onAddFieldPayment={addFieldPaymentRequest} onUpdateFieldPaymentStatus={updateFieldPaymentStatus} />}
-            {activeView === "finance" && <FinanceModule />}
+            {activeView === "finance" && <FinanceModule role={role} />}
             {activeView === "reports" && <ReportsView inventory={inventory} />}
             {activeView === "notifications" && (
                 <NotificationsView

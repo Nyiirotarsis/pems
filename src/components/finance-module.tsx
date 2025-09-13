@@ -23,7 +23,7 @@ import {
   mockInvoices,
   mockPayments,
 } from "@/lib/mock-data";
-import type { Quotation, LPO, Invoice, Payment, FinancialStatus } from "@/types";
+import type { Quotation, LPO, Invoice, Payment, FinancialStatus, FinanceModuleProps } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -82,12 +82,15 @@ function StatusBadge({ status }: { status: FinancialStatus }) {
 }
 
 
-export function FinanceModule() {
+export function FinanceModule({ role }: FinanceModuleProps) {
   const router = useRouter();
   const [quotations, setQuotations] = React.useState<Quotation[]>(mockQuotations);
   const [lpos, setLpos] = React.useState<LPO[]>(mockLPOs);
   const [invoices, setInvoices] = React.useState<Invoice[]>(mockInvoices);
   const [payments, setPayments] = React.useState<Payment[]>(mockPayments);
+
+  const canCreate = role === 'Finance Manager' || role === 'Director';
+  const canCreateQuotations = canCreate || role === 'CEO';
 
   return (
     <Tabs defaultValue="quotations" className="w-full">
@@ -107,9 +110,11 @@ export function FinanceModule() {
                   Manage service or item quotations.
                 </CardDescription>
               </div>
-              <Button onClick={() => router.push('/dashboard/finance/quotations/new')}>
-                <FilePlus className="mr-2" /> Create Quotation
-              </Button>
+              {canCreateQuotations && (
+                <Button onClick={() => router.push('/dashboard/finance/quotations/new')}>
+                  <FilePlus className="mr-2" /> Create Quotation
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -152,9 +157,11 @@ export function FinanceModule() {
                   Track LPOs converted from approved quotations.
                 </CardDescription>
               </div>
-              <Button onClick={() => router.push('/dashboard/finance/lpos/new')}>
-                <FileText className="mr-2" /> Issue LPO
-              </Button>
+              {canCreate && (
+                <Button onClick={() => router.push('/dashboard/finance/lpos/new')}>
+                    <FileText className="mr-2" /> Issue LPO
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -195,9 +202,11 @@ export function FinanceModule() {
                   Manage and track supplier invoices.
                 </CardDescription>
               </div>
-              <Button onClick={() => router.push('/dashboard/finance/invoices/new')}>
-                <Receipt className="mr-2" /> Capture Invoice
-              </Button>
+              {canCreate && (
+                <Button onClick={() => router.push('/dashboard/finance/invoices/new')}>
+                    <Receipt className="mr-2" /> Capture Invoice
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -240,9 +249,11 @@ export function FinanceModule() {
                   Record and track payments made against invoices.
                 </CardDescription>
               </div>
-              <Button onClick={() => router.push('/dashboard/finance/payments/new')}>
-                <DollarSign className="mr-2" /> Record Payment
-              </Button>
+              {canCreate && (
+                <Button onClick={() => router.push('/dashboard/finance/payments/new')}>
+                    <DollarSign className="mr-2" /> Record Payment
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
