@@ -53,6 +53,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 type AssetWithDetails = Asset & {
   assetName: string;
@@ -94,6 +95,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function AssetsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [assets, setAssets] = React.useState<AssetWithDetails[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("All");
 
@@ -116,11 +118,58 @@ export default function AssetsPage() {
     return asset.condition === statusFilter;
   });
   
+  const getAssignedToNameString = (username?: string) => {
+    if (!username) return "Store Room";
+    const user = mockUsers.find(u => u.username === username);
+    return user ? user.role : username;
+  }
+
   const getAssignedToName = (username?: string) => {
     if (!username) return <span className="text-muted-foreground">Store Room</span>;
     const user = mockUsers.find(u => u.username === username);
     return user ? user.role : username;
   }
+
+  const handleExport = () => {
+    if (filteredAssets.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "No data to export",
+        description: "There are no assets matching the current filter.",
+      });
+      return;
+    }
+
+    const headers = ["Asset ID", "Asset Name", "Category", "Assigned To", "Purchase Date", "Condition", "Status"];
+    const csvRows = [
+      headers.join(','),
+      ...filteredAssets.map(asset => [
+        `"${asset.id}"`,
+        `"${asset.assetName}"`,
+        `"${asset.category}"`,
+        `"${getAssignedToNameString(asset.assignedTo)}"`,
+        `"${asset.purchaseDate}"`,
+        `"${asset.condition}"`,
+        `"${asset.status}"`,
+      ].join(','))
+    ];
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'assets.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Export Successful",
+      description: `${filteredAssets.length} assets have been exported to CSV.`,
+    })
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -158,7 +207,7 @@ export default function AssetsPage() {
                   <SelectItem value="Damaged">Damaged</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleExport}>
                 <FileDown className="mr-2" />
                 Export
               </Button>
