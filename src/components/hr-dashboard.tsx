@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -13,66 +14,58 @@ import {
   UserMinus,
   FileBarChart,
   Briefcase,
+  Bell,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import type { Visitor } from "@/types";
+import { format } from "date-fns";
 
-const kpiCards = [
-  {
-    title: "Total Staff",
-    value: "52",
-    icon: Users,
-    description: "All employees, full-time and casual",
-  },
-  {
-    title: "Active Contracts",
-    value: "45",
-    icon: FileText,
-    description: "Currently active employment contracts",
-  },
-  {
-    title: "Leave Requests Pending",
-    value: "3",
-    icon: CalendarOff,
-    description: "Awaiting approval",
-  },
-  {
-    title: "Payroll This Month",
-    value: "UGX 85M",
-    icon: DollarSign,
-    description: "Total gross payroll processed",
-  },
-];
+type HrDashboardProps = {
+    visitors: Visitor[];
+}
 
-const quickActions = [
-  { title: "Add New Employee", icon: UserPlus, href: "/dashboard/hr/employees" },
-  { title: "Run Payroll", icon: DollarSign, href: "/dashboard/hr/payroll" },
-  { title: "Approve Leave", icon: UserCheck, href: "/dashboard/hr/leave" },
-  { title: "Post Job Advert", icon: Briefcase, href: "/dashboard/hr/recruitment" },
-  { title: "Capture Attendance", icon: CalendarOff, href: "/dashboard/attendance" },
-];
-
-const moduleShortcuts = [
-  { title: "Payroll", icon: DollarSign, href: "/dashboard/hr/payroll" },
-  { title: "Leave Management", icon: CalendarOff, href: "/dashboard/hr/leave" },
-  { title: "Recruitment", icon: Briefcase, href: "/dashboard/hr/recruitment" },
-  { title: "Attendance", icon: UserCheck, href: "/dashboard/attendance" },
-  { title: "Employee Records", icon: Users, href: "/dashboard/hr/employees" },
-  { title: "Exit Process", icon: UserMinus, href: "/dashboard/hr/exit" },
-];
-
-const recentActivity = [
-    { text: "Payroll for August processed", date: "02-Sep-25" },
-    { text: "Leave request: John Okello → Pending", date: "01-Sep-25" },
-    { text: "Job advert: Event Manager role posted", date: "01-Sep-25" },
-    { text: "3 employees checked in late", date: "today" },
-];
-
-
-export default function HrDashboard() {
+export default function HrDashboard({ visitors }: HrDashboardProps) {
   const router = useRouter();
+
+  const kpiCards = [
+    {
+      title: "Total Staff",
+      value: "52",
+      icon: Users,
+      description: "All employees, full-time and casual",
+    },
+    {
+      title: "Active Visitors Today",
+      value: visitors.length.toString(),
+      icon: UserCheck,
+      description: "Visitors currently on-site",
+    },
+    {
+      title: "Leave Requests Pending",
+      value: "3",
+      icon: CalendarOff,
+      description: "Awaiting approval",
+    },
+    {
+      title: "Payroll This Month",
+      value: "UGX 85M",
+      icon: DollarSign,
+      description: "Total gross payroll processed",
+    },
+  ];
+
+  const quickActions = [
+    { title: "Register Visitor", icon: UserPlus, href: "/dashboard/hr/visitors" },
+    { title: "Run Payroll", icon: DollarSign, href: "/dashboard/hr/payroll" },
+    { title: "Approve Leave", icon: UserCheck, href: "/dashboard/hr/leave" },
+    { title: "Post Job Advert", icon: Briefcase, href: "/dashboard/hr/recruitment" },
+  ];
   
+  const recentVisitors = visitors.slice(0, 3);
+  const visitorAlerts = visitors.slice(0, 2);
+
   return (
     <div className="grid gap-6">
       {/* KPI Cards */}
@@ -102,51 +95,63 @@ export default function HrDashboard() {
                 <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {quickActions.map((action, index) => (
                     <Button key={index} variant="outline" className="h-20 flex-col gap-2" onClick={() => router.push(action.href)}>
                         <action.icon className="h-6 w-6" />
-                        <span>{action.title}</span>
+                        <span className="text-center">{action.title}</span>
                     </Button>
                 ))}
                 </CardContent>
             </Card>
 
-            {/* Module Shortcuts */}
-            <Card>
-                <CardHeader>
-                <CardTitle>Module Shortcuts</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {moduleShortcuts.map((shortcut, index) => (
-                    <Button key={index} variant="secondary" size="lg" className="h-24 flex-col gap-2" onClick={() => router.push(shortcut.href)}>
-                        <shortcut.icon className="h-8 w-8" />
-                        <span>{shortcut.title}</span>
-                    </Button>
-                ))}
-                </CardContent>
-            </Card>
+             {/* Recent Visitors & Alerts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Visitor Alerts</CardTitle>
+                        <CardDescription>Recent visitor arrivals.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {visitorAlerts.map((visitor) => (
+                                <div key={visitor.id} className="flex items-center gap-3">
+                                    <Bell className="h-5 w-5 text-primary" />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium leading-none">{visitor.name} arrived for {visitor.reason}</p>
+                                        <p className="text-xs text-muted-foreground">{format(new Date(visitor.timeIn), 'HH:mm')}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Recent Visitors</CardTitle>
+                        <CardDescription>A log of who visited whom.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <div className="space-y-4">
+                            {recentVisitors.map((visitor) => (
+                                <div key={visitor.id} className="flex items-center justify-between">
+                                    <p className="text-sm font-medium">{visitor.name}</p>
+                                    <p className="text-sm text-muted-foreground">{visitor.personVisiting}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Placeholder for other modules */}
         <Card>
             <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-6">
-                    {recentActivity.map((activity, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                            <Avatar className="h-8 w-8 border">
-                                <AvatarFallback>{activity.text.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <p className="text-sm font-medium leading-none">{activity.text}</p>
-                                <p className="text-xs text-muted-foreground">{activity.date}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <p>Other HR activities will be shown here...</p>
             </CardContent>
         </Card>
       </div>

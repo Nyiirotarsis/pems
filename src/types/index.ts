@@ -178,6 +178,15 @@ export interface FieldPaymentRequest {
     receiptFile?: string;
 }
 
+// Visitor Management Types
+export interface Visitor {
+    id: number;
+    name: string;
+    reason: string;
+    timeIn: string;
+    personVisiting: UserRole; // Storing the role they are visiting
+}
+
 // Reports View
 export interface ReportsViewProps {
     inventory: InventoryItem[];

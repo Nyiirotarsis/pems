@@ -39,11 +39,11 @@ import {
   Cog,
 } from "lucide-react";
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { initialInventory, ROLES, mockUsers } from "@/lib/mock-data";
-import type { UserRole, InventoryItem, AppNotification, Kpi } from "@/types";
+import type { UserRole, InventoryItem, AppNotification, Kpi, Visitor } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
 import { handleSuggestOutsourcing } from "@/app/actions";
@@ -102,8 +102,10 @@ import {
   mockLPOs,
   mockPayments,
   mockQuotations,
+  mockVisitors,
 } from "@/lib/mock-data";
 import { addKpi, completeKpi, addAttendanceRecord, addFieldPaymentRequest, updateFieldPaymentStatus } from "@/lib/hr";
+import { addVisitor } from "@/lib/hr-visitors";
 import { format } from "date-fns";
 
 type View = "dashboard" | "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance" | "systems" | "security" | "users" | "settings";
@@ -184,6 +186,8 @@ const navItems: Record<
 export default function PEMSDashboard() {
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [role, setRole] = React.useState<UserRole | null>(null);
   const [activeView, setActiveView] = React.useState<View>("inventory");
   const [inventory, setInventory] = React.useState(initialInventory);
@@ -192,7 +196,19 @@ export default function PEMSDashboard() {
   const [fieldPayments, setFieldPayments] = React.useState(mockFieldPaymentRequests);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
+  const [visitors, setVisitors] = React.useState<Visitor[]>(mockVisitors);
   
+  const addNotification = React.useCallback((message: string, forRoles: UserRole[]) => {
+    const newNotification: AppNotification = {
+      id: Date.now(),
+      message,
+      date: new Date().toISOString(),
+      read: false,
+      forRoles,
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  }, []);
+
   React.useEffect(() => {
     const storedRole = localStorage.getItem("userRole") as UserRole | null;
     if (!storedRole || !ROLES.includes(storedRole)) {
@@ -206,6 +222,32 @@ export default function PEMSDashboard() {
       }
     }
   }, [router]);
+  
+  React.useEffect(() => {
+    const newVisitorName = searchParams.get('new_visitor');
+    const visitedPersonRole = searchParams.get('visited_person') as UserRole;
+    
+    if (newVisitorName && visitedPersonRole) {
+      const newVisitor = {
+        name: newVisitorName,
+        personVisiting: visitedPersonRole,
+        reason: searchParams.get('reason') || 'Unknown',
+      };
+      
+      const { newVisitor: addedVisitor, error } = addVisitor(visitors, newVisitor);
+      
+      if (addedVisitor) {
+        setVisitors(prev => [addedVisitor, ...prev]);
+        addNotification(`Visitor Alert: ${addedVisitor.name} has arrived to see you.`, [addedVisitor.personVisiting]);
+        toast({
+          title: "Visitor Registered",
+          description: `${addedVisitor.name} has been checked in. An alert has been sent to ${addedVisitor.personVisiting}.`,
+        });
+        // Clean up URL
+        router.replace('/dashboard');
+      }
+    }
+  }, [searchParams, router, visitors, addNotification, toast]);
 
   const getInventoryTotals = (item: InventoryItem) => {
     const total = item.assets.length;
@@ -255,17 +297,6 @@ export default function PEMSDashboard() {
   ) => {
     const { updatedInventory, affectedAssets } = updateInventory(inventory, equipmentId, quantity, type, condition, role || 'Unknown');
     setInventory(updatedInventory);
-  };
-
-  const addNotification = (message: string, forRoles: UserRole[]) => {
-    const newNotification: AppNotification = {
-      id: Date.now(),
-      message,
-      date: new Date().toISOString(),
-      read: false,
-      forRoles,
-    };
-    setNotifications(prev => [newNotification, ...prev]);
   };
 
   const markNotificationAsRead = (id: number) => {
@@ -332,7 +363,7 @@ export default function PEMSDashboard() {
           <SidebarMenuButton className="justify-between">
             <div className="flex items-center gap-2">
               <CalendarIcon />
-              <span>Time & Leave</span>
+              <span>Time & People</span>
             </div>
             <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </SidebarMenuButton>
@@ -341,6 +372,7 @@ export default function PEMSDashboard() {
           <SidebarMenuSub>
              <SidebarMenuSubButton onClick={() => handleViewChange("attendance")} isActive={activeView === "attendance"}>Attendance</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => router.push('/dashboard/hr/leave')}>Leave Management</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => router.push('/dashboard/hr/visitors')}>Visitors</SidebarMenuSubButton>
           </SidebarMenuSub>
         </CollapsibleContent>
       </Collapsible>
@@ -464,7 +496,7 @@ export default function PEMSDashboard() {
 
   const renderContent = () => {
     if (role === 'HR/Admin' && activeView === 'dashboard') {
-      return <HrDashboard />;
+      return <HrDashboard visitors={visitors}/>;
     }
     
     if (role === 'IT Managers' && activeView === 'dashboard') {
@@ -659,3 +691,4 @@ export default function PEMSDashboard() {
     </SidebarProvider>
   );
 }
+

@@ -1,6 +1,6 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin"];
@@ -185,9 +185,14 @@ export const mockFieldPaymentRequests: FieldPaymentRequest[] = [
     }
 ];
 
+export const mockVisitors: Visitor[] = [
+    { id: 1, name: "John Okello", reason: "Delivery", timeIn: "2024-09-03T10:15:00", personVisiting: "Store Manager" },
+    { id: 2, name: "Sarah Namatovu", reason: "Interview", timeIn: "2024-09-03T09:45:00", personVisiting: "HR/Admin" },
+    { id: 3, name: "Peter Musoke", reason: "Meeting", timeIn: "2024-09-03T11:00:00", personVisiting: "CEO" },
+];
+
 
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
 
-    

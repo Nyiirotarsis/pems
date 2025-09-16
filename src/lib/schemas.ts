@@ -42,3 +42,11 @@ export const fieldPaymentRequestSchema = z.object({
     rate: z.coerce.number().min(1, "Please enter a valid rate."),
     requestDate: z.date(),
 })
+
+
+export const visitorRegistrationSchema = z.object({
+  name: z.string().min(2, "Visitor name is required."),
+  reason: z.string().min(3, "Please provide a reason for the visit."),
+  personVisiting: z.string().min(1, "Please select the person being visited."),
+});
+
