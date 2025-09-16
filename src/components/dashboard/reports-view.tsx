@@ -1,3 +1,4 @@
+
 "use client";
 import React from "react";
 import {
@@ -8,6 +9,8 @@ import {
   PieChartIcon,
   FileText,
   Landmark,
+  UserCheck,
+  ClipboardCheck,
 } from "lucide-react";
 import {
   Bar,
@@ -32,10 +35,10 @@ import {
   startOfQuarter,
   endOfQuarter,
   startOfYear,
-  endOfYear,
+  isToday,
 } from "date-fns";
 
-import type { InventoryItem, ReportsViewProps, FinancialStatus } from "@/types";
+import type { InventoryItem, ReportsViewProps, FinancialStatus, AttendanceStatus, KpiStatus } from "@/types";
 import { assetCategories } from "@/lib/mock-data";
 
 import {
@@ -66,6 +69,8 @@ export function ReportsView({
   lpos,
   invoices,
   payments,
+  kpis,
+  attendance,
 }: ReportsViewProps) {
   const [timeFilter, setTimeFilter] = React.useState<TimeFilter>("monthly");
 
@@ -179,6 +184,21 @@ export function ReportsView({
   const paymentChartData = Object.entries(paymentsByTime).map(
     ([name, total]) => ({ name, total })
   );
+  
+   const todayAttendance = attendance.filter(a => isToday(new Date(a.date)));
+   const attendanceStatusData = (["Present", "Late", "Absent", "On Leave"] as AttendanceStatus[])
+    .map(status => ({
+        name: status,
+        value: todayAttendance.filter(a => a.status === status).length,
+    }))
+    .filter(d => d.value > 0);
+    
+    const kpiStatusData = (["Pending", "In Progress", "Completed"] as KpiStatus[])
+        .map(status => ({
+            name: status,
+            count: kpis.filter(k => k.status === status).length,
+        }))
+        .filter(d => d.count > 0);
 
   const COLORS = [
     "hsl(var(--chart-1))",
@@ -189,6 +209,8 @@ export function ReportsView({
   ];
 
   const showFinanceReports = role === "Finance Manager" || role === "Director";
+  const showHrReports = role === "HR/Admin" || role === "CEO" || role === "Director";
+
 
   return (
     <Tabs defaultValue="summary">
@@ -196,7 +218,7 @@ export function ReportsView({
         <div>
           <h1 className="font-headline text-3xl font-semibold">Reports</h1>
           <p className="text-muted-foreground">
-            A summary of the current inventory and financial status.
+            A summary of the current operational status.
           </p>
         </div>
         <TabsList>
@@ -209,6 +231,11 @@ export function ReportsView({
           {showFinanceReports && (
             <TabsTrigger value="finance">
               <Landmark className="mr-2" /> Finance
+            </TabsTrigger>
+          )}
+          {showHrReports && (
+            <TabsTrigger value="hr">
+                <UserCheck className="mr-2" /> HR
             </TabsTrigger>
           )}
         </TabsList>
@@ -568,6 +595,81 @@ export function ReportsView({
               </CardContent>
             </Card>
           </div>
+        </div>
+      </TabsContent>
+      <TabsContent value="hr">
+        <div className="grid gap-6 md:grid-cols-2">
+             <Card>
+              <CardHeader>
+                <CardTitle className="font-headline">Today's Attendance</CardTitle>
+                 <CardDescription>A snapshot of staff attendance for the current day.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <ChartContainer
+                  config={{}}
+                  className="min-h-[250px] w-full max-w-xs"
+                >
+                  <PieChart>
+                    <Tooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <Pie
+                      data={attendanceStatusData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label
+                    >
+                      {attendanceStatusData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+             <Card>
+              <CardHeader>
+                <CardTitle className="font-headline">KPI Performance</CardTitle>
+                <CardDescription>An overview of the status of all KPIs.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={{}} className="min-h-[250px] w-full">
+                  <RechartsBarChart
+                    data={kpiStatusData}
+                    layout="vertical"
+                    margin={{ left: 10 }}
+                  >
+                    <CartesianGrid horizontal={false} />
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={10}
+                      width={80}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "hsl(var(--muted))" }}
+                      content={<ChartTooltipContent />}
+                    />
+                    <Bar dataKey="count" radius={5}>
+                       {kpiStatusData.map((d, i) => (
+                        <Cell
+                          key={d.name}
+                          fill={COLORS[(i + 2) % COLORS.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </RechartsBarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
         </div>
       </TabsContent>
     </Tabs>

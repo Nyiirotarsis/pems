@@ -616,7 +616,7 @@ export default function PEMSDashboard() {
       case 'finance':
         return <FinanceModule role={role} />;
       case 'reports':
-        return <ReportsView inventory={inventory} role={role} quotations={mockQuotations} lpos={mockLPOs} invoices={mockInvoices} payments={mockPayments} />;
+        return <ReportsView inventory={inventory} role={role} quotations={mockQuotations} lpos={mockLPOs} invoices={mockInvoices} payments={mockPayments} kpis={kpis} attendance={attendance} />;
       case 'notifications':
         return <NotificationsView notifications={notifications.filter(n => n.forRoles.includes(role!))} onMarkAsRead={markNotificationAsRead} />;
       default:
@@ -691,4 +691,3 @@ export default function PEMSDashboard() {
     </SidebarProvider>
   );
 }
-

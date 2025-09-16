@@ -195,4 +195,6 @@ export interface ReportsViewProps {
     lpos: LPO[];
     invoices: Invoice[];
     payments: Payment[];
+    kpis: Kpi[];
+    attendance: AttendanceRecord[];
 }
