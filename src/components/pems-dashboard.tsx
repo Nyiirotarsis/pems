@@ -35,6 +35,8 @@ import {
   UserMinus,
   FileBarChart,
   DollarSign,
+  Shield,
+  Cog,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -77,42 +79,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { restockFormSchema, transactionFormSchema } from "@/lib/schemas";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { updateInventory } from "@/lib/inventory";
 import { InventoryView } from "@/components/dashboard/inventory-view";
 import { TransactionsView } from "@/components/dashboard/transactions-view";
@@ -123,6 +93,7 @@ import { KpiTrackerView } from "@/components/dashboard/kpi-tracker-view";
 import { AttendanceView } from "@/components/dashboard/attendance-view";
 import { FinanceModule } from "@/components/finance-module";
 import HrDashboard from "@/components/hr-dashboard";
+import ITDashboard from "@/components/it-dashboard";
 import {
   mockAttendance,
   mockFieldPaymentRequests,
@@ -135,7 +106,7 @@ import {
 import { addKpi, completeKpi, addAttendanceRecord, addFieldPaymentRequest, updateFieldPaymentStatus } from "@/lib/hr";
 import { format } from "date-fns";
 
-type View = "dashboard" | "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance";
+type View = "dashboard" | "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance" | "systems" | "security" | "users" | "settings";
 
 const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi", "attendance"],
@@ -143,17 +114,17 @@ const permissions: Record<UserRole, View[]> = {
   "HR/Admin": ["dashboard", "kpi", "attendance", "reports", "notifications"],
   "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
   "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
-  "IT Managers": ["inventory", "assets", "transactions", "notifications", "requests", "kpi"],
+  "IT Managers": ["dashboard", "inventory", "assets", "transactions", "notifications", "requests", "kpi", "reports", "systems", "security", "users", "settings"],
 };
 
 const navItems: Record<
-  View,
-  { label: string; icon: React.ElementType; forRoles: UserRole[] }
+  string,
+  { label: string; icon: React.ElementType; forRoles: UserRole[]; isPage?: boolean; href?: string }
 > = {
   dashboard: {
     label: "Dashboard",
     icon: BarChart,
-    forRoles: ["HR/Admin"],
+    forRoles: ["HR/Admin", "IT Managers"],
   },
   inventory: {
     label: "Inventory",
@@ -164,6 +135,8 @@ const navItems: Record<
       label: "Assets",
       icon: Wrench,
       forRoles: ["Store Manager", "CEO", "IT Managers", "Director"],
+      isPage: true,
+      href: "/dashboard/assets"
   },
   transactions: {
     label: "Issue / Return",
@@ -193,13 +166,17 @@ const navItems: Record<
   reports: {
     label: "Reports",
     icon: FileText,
-    forRoles: ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director"],
+    forRoles: ["Store Manager", "Finance Manager", "HR/Admin", "CEO", "Director", "IT Managers"],
   },
   notifications: {
       label: "Notifications",
       icon: Bell,
       forRoles: ["Store Manager", "CEO", "Director", "Finance Manager", "HR/Admin", "IT Managers"],
-  }
+  },
+  systems: { label: "Systems", icon: Cog, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/systems" },
+  security: { label: "Security", icon: Shield, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/security" },
+  users: { label: "Users", icon: Users, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/users" },
+  settings: { label: "Settings", icon: Cog, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/settings" },
 };
 
 
@@ -224,7 +201,8 @@ export default function PEMSDashboard() {
       setRole(storedRole);
       // Set initial view based on role
       if (permissions[storedRole].length > 0) {
-        setActiveView(permissions[storedRole][0]);
+        const initialView = permissions[storedRole][0];
+        setActiveView(initialView);
       }
     }
   }, [router]);
@@ -244,10 +222,10 @@ export default function PEMSDashboard() {
     ...getInventoryTotals(item)
   }));
   
-  const handleViewChange = (view: View) => {
+  const handleViewChange = (view: View, isPage?: boolean, href?: string) => {
     if (role && permissions[role].includes(view)) {
-        if (view === 'assets') {
-            router.push('/dashboard/assets');
+        if (isPage && href) {
+            router.push(href);
         } else {
             setActiveView(view);
         }
@@ -272,7 +250,8 @@ export default function PEMSDashboard() {
     equipmentId: number,
     quantity: number,
     type: "issue" | "return" | "restock",
-    condition?: "Good" | "Damaged" | "Lost" | "Faulty"
+    condition?: "Good" | "Damaged" | "Lost" | "Faulty",
+    userRole?: UserRole
   ) => {
     const { updatedInventory, affectedAssets } = updateInventory(inventory, equipmentId, quantity, type, condition, role || 'Unknown');
     setInventory(updatedInventory);
@@ -401,7 +380,7 @@ export default function PEMSDashboard() {
         <CollapsibleContent>
           <SidebarMenuSub>
             <SidebarMenuSubButton onClick={() => handleViewChange("inventory")} isActive={activeView === "inventory"}>Inventory</SidebarMenuSubButton>
-            <SidebarMenuSubButton onClick={() => handleViewChange("assets")} isActive={activeView === "assets"}>Assets</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("assets", true, "/dashboard/assets")} isActive={activeView === "assets"}>Assets</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("transactions")} isActive={activeView === "transactions"}>Issue / Return</SidebarMenuSubButton>
           </SidebarMenuSub>
         </CollapsibleContent>
@@ -433,7 +412,7 @@ export default function PEMSDashboard() {
           return (
             <SidebarMenuItem key={key}>
               <SidebarMenuButton
-                onClick={() => handleViewChange(viewKey)}
+                onClick={() => handleViewChange(viewKey, item.isPage, item.href)}
                 isActive={activeView === key}
               >
                 <item.icon />
@@ -458,7 +437,7 @@ export default function PEMSDashboard() {
           return (
             <SidebarMenuItem key={key}>
               <SidebarMenuButton
-                onClick={() => handleViewChange(viewKey)}
+                onClick={() => handleViewChange(viewKey, item.isPage, item.href)}
                 isActive={activeView === key}
               >
                 <item.icon />
@@ -488,6 +467,10 @@ export default function PEMSDashboard() {
       return <HrDashboard />;
     }
     
+    if (role === 'IT Managers' && activeView === 'dashboard') {
+        return <ITDashboard />;
+    }
+
     switch(activeView) {
       case 'inventory':
         return (
