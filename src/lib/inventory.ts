@@ -1,9 +1,10 @@
+
 import type { InventoryItem, Asset, Condition, UserRole } from "@/types";
 
 export function updateInventory(
   currentInventory: InventoryItem[],
   equipmentId: number,
-  quantity: number,
+  transactionPayload: { assetIds: string[] } | { quantity: number },
   type: "issue" | "return" | "restock",
   condition?: Condition,
   userRole?: UserRole
@@ -13,7 +14,8 @@ export function updateInventory(
     if (item.id === equipmentId) {
       let updatedAssetsList = [...item.assets];
 
-      if (type === 'restock') {
+      if (type === 'restock' && 'quantity' in transactionPayload) {
+        const { quantity } = transactionPayload;
         const namePrefix = item.name.substring(0, 3).toUpperCase();
         const lastAssetIdNum =
           item.assets.length > 0
@@ -36,30 +38,24 @@ export function updateInventory(
           updatedAssetsList.push(newAsset);
           affectedAssets.push(newAsset);
         }
-      } else if (type === 'issue') {
-        const availableAssets = updatedAssetsList
-          .filter((a) => a.status === "Available" && a.condition === "Good")
-          .slice(0, quantity);
-        
-        affectedAssets = availableAssets;
+      } else if (type === 'issue' && 'assetIds' in transactionPayload) {
+        const { assetIds } = transactionPayload;
+        affectedAssets = updatedAssetsList.filter(a => assetIds.includes(a.id));
 
-        availableAssets.forEach((a) => {
+        affectedAssets.forEach((a) => {
           const asset = updatedAssetsList.find((ua) => ua.id === a.id);
-          if (asset) {
+          if (asset && asset.status === 'Available') {
             asset.status = "Issued";
             asset.assignedTo = userRole || "Unknown"; // Assign to current role for demo
           }
         });
-      } else if (type === 'return') {
-        const issuedAssets = updatedAssetsList
-          .filter((a) => a.status === "Issued")
-          .slice(0, quantity);
+      } else if (type === 'return' && 'assetIds' in transactionPayload) {
+        const { assetIds } = transactionPayload;
+        affectedAssets = updatedAssetsList.filter(a => assetIds.includes(a.id));
         
-        affectedAssets = issuedAssets;
-        
-        issuedAssets.forEach((a) => {
+        affectedAssets.forEach((a) => {
           const asset = updatedAssetsList.find((ua) => ua.id === a.id);
-          if (asset) {
+          if (asset && asset.status === 'Issued') {
             asset.status = "Available";
             asset.condition = condition || "Good";
             delete asset.assignedTo;

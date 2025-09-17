@@ -1,10 +1,11 @@
+
 import { z } from "zod";
 
 export const transactionFormSchema = z.object({
   equipmentId: z.string().min(1, "Please select an equipment."),
-  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
   date: z.date(),
   condition: z.string().optional(),
+  assetIds: z.array(z.string()).min(1, "Please select at least one asset."),
 });
 
 export const restockFormSchema = z.object({
@@ -49,4 +50,3 @@ export const visitorRegistrationSchema = z.object({
   reason: z.string().min(3, "Please provide a reason for the visit."),
   personVisiting: z.string().min(1, "Please select the person being visited."),
 });
-

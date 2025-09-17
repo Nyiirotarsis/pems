@@ -290,12 +290,12 @@ export default function PEMSDashboard() {
 
   const handleUpdateInventory = (
     equipmentId: number,
-    quantity: number,
+    transactionPayload: { assetIds: string[] } | { quantity: number },
     type: "issue" | "return" | "restock",
     condition?: "Good" | "Damaged" | "Lost" | "Faulty",
     userRole?: UserRole
   ) => {
-    const { updatedInventory, affectedAssets } = updateInventory(inventory, equipmentId, quantity, type, condition, role || 'Unknown');
+    const { updatedInventory, affectedAssets } = updateInventory(inventory, equipmentId, transactionPayload, type, condition, role || 'Unknown');
     setInventory(updatedInventory);
   };
 
@@ -512,7 +512,7 @@ export default function PEMSDashboard() {
             setSearchQuery={setSearchQuery}
             onRestock={(values) => {
               const equipmentId = parseInt(values.equipmentId);
-              handleUpdateInventory(equipmentId, values.quantity, "restock");
+              handleUpdateInventory(equipmentId, {quantity: values.quantity}, "restock");
               toast({
                 title: "Success",
                 description: `${values.quantity} units of ${
@@ -528,18 +528,18 @@ export default function PEMSDashboard() {
                 inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} 
                 onIssue={(values) => {
                   const equipmentId = parseInt(values.equipmentId);
-                  handleUpdateInventory(equipmentId, values.quantity, "issue");
+                  handleUpdateInventory(equipmentId, {assetIds: values.assetIds}, "issue");
                   toast({
                     title: "Success",
-                    description: `${values.quantity} units of ${inventory.find(i => i.id === equipmentId)?.name} issued.`,
+                    description: `${values.assetIds.length} unit(s) of ${inventory.find(i => i.id === equipmentId)?.name} issued.`,
                   });
                 }}
                 onReturn={(values) => {
                   const equipmentId = parseInt(values.equipmentId);
-                  handleUpdateInventory(equipmentId, values.quantity, "return", values.condition);
+                  handleUpdateInventory(equipmentId, {assetIds: values.assetIds}, "return", values.condition as any);
                    toast({
                     title: "Success",
-                    description: `${values.quantity} units of ${inventory.find(i => i.id === equipmentId)?.name} returned in ${values.condition} condition.`,
+                    description: `${values.assetIds.length} unit(s) of ${inventory.find(i => i.id === equipmentId)?.name} returned in ${values.condition} condition.`,
                   });
                 }}
               />
