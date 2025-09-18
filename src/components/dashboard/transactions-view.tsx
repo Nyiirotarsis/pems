@@ -375,4 +375,3 @@ function TransactionFormFields({ form, inventory, type }: { form: any; inventory
     </>
   );
 }
-
