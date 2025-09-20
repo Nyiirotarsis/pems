@@ -586,32 +586,6 @@ export default function PEMSDashboard() {
                     toast({ title: "Attendance Recorded", description: `Attendance for ${mockUsers.find(u => u.id.toString() === v.userId)?.username} on ${format(v.date, "PPP")} has been logged as ${v.status}.` });
                 }
             }}
-            role={role}
-            fieldPayments={fieldPayments}
-            onAddFieldPayment={(v) => {
-                const { newRequest, error } = addFieldPaymentRequest(fieldPayments, v);
-                if (error) {
-                    toast({ variant: "destructive", title: "Error", description: error });
-                } else if (newRequest) {
-                    setFieldPayments(prev => [newRequest, ...prev]);
-                    addNotification(`New payment request for ${newRequest.staffName} (UGX ${newRequest.totalAmount.toLocaleString()}) needs approval.`, ['Finance Manager']);
-                    toast({ title: "Payment Request Submitted", description: `Requisition for ${newRequest.staffName} has been sent to Finance.` });
-                }
-            }}
-            onUpdateFieldPaymentStatus={(id, status) => {
-                const { updatedPayments, updatedPayment, error } = updateFieldPaymentStatus(fieldPayments, id, status);
-                 if (error) {
-                    toast({ variant: "destructive", title: "Error", description: error });
-                } else if (updatedPayment) {
-                    setFieldPayments(updatedPayments);
-                    if (status === 'Paid') {
-                      addNotification(`Payment for ${updatedPayment.staffName} has been processed. Please acknowledge and upload receipt.`, ['CEO']);
-                    }
-                    if (status === 'Acknowledged') {
-                         addNotification(`CEO has acknowledged payment for ${updatedPayment.staffName}.`, ['Finance Manager']);
-                    }
-                }
-            }}
         />;
       case 'finance':
         return <FinanceModule role={role} />;
