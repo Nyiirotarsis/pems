@@ -35,6 +35,7 @@ import {
   startOfQuarter,
   endOfQuarter,
   startOfYear,
+  endOfYear,
   isToday,
 } from "date-fns";
 
