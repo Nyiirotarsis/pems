@@ -433,6 +433,7 @@ export default function PEMSDashboard() {
             <SidebarMenuSubButton onClick={() => handleViewChange("requests")} isActive={activeView === "requests"}>Requests</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("kpi")} isActive={activeView === "kpi"}>KPI Tracker</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("attendance")} isActive={activeView === "attendance"}>Attendance</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => router.push('/dashboard/hr/field-payments')}>Field Payments</SidebarMenuSubButton>
           </SidebarMenuSub>
         </CollapsibleContent>
       </Collapsible>
@@ -488,6 +489,7 @@ export default function PEMSDashboard() {
   
   const renderNav = () => {
     switch(role) {
+      case 'CEO':
       case 'Director': return directorNav;
       case 'HR/Admin': return hrNav;
       default: return defaultNav;
