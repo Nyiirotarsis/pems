@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +11,7 @@ import {
   Calendar as CalendarIcon,
   PlusCircle,
   MoreVertical,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -202,14 +204,20 @@ export default function FieldPaymentsPage() {
         <Card className="md:col-span-2">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-              <div>
-                <CardTitle className="font-headline">
-                  Field Staff Payments
-                </CardTitle>
-                <CardDescription>
-                  Create and track payment requisitions for casual
-                  workers.
-                </CardDescription>
+               <div className="flex items-center gap-4">
+                <Button asChild variant="outline" size="icon">
+                  <Link href="/dashboard">
+                    <ArrowLeft className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <div>
+                  <CardTitle className="font-headline">
+                    Field Staff Payments
+                  </CardTitle>
+                  <CardDescription>
+                    Create and track payment requisitions for casual workers.
+                  </CardDescription>
+                </div>
               </div>
               {role === "CEO" && (
                 <Dialog>
