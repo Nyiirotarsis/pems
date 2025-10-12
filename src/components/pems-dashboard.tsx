@@ -37,6 +37,7 @@ import {
   DollarSign,
   Shield,
   Cog,
+  Clapperboard,
 } from "lucide-react";
 import { useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -108,15 +109,15 @@ import { addKpi, completeKpi, addAttendanceRecord, addFieldPaymentRequest, updat
 import { addVisitor } from "@/lib/hr-visitors";
 import { format } from "date-fns";
 
-type View = "dashboard" | "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance" | "systems" | "security" | "users" | "settings";
+type View = "dashboard" | "inventory" | "assets" | "transactions" | "requests" | "reports" | "notifications" | "finance" | "kpi" | "attendance" | "systems" | "security" | "users" | "settings" | "album-show";
 
 const permissions: Record<UserRole, View[]> = {
   "Store Manager": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "kpi", "attendance"],
   "Finance Manager": ["finance", "requests", "reports", "notifications", "kpi", "attendance"],
   "HR/Admin": ["dashboard", "kpi", "attendance", "reports", "notifications"],
-  "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
-  "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance"],
-  "IT Managers": ["dashboard", "inventory", "assets", "transactions", "notifications", "requests", "kpi", "reports", "systems", "security", "users", "settings"],
+  "CEO": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance", "album-show"],
+  "Director": ["inventory", "assets", "transactions", "requests", "reports", "notifications", "finance", "kpi", "attendance", "album-show"],
+  "IT Managers": ["dashboard", "inventory", "assets", "transactions", "notifications", "requests", "kpi", "reports", "systems", "security", "users", "settings", "album-show"],
 };
 
 const navItems: Record<
@@ -179,6 +180,7 @@ const navItems: Record<
   security: { label: "Security", icon: Shield, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/security" },
   users: { label: "Users", icon: Users, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/users" },
   settings: { label: "Settings", icon: Cog, forRoles: ["IT Managers"], isPage: true, href: "/dashboard/it/settings" },
+  "album-show": { label: "Album Show", icon: Clapperboard, forRoles: ["CEO", "Director", "IT Managers"], isPage: true, href: "/dashboard/album-show" },
 };
 
 
@@ -414,6 +416,7 @@ export default function PEMSDashboard() {
             <SidebarMenuSubButton onClick={() => handleViewChange("inventory")} isActive={activeView === "inventory"}>Inventory</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("assets", true, "/dashboard/assets")} isActive={activeView === "assets"}>Assets</SidebarMenuSubButton>
             <SidebarMenuSubButton onClick={() => handleViewChange("transactions")} isActive={activeView === "transactions"}>Issue / Return</SidebarMenuSubButton>
+            <SidebarMenuSubButton onClick={() => handleViewChange("album-show", true, "/dashboard/album-show")} isActive={activeView === "album-show"}>Album Show</SidebarMenuSubButton>
           </SidebarMenuSub>
         </CollapsibleContent>
       </Collapsible>
