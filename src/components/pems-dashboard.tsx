@@ -201,9 +201,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['inventory', 'assets', 'transactions', 'requests'].map(key => (
-                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                        ))}
+                        {['inventory', 'assets', 'transactions', 'requests'].map(key => {
+                            const Icon = navItems[key].icon;
+                            return (
+                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                            );
+                        })}
                     </SidebarMenu>
                 </CollapsibleContent>
             </Collapsible>
@@ -220,9 +223,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => (
-                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                        ))}
+                        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => {
+                             const Icon = navItems[key].icon;
+                             return (
+                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                            );
+                        })}
                     </SidebarMenu>
                 </CollapsibleContent>
             </Collapsible>
@@ -235,9 +241,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['systems', 'security', 'users', 'settings', 'album-show'].map(key => (
-                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                        ))}
+                        {['systems', 'security', 'users', 'settings', 'album-show'].map(key => {
+                            const Icon = navItems[key].icon;
+                            return (
+                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                            );
+                        })}
                     </SidebarMenu>
                 </CollapsibleContent>
             </Collapsible>
@@ -260,8 +269,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const financeNav = (
         <>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/finance')} isActive={pathname.startsWith('/dashboard/finance')}><Landmark /><span>Finance Hub</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['requests'].href!)} isActive={pathname === navItems['requests'].href}><navItems['requests'].icon /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['reports'].href!)} isActive={pathname === navItems['reports'].href}><navItems['reports'].icon /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['requests'].href!)} isActive={pathname === navItems['requests'].href}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['reports'].href!)} isActive={pathname === navItems['reports'].href}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname === '/dashboard/notifications'}>
                   <Bell /><span>Notifications</span>
@@ -278,14 +287,17 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <Home /><span>Dashboard</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => (
-          <SidebarMenuItem key={key}>
-            <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
-              <navItems[key].icon /><span>{navItems[key].label}</span>
-              {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
+        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => {
+            const Icon = navItems[key].icon;
+            return (
+                <SidebarMenuItem key={key}>
+                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+                    <Icon /><span>{navItems[key].label}</span>
+                    {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            );
+        })}
       </>
     );
 
@@ -296,14 +308,17 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <Home /><span>Dashboard</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {['inventory', 'assets', 'transactions', 'requests', 'systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => (
-          <SidebarMenuItem key={key}>
-            <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
-              <navItems[key].icon /><span>{navItems[key].label}</span>
-              {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
+        {['inventory', 'assets', 'transactions', 'requests', 'systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => {
+            const Icon = navItems[key].icon;
+            return (
+              <SidebarMenuItem key={key}>
+                <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+                  <Icon /><span>{navItems[key].label}</span>
+                  {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+        })}
       </>
     );
     
@@ -397,5 +412,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     </SidebarProvider>
   );
 }
+
+    
 
     
