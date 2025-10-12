@@ -36,7 +36,8 @@ import {
   Shield,
   Cog,
   Clapperboard,
-  Home
+  Home,
+  PackageSearch,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -204,7 +205,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                         {['inventory', 'assets', 'transactions', 'requests'].map(key => {
                             const Icon = navItems[key].icon;
                             return (
-                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                                <SidebarMenuItem key={key}>
+                                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}>
+                                        <Icon /><span>{navItems[key].label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
                             );
                         })}
                     </SidebarMenu>
@@ -226,7 +231,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                         {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => {
                              const Icon = navItems[key].icon;
                              return (
-                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                                <SidebarMenuItem key={key}>
+                                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}>
+                                        <Icon /><span>{navItems[key].label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
                             );
                         })}
                     </SidebarMenu>
@@ -244,7 +253,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                         {['systems', 'security', 'users', 'settings', 'album-show'].map(key => {
                             const Icon = navItems[key].icon;
                             return (
-                                <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><Icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                                <SidebarMenuItem key={key}>
+                                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}>
+                                        <Icon /><span>{navItems[key].label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
                             );
                         })}
                     </SidebarMenu>
@@ -416,3 +429,4 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     
 
     
+
