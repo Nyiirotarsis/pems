@@ -194,42 +194,54 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             </SidebarMenuButton>
         </SidebarMenuItem>
         
-        <Collapsible className="w-full">
-            <CollapsibleTrigger asChild>
-                <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/store')}><div className="flex items-center gap-2"><Package /><span>Store</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-                 {['inventory', 'assets', 'transactions', 'requests'].map(key => (
-                    <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                ))}
-            </CollapsibleContent>
-        </Collapsible>
-        
+        <SidebarMenuItem>
+            <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/store')}><div className="flex items-center gap-2"><Package /><span>Store</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        {['inventory', 'assets', 'transactions', 'requests'].map(key => (
+                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
+
         <SidebarMenuItem>
             <SidebarMenuButton onClick={() => router.push('/dashboard/finance')} isActive={pathname.startsWith('/dashboard/finance')}><Landmark /><span>Finance</span></SidebarMenuButton>
         </SidebarMenuItem>
         
-        <Collapsible className="w-full">
-            <CollapsibleTrigger asChild>
-                <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/hr')}><div className="flex items-center gap-2"><Users /><span>HR</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-                 {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => (
-                    <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                ))}
-            </CollapsibleContent>
-        </Collapsible>
+        <SidebarMenuItem>
+            <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/hr')}><div className="flex items-center gap-2"><Users /><span>HR</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => (
+                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
 
-         <Collapsible className="w-full">
-            <CollapsibleTrigger asChild>
-                <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/it')}><div className="flex items-center gap-2"><Shield /><span>IT</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-                 {['systems', 'security', 'users', 'settings', 'album-show'].map(key => (
-                    <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
-                ))}
-            </CollapsibleContent>
-        </Collapsible>
+        <SidebarMenuItem>
+            <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/it')}><div className="flex items-center gap-2"><Shield /><span>IT</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        {['systems', 'security', 'users', 'settings', 'album-show'].map(key => (
+                            <SidebarMenuItem key={key}><SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}><navItems[key].icon /><span>{navItems[key].label}</span></SidebarMenuButton></SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
         
         <SidebarMenuItem>
             <SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}>
@@ -260,37 +272,45 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     );
     
     const hrNav = (
-        <>
-           <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/hr')} isActive={pathname === '/dashboard/hr'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-            {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => (
-                <SidebarMenuItem key={key}>
-                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}>
-                        <navItems[key].icon /><span>{navItems[key].label}</span>
-                         {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
-        </>
+      <>
+        <SidebarMenuItem>
+          <SidebarMenuButton onClick={() => router.push('/dashboard/hr')} isActive={pathname === '/dashboard/hr'}>
+            <Home /><span>Dashboard</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => (
+          <SidebarMenuItem key={key}>
+            <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+              <navItems[key].icon /><span>{navItems[key].label}</span>
+              {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </>
     );
 
     const itNav = (
-        <>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/it')} isActive={pathname === '/dashboard/it'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-            {['inventory', 'assets', 'transactions', 'requests', 'systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => (
-                 <SidebarMenuItem key={key}>
-                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname === navItems[key].href}>
-                        <navItems[key].icon /><span>{navItems[key].label}</span>
-                         {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
-        </>
+      <>
+        <SidebarMenuItem>
+          <SidebarMenuButton onClick={() => router.push('/dashboard/it')} isActive={pathname === '/dashboard/it'}>
+            <Home /><span>Dashboard</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        {['inventory', 'assets', 'transactions', 'requests', 'systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => (
+          <SidebarMenuItem key={key}>
+            <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+              <navItems[key].icon /><span>{navItems[key].label}</span>
+              {key === 'notifications' && unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </>
     );
     
     const storeNav = (
          <>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store')} isActive={pathname === '/dashboard/store' || pathname === '/dashboard/store/inventory'}><PackageSearch /><span>Inventory</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/assets')} isActive={pathname === '/dashboard/assets'}><Wrench /><span>Assets</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/assets')} isActive={pathname.startsWith('/dashboard/assets')}><Wrench /><span>Assets</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname === '/dashboard/store/transactions'}><ArrowRightLeft /><span>Issue / Return</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname === '/dashboard/store/requests'}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
@@ -377,7 +397,5 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     </SidebarProvider>
   );
 }
-
-    
 
     
