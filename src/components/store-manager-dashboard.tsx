@@ -5,7 +5,7 @@ import React from "react";
 import type { InventoryItem } from "@/types";
 import { InventoryView } from "./dashboard/inventory-view";
 import { initialInventory } from "@/lib/mock-data";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { updateInventory } from "@/lib/inventory";
 
 export default function StoreManagerDashboard() {
