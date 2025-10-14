@@ -50,3 +50,22 @@ export const visitorRegistrationSchema = z.object({
   reason: z.string().min(3, "Please provide a reason for the visit."),
   personVisiting: z.string().min(1, "Please select the person being visited."),
 });
+
+export const maintenanceLogSchema = z.object({
+  serialNumber: z.string().min(1, "Serial Number is required."),
+  itemName: z.string().min(1, "Item Name is required."),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
+  issueDescription: z.string().min(5, "Issue description is required."),
+  hardware: z.boolean(),
+  software: z.boolean(),
+  cause: z.string().min(3, "Cause of damage/fault is required."),
+  unitCost: z.coerce.number().optional(),
+  totalCost: z.coerce.number().optional(),
+  status: z.enum(["Paid", "Pending"]),
+  technicianName: z.string().optional(),
+  contact: z.string().optional(),
+  remarks: z.string().optional(),
+}).refine(data => data.hardware || data.software, {
+    message: "At least one issue type (Hardware or Software) must be selected.",
+    path: ["hardware"], // you can pick any of the fields to attach the error to
+});

@@ -198,3 +198,21 @@ export interface ReportsViewProps {
     kpis: Kpi[];
     attendance: AttendanceRecord[];
 }
+
+// Maintenance Log Types
+export interface MaintenanceLog {
+    id: string;
+    serialNumber: string;
+    itemName: string;
+    quantity: number;
+    issueDescription: string;
+    hardware: boolean;
+    software: boolean;
+    cause: string;
+    unitCost: number;
+    totalCost: number;
+    status: "Paid" | "Pending";
+    technicianName?: string;
+    contact?: string;
+    remarks?: string;
+}

@@ -38,6 +38,7 @@ import {
   Clapperboard,
   Home,
   PackageSearch,
+  Tool,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -119,6 +120,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   assets: { label: "Assets", icon: Wrench, isPage: true, href: "/dashboard/assets" },
   transactions: { label: "Issue / Return", icon: ArrowRightLeft, isPage: true, href: "/dashboard/store/transactions" },
   requests: { label: "Requests", icon: BotMessageSquare, isPage: true, href: "/dashboard/store/requests" },
+  maintenance: { label: "Maintenance", icon: Tool, isPage: true, href: "/dashboard/store/maintenance" },
 
   // HR Sub-items
   employees: { label: "Employees", icon: Users, isPage: true, href: "/dashboard/hr/employees" },
@@ -202,7 +204,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['inventory', 'assets', 'transactions', 'requests'].map(key => {
+                        {['inventory', 'assets', 'transactions', 'requests', 'maintenance'].map(key => {
                             const Icon = navItems[key].icon;
                             return (
                                 <SidebarMenuItem key={key}>
@@ -341,6 +343,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/assets')} isActive={pathname.startsWith('/dashboard/assets')}><Wrench /><span>Assets</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname === '/dashboard/store/transactions'}><ArrowRightLeft /><span>Issue / Return</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname === '/dashboard/store/requests'}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/maintenance')} isActive={pathname === '/dashboard/store/maintenance'}><Tool /><span>Maintenance</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname === '/dashboard/notifications'}>
@@ -429,4 +432,5 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     
 
     
+
 

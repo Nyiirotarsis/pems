@@ -1,6 +1,6 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin"];
@@ -191,8 +191,44 @@ export const mockVisitors: Visitor[] = [
     { id: 3, name: "Peter Musoke", reason: "Meeting", timeIn: "2024-09-03T11:00:00", personVisiting: "CEO" },
 ];
 
+export const mockMaintenanceLogs: MaintenanceLog[] = [
+    {
+        id: "1",
+        serialNumber: "LAP-3-0001",
+        itemName: "Laptop",
+        quantity: 1,
+        issueDescription: "Screen is flickering and has dead pixels.",
+        hardware: true,
+        software: false,
+        cause: "Accidental drop",
+        unitCost: 150000,
+        totalCost: 150000,
+        status: "Paid",
+        technicianName: "Alex Ray",
+        contact: "078-111-2222",
+        remarks: "Screen replaced and tested.",
+    },
+    {
+        id: "2",
+        serialNumber: "PRO-2-0005",
+        itemName: "Projector",
+        quantity: 1,
+        issueDescription: "Projector lamp is dim and needs replacement.",
+        hardware: true,
+        software: false,
+        cause: "End of life cycle",
+        unitCost: 250000,
+        totalCost: 250000,
+        status: "Pending",
+        technicianName: "In-house IT",
+        contact: "Ext 105",
+        remarks: "Lamp ordered, awaiting delivery.",
+    }
+];
+
 
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
+
 
