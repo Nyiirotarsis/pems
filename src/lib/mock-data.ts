@@ -114,7 +114,7 @@ export const mockLPOs: LPO[] = [
     { 
         id: 'L001', 
         number: 'LPO-2024-001', 
-        supplier: 'Tech Solutions Ltd.', 
+        client: 'Tech Solutions Ltd.', 
         date: '2024-07-02', 
         items: [{ description: 'Cat6 Ethernet Cables', quantity: 50, unitPrice: 30 }],
         amount: 1500, 
@@ -123,7 +123,7 @@ export const mockLPOs: LPO[] = [
     { 
         id: 'L002', 
         number: 'LPO-2024-002', 
-        supplier: 'Creative Designs Inc.', 
+        client: 'Creative Designs Inc.', 
         date: '2024-07-08', 
         items: [{ description: 'Stage Backdrop Banner', quantity: 1, unitPrice: 3200 }],
         amount: 3200, 
@@ -230,5 +230,6 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
+
 
 

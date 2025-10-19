@@ -48,6 +48,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
@@ -169,7 +170,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Number</TableHead>
-                        <TableHead>Supplier</TableHead>
+                        <TableHead>Client</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Status</TableHead>
@@ -180,7 +181,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                     {lpos.map((lpo) => (
                         <TableRow key={lpo.id}>
                             <TableCell className="font-medium">{lpo.number}</TableCell>
-                            <TableCell>{lpo.supplier}</TableCell>
+                            <TableCell>{lpo.client}</TableCell>
                             <TableCell>{lpo.date}</TableCell>
                             <TableCell>${lpo.amount.toFixed(2)}</TableCell>
                             <TableCell><StatusBadge status={lpo.status} /></TableCell>
@@ -291,7 +292,7 @@ function ItemActions({ item, type }: { item: any, type: string }) {
     const router = useRouter();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     
-    const handleAction = (action: 'edit' | 'attach' | 'delete') => {
+    const handleAction = (action: 'edit' | 'attach' | 'delete' | 'invoice') => {
         switch(action) {
             case 'edit':
                 router.push(`/dashboard/finance/${type}/${item.id}/edit`);
@@ -302,6 +303,9 @@ function ItemActions({ item, type }: { item: any, type: string }) {
             case 'delete':
                 // We can show a confirmation dialog here
                 alert(`Delete ${type} ${item.number || item.invoiceNumber}`);
+                break;
+            case 'invoice':
+                router.push(`/dashboard/finance/invoices/new`);
                 break;
         }
     }
@@ -314,6 +318,8 @@ function ItemActions({ item, type }: { item: any, type: string }) {
             alert(`File "${file.name}" selected for attachment.`);
         }
     };
+    
+    const canIssueInvoice = (type === 'quotations' && item.status === 'Approved') || (type === 'lpos' && item.status === 'Delivered');
 
 
     return (
@@ -332,6 +338,15 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                     {canIssueInvoice && (
+                        <>
+                            <DropdownMenuItem onClick={() => handleAction('invoice')}>
+                                <Receipt className="mr-2 h-4 w-4" />
+                                <span>Issue Invoice</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        </>
+                    )}
                     <DropdownMenuItem onClick={() => handleAction('edit')}>
                         <Edit className="mr-2 h-4 w-4" />
                         <span>Edit</span>

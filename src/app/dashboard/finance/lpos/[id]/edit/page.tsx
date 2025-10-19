@@ -72,7 +72,7 @@ const lpoItemSchema = z.object({
 });
 
 const lpoFormSchema = z.object({
-  supplier: z.string().min(2, "Supplier name is required."),
+  client: z.string().min(2, "Client name is required."),
   date: z.date(),
   status: z.enum(["Pending", "Delivered"]),
   items: z.array(lpoItemSchema).min(1, "Please add at least one item."),
@@ -163,12 +163,12 @@ export default function EditLpoPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                      <FormField
                         control={form.control}
-                        name="supplier"
+                        name="client"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Supplier</FormLabel>
+                            <FormLabel>Client</FormLabel>
                             <FormControl>
-                            <Input placeholder="e.g., Tech Solutions Ltd." {...field} />
+                            <Input placeholder="e.g., Judiciary" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

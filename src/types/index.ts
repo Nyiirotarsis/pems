@@ -76,7 +76,7 @@ interface LpoItem {
 export interface LPO {
     id: string;
     number: string;
-    supplier: string;
+    client: string;
     date: string;
     items: LpoItem[];
     amount: number; // This can be calculated from items, but storing for simplicity
