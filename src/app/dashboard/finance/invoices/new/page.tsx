@@ -53,16 +53,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-const invoiceFormSchema = z.object({
-  supplier: z.string().min(2, "Supplier name is required."),
-  invoiceNumber: z.string().min(1, "Invoice number is required."),
-  date: z.date(),
-  dueDate: z.date(),
-  amount: z.coerce.number().min(0, "Amount must be a positive number."),
-  status: z.enum(["Paid", "Unpaid", "Partially Paid"]),
-  attachment: z.any().optional(),
-});
+import { invoiceFormSchema } from "@/lib/schemas";
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
 
@@ -103,7 +94,7 @@ export default function NewInvoicePage() {
                     Capture New Invoice
                   </CardTitle>
                   <CardDescription>
-                    Fill in the details for the new supplier invoice.
+                    Fill in the details for the new client invoice.
                   </CardDescription>
                 </div>
               </div>
@@ -111,30 +102,45 @@ export default function NewInvoicePage() {
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
-                name="supplier"
+                name="client"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Supplier</FormLabel>
+                    <FormLabel>Client</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Tech Solutions Ltd." {...field} />
+                      <Input placeholder="e.g., Judiciary" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-               <FormField
-                control={form.control}
-                name="invoiceNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Invoice Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., INV-2024-123" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="invoiceNumber"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Invoice Number</FormLabel>
+                        <FormControl>
+                        <Input placeholder="e.g., INV-2024-123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="quotationNumber"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Quotation No. (Optional)</FormLabel>
+                        <FormControl>
+                        <Input placeholder="e.g., QUO-2024-001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <FormField
                   control={form.control}

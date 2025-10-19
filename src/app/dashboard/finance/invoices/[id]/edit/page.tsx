@@ -55,15 +55,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { mockInvoices } from "@/lib/mock-data";
-
-const invoiceFormSchema = z.object({
-  supplier: z.string().min(2, "Supplier name is required."),
-  date: z.date(),
-  dueDate: z.date(),
-  amount: z.coerce.number().min(0, "Amount must be a positive number."),
-  status: z.enum(["Paid", "Unpaid", "Partially Paid"]),
-  attachment: z.any().optional(),
-});
+import { invoiceFormSchema } from "@/lib/schemas";
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
 
@@ -75,9 +67,13 @@ export default function EditInvoicePage() {
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
     values: invoice ? {
-        ...invoice,
+        client: invoice.supplier, // Use client field now
+        invoiceNumber: invoice.number,
         date: new Date(invoice.date),
         dueDate: new Date(invoice.dueDate),
+        status: invoice.status,
+        amount: invoice.amount,
+        quotationNumber: (invoice as any).quotationNumber || ""
     } : undefined,
   });
   
@@ -132,10 +128,10 @@ export default function EditInvoicePage() {
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
-                name="supplier"
+                name="client"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Supplier</FormLabel>
+                    <FormLabel>Client</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Tech Solutions Ltd." {...field} />
                     </FormControl>

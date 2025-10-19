@@ -105,7 +105,8 @@ export const quotationFormSchema = z.object({
 });
 
 export const invoiceFormSchema = z.object({
-  supplier: z.string().min(2, "Supplier name is required."),
+  client: z.string().min(2, "Client name is required."),
+  quotationNumber: z.string().optional(),
   invoiceNumber: z.string().min(1, "Invoice number is required."),
   date: z.date(),
   dueDate: z.date(),
