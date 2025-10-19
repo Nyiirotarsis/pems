@@ -16,6 +16,7 @@ import {
   FileText,
   Truck,
   ChevronDown,
+  Eye,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -94,6 +95,12 @@ export function FinanceModule({ role }: FinanceModuleProps) {
   const canCreate = role === 'Finance Manager' || role === 'Director';
   const canCreateQuotations = canCreate || role === 'CEO';
 
+  const handleQuotationStatusChange = (id: string, status: 'Approved' | 'Rejected') => {
+    setQuotations(prevQuotations =>
+      prevQuotations.map(q => (q.id === id ? { ...q, status } : q))
+    );
+  };
+
   return (
     <Tabs defaultValue="quotations" className="w-full">
       <TabsList className="grid w-full grid-cols-4">
@@ -149,7 +156,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                     <TableCell>${q.amount.toFixed(2)}</TableCell>
                     <TableCell><StatusBadge status={q.status} /></TableCell>
                     <TableCell className="text-right">
-                      <ItemActions item={q} type="quotations"/>
+                      <ItemActions item={q} type="quotations" onStatusChange={handleQuotationStatusChange}/>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -243,7 +250,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Number</TableHead>
-                        <TableHead>Supplier</TableHead>
+                        <TableHead>Client</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Due Date</TableHead>
                         <TableHead>Amount</TableHead>
@@ -325,12 +332,13 @@ export function FinanceModule({ role }: FinanceModuleProps) {
 }
 
 
-function ItemActions({ item, type }: { item: any, type: string }) {
+function ItemActions({ item, type, onStatusChange }: { item: any, type: string, onStatusChange?: (id: string, status: 'Approved' | 'Rejected') => void }) {
     const router = useRouter();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     
-    const handleAction = (action: 'edit' | 'attach' | 'delete' | 'invoice') => {
+    const handleAction = (action: 'edit' | 'attach' | 'delete' | 'invoice' | 'view' | 'approve' | 'reject') => {
         switch(action) {
+            case 'view':
             case 'edit':
                 router.push(`/dashboard/finance/${type}/${item.id}/edit`);
                 break;
@@ -343,6 +351,16 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                 break;
             case 'invoice':
                 router.push(`/dashboard/finance/invoices/new`);
+                break;
+            case 'approve':
+                 if(type === 'quotations' && onStatusChange) {
+                    onStatusChange(item.id, 'Approved');
+                }
+                break;
+            case 'reject':
+                 if(type === 'quotations' && onStatusChange) {
+                    onStatusChange(item.id, 'Rejected');
+                }
                 break;
         }
     }
@@ -375,6 +393,28 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleAction('view')}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        <span>View</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAction('edit')}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        <span>Edit</span>
+                    </DropdownMenuItem>
+                    {type === 'quotations' && item.status === 'Pending' && (
+                        <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleAction('approve')}>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                <span>Approve</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => handleAction('reject')}>
+                                <XCircle className="mr-2 h-4 w-4" />
+                                <span>Reject</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        </>
+                    )}
                      {canIssueInvoice && (
                         <>
                             <DropdownMenuItem onClick={() => handleAction('invoice')}>
@@ -384,10 +424,6 @@ function ItemActions({ item, type }: { item: any, type: string }) {
                             <DropdownMenuSeparator />
                         </>
                     )}
-                    <DropdownMenuItem onClick={() => handleAction('edit')}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        <span>Edit</span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleAction('attach')}>
                         <Paperclip className="mr-2 h-4 w-4" />
                         <span>Attach File</span>
