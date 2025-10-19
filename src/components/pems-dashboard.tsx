@@ -416,8 +416,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
       </Sidebar>
       <SidebarInset>
         <div className="p-4 sm:p-6 lg:p-8 flex-1">
-          <header className="flex items-center justify-between mb-6">
-             <SidebarTrigger className="md:hidden" />
+          <header className="flex items-center justify-between mb-6 md:hidden">
+             <SidebarTrigger />
           </header>
           <main>
             {children}
