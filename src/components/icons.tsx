@@ -31,8 +31,8 @@ export function PacificEventsLogo(props: React.SVGProps<SVGSVGElement>) {
       {/* ific */}
       <text x="75" y="35" className="pacific-font">ific</text>
       
-      {/* EVENTS */}
-      <text x="70" y="50" className="events-font">EVENTS</text>
+      {/* events */}
+      <text x="70" y="50" className="events-font">events</text>
     </svg>
   );
 }
