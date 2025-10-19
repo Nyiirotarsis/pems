@@ -134,7 +134,7 @@ export default function NewQuotationPage() {
               <div className="flex justify-between items-start">
                  <div className="flex items-center gap-4">
                   <Button asChild variant="outline" size="icon">
-                    <Link href="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+                    <Link href="/dashboard/finance"><ArrowLeft className="h-4 w-4" /></Link>
                   </Button>
                   <div>
                     <CardTitle className="font-headline text-2xl">

@@ -93,7 +93,7 @@ export default function EditInvoicePage() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline">
-              <Link href="/dashboard">Back to Dashboard</Link>
+              <Link href="/dashboard/finance">Back to Dashboard</Link>
             </Button>
           </CardContent>
         </Card>
@@ -117,7 +117,7 @@ export default function EditInvoicePage() {
             <CardHeader>
               <div className="flex items-center gap-4">
                 <Button asChild variant="outline" size="icon">
-                  <Link href="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+                  <Link href="/dashboard/finance"><ArrowLeft className="h-4 w-4" /></Link>
                 </Button>
                 <div>
                   <CardTitle className="font-headline text-2xl">
