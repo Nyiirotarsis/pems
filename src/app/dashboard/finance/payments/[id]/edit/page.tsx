@@ -60,6 +60,7 @@ import { updateInvoiceStatus } from "@/app/actions";
 
 const paymentFormSchema = z.object({
   invoiceNumber: z.string(),
+  quotationNumber: z.string().optional(),
   paymentDate: z.date(),
   amount: z.coerce.number().min(0.01, "Amount must be greater than zero."),
   method: z.enum(["Bank", "Cash", "Mobile Money"]),
@@ -130,7 +131,7 @@ export default function EditPaymentPage() {
                   </Button>
                   <div>
                     <CardTitle className="font-headline text-2xl">
-                      Edit Payment
+                      Edit Payment / Receipt
                     </CardTitle>
                     <CardDescription>
                       Update payment details for Invoice {payment.invoiceNumber}.
@@ -139,19 +140,34 @@ export default function EditPaymentPage() {
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-               <FormField
-                  control={form.control}
-                  name="invoiceNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Invoice</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="invoiceNumber"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Invoice</FormLabel>
+                        <FormControl>
+                            <Input {...field} disabled />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                <FormField
+                    control={form.control}
+                    name="quotationNumber"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Quotation No.</FormLabel>
+                        <FormControl>
+                            <Input {...field} disabled />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
                 />
+               </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -232,12 +248,12 @@ export default function EditPaymentPage() {
                     name="receipt"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Attach Receipt (PDF, Word, Excel)</FormLabel>
+                            <FormLabel>Attach Proof of Payment</FormLabel>
                             <FormControl>
                             <Input 
                                 type="file" 
                                 {...fileRef}
-                                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
                             />
                             </FormControl>
                             <FormMessage />

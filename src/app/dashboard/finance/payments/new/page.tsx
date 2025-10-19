@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Calendar as CalendarIcon, DollarSign, Paperclip } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, DollarSign, Paperclip, Receipt } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,7 @@ import { updateInvoiceStatus } from "@/app/actions";
 
 const paymentFormSchema = z.object({
   invoiceNumber: z.string().min(1, "Please select an invoice."),
+  quotationNumber: z.string().optional(),
   paymentDate: z.date(),
   amount: z.coerce.number().min(0.01, "Amount must be greater than zero."),
   method: z.enum(["Bank", "Cash", "Mobile Money"]),
@@ -89,8 +90,12 @@ export default function NewPaymentPage() {
   });
 
   const selectedInvoice = React.useMemo(() => {
-    return mockInvoices.find(i => i.number === watchedInvoiceNumber);
-  }, [watchedInvoiceNumber]);
+    const inv = mockInvoices.find(i => i.number === watchedInvoiceNumber)
+    if (inv) {
+        form.setValue("quotationNumber", inv.quotationNumber);
+    }
+    return inv;
+  }, [watchedInvoiceNumber, form]);
 
   const paidAmount = React.useMemo(() => {
     if (!selectedInvoice) return 0;
@@ -123,6 +128,7 @@ export default function NewPaymentPage() {
         paymentDate: new Date(),
         amount: 0,
         invoiceNumber: '',
+        quotationNumber: '',
         method: undefined,
         receipt: undefined
     });
@@ -140,39 +146,54 @@ export default function NewPaymentPage() {
                   </Button>
                   <div>
                     <CardTitle className="font-headline text-2xl">
-                      Record New Payment
+                      Record Payment & Issue Receipt
                     </CardTitle>
                     <CardDescription>
-                      Fill in the details to record a new payment.
+                      Fill in the details to record a client payment.
                     </CardDescription>
                   </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
-               <FormField
-                  control={form.control}
-                  name="invoiceNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Invoice</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an invoice to pay" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {mockInvoices.filter(i => i.status !== 'Paid').map((invoice) => (
-                            <SelectItem key={invoice.id} value={invoice.number}>
-                              {invoice.number} ({invoice.supplier}) - Amount: ${invoice.amount.toLocaleString()}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <FormField
+                    control={form.control}
+                    name="invoiceNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Invoice</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an invoice to pay" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {mockInvoices.filter(i => i.status !== 'Paid').map((invoice) => (
+                              <SelectItem key={invoice.id} value={invoice.number}>
+                                {invoice.number} ({invoice.supplier}) - Amount: ${invoice.amount.toLocaleString()}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="quotationNumber"
+                      render={({ field }) => (
+                      <FormItem>
+                          <FormLabel>Quotation No.</FormLabel>
+                          <FormControl>
+                          <Input {...field} disabled />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                      )}
+                  />
+               </div>
                 
                 {selectedInvoice && (
                     <Card className="bg-muted/50">
@@ -273,12 +294,12 @@ export default function NewPaymentPage() {
                     name="receipt"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Attach Receipt (PDF, Word, Excel)</FormLabel>
+                            <FormLabel>Attach Proof of Payment</FormLabel>
                             <FormControl>
                             <Input 
                                 type="file" 
                                 {...fileRef}
-                                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png"
                             />
                             </FormControl>
                             <FormMessage />
@@ -290,15 +311,15 @@ export default function NewPaymentPage() {
                  <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button type="button">
-                            <DollarSign className="mr-2" />
-                            Record Payment
+                            <Receipt className="mr-2" />
+                            Record Payment & Issue Receipt
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action will record a new payment against the selected invoice.
+                            This action will record a new payment and update the invoice status.
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

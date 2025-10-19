@@ -88,6 +88,7 @@ export interface Invoice {
     id: string;
     number: string;
     supplier: string;
+    quotationNumber: string;
     date: string;
     dueDate: string;
     amount: number;
@@ -99,6 +100,7 @@ export interface Invoice {
 export interface Payment {
     id: string;
     invoiceNumber: string;
+    quotationNumber?: string;
     date: string;
     amount: number;
     method: "Bank" | "Cash" | "Mobile Money";
