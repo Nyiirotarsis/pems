@@ -90,6 +90,7 @@ const quotationItemSchema = z.object({
   quantity: z.coerce.number().min(1, "Qty must be at least 1."),
   days: z.coerce.number().min(1, "Days must be at least 1."),
   unitCost: z.coerce.number().min(0, "Price must be a positive number."),
+  discount: z.coerce.number().optional(),
 });
 
 export const quotationFormSchema = z.object({

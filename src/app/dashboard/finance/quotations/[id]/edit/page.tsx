@@ -58,26 +58,8 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { mockQuotations } from "@/lib/mock-data";
 import { PacificEventsLogo } from "@/components/icons";
+import { quotationFormSchema } from "@/lib/schemas";
 
-
-const quotationItemSchema = z.object({
-  description: z.string().min(1, "Description is required."),
-  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
-  days: z.coerce.number().min(1, "Days must be at least 1."),
-  unitCost: z.coerce.number().min(0, "Price must be a positive number."),
-});
-
-const quotationFormSchema = z.object({
-  quotationNumber: z.string(),
-  quotationDate: z.date(),
-  clientName: z.string().min(2, "Client name is required."),
-  venue: z.string().min(2, "Venue is required"),
-  eventDate: z.date(),
-  items: z.array(quotationItemSchema).min(1, "Please add at least one item."),
-  terms: z.string(),
-  validity: z.string(),
-  attachment: z.any().optional(),
-});
 
 type QuotationFormValues = z.infer<typeof quotationFormSchema>;
 
@@ -96,7 +78,7 @@ export default function EditQuotationPage() {
       clientName: "Judiciary",
       venue: "Kololo Independence Grounds",
       eventDate: new Date(),
-      items: [{ description: quotation.service, quantity: 1, days: 1, unitCost: quotation.amount }],
+      items: [{ description: quotation.service, quantity: 1, days: 1, unitCost: quotation.amount, discount: 0 }],
       terms: "50% deposit required to confirm booking.\nBalance payable before event date.\nAll equipment subject to availability at time of booking.\nAny changes to scope may affect final pricing.",
       validity: "14 days",
     } : undefined,
@@ -119,9 +101,11 @@ export default function EditQuotationPage() {
       (acc, item) => acc + (item.quantity || 0) * (item.days || 0) * (item.unitCost || 0),
       0
     );
-    const tax = subtotal * 0.18;
-    const grandTotal = subtotal + tax;
-    return { subtotal, tax, grandTotal };
+    const totalDiscount = watchedItems.reduce((acc, item) => acc + (item.discount || 0), 0);
+    const discountedSubtotal = subtotal - totalDiscount;
+    const tax = discountedSubtotal * 0.18;
+    const grandTotal = discountedSubtotal + tax;
+    return { subtotal, totalDiscount, tax, grandTotal };
   }, [watchedItems]);
 
   if (!quotation) {
@@ -345,6 +329,7 @@ export default function EditQuotationPage() {
                         <TableHead>Qty</TableHead>
                         <TableHead>Days</TableHead>
                         <TableHead>Unit Cost (UGX)</TableHead>
+                        <TableHead>Discount (UGX)</TableHead>
                         <TableHead className="text-right">Total (UGX)</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
@@ -409,11 +394,26 @@ export default function EditQuotationPage() {
                               )}
                             />
                           </TableCell>
+                          <TableCell>
+                            <FormField
+                              control={form.control}
+                              name={`items.${index}.discount`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input type="number" placeholder="0" {...field} />
+                                  </FormControl>
+                                   <FormMessage/>
+                                </FormItem>
+                              )}
+                            />
+                          </TableCell>
                           <TableCell className="text-right font-medium">
                             {(
                               (watchedItems[index]?.quantity || 0) *
                               (watchedItems[index]?.days || 0) *
                               (watchedItems[index]?.unitCost || 0)
+                              - (watchedItems[index]?.discount || 0)
                             ).toLocaleString()}
                           </TableCell>
                           <TableCell>
@@ -437,7 +437,7 @@ export default function EditQuotationPage() {
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  onClick={() => append({ description: "", quantity: 1, days: 1, unitCost: 0 })}
+                  onClick={() => append({ description: "", quantity: 1, days: 1, unitCost: 0, discount: 0 })}
                 >
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Add Item
@@ -450,6 +450,10 @@ export default function EditQuotationPage() {
                         <div className="flex justify-between">
                             <span className="text-muted-foreground">Subtotal</span>
                             <span className="font-medium">UGX {calculations.subtotal.toLocaleString()}</span>
+                        </div>
+                         <div className="flex justify-between">
+                            <span className="text-muted-foreground">Discount</span>
+                            <span className="font-medium text-destructive">- UGX {calculations.totalDiscount.toLocaleString()}</span>
                         </div>
                          <div className="flex justify-between">
                             <span className="text-muted-foreground">VAT (18%)</span>
