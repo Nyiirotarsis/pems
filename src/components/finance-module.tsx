@@ -14,7 +14,8 @@ import {
   DollarSign,
   Receipt,
   FileText,
-  Truck
+  Truck,
+  ChevronDown,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -112,9 +113,18 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 </CardDescription>
               </div>
               {canCreateQuotations && (
-                <Button onClick={() => router.push('/dashboard/finance/quotations/new')}>
-                  <FilePlus className="mr-2" /> Create Quotation
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button>
+                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push('/dashboard/finance/quotations/new')}>
+                            <FilePlus className="mr-2" /> Create Quotation
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </CardHeader>
@@ -159,9 +169,18 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 </CardDescription>
               </div>
               {canCreate && (
-                <Button onClick={() => router.push('/dashboard/finance/lpos/new')}>
-                    <FileText className="mr-2" /> Issue LPO
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button>
+                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push('/dashboard/finance/lpos/new')}>
+                            <FileText className="mr-2" /> Issue LPO
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </CardHeader>
@@ -204,9 +223,18 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 </CardDescription>
               </div>
               {canCreate && (
-                <Button onClick={() => router.push('/dashboard/finance/invoices/new')}>
-                    <Receipt className="mr-2" /> Capture Invoice
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button>
+                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push('/dashboard/finance/invoices/new')}>
+                            <Receipt className="mr-2" /> Capture Invoice
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </CardHeader>
@@ -251,9 +279,18 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                 </CardDescription>
               </div>
               {canCreate && (
-                <Button onClick={() => router.push('/dashboard/finance/payments/new')}>
-                    <DollarSign className="mr-2" /> Record Payment
-                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button>
+                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push('/dashboard/finance/payments/new')}>
+                            <DollarSign className="mr-2" /> Record Payment
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </CardHeader>
