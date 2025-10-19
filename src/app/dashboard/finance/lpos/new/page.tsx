@@ -61,21 +61,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-
-const lpoItemSchema = z.object({
-  description: z.string().min(1, "Description is required."),
-  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
-  unitPrice: z.coerce.number().min(0, "Price must be a positive number."),
-});
-
-const lpoFormSchema = z.object({
-  supplier: z.string().min(2, "Supplier name is required."),
-  date: z.date(),
-  status: z.enum(["Pending", "Delivered"]),
-  items: z.array(lpoItemSchema).min(1, "Please add at least one item."),
-  attachment: z.any().optional(),
-});
+import { lpoFormSchema } from "@/lib/schemas";
 
 type LpoFormValues = z.infer<typeof lpoFormSchema>;
 
@@ -95,7 +81,7 @@ export default function NewLpoPage() {
     name: "items",
   });
   
-  const fileRef = form.register("attachment");
+  const fileRef = form.register("attachments");
   
   const watchedItems = useWatch({
     control: form.control,
@@ -114,7 +100,7 @@ export default function NewLpoPage() {
     console.log(data);
     toast({
       title: "LPO Created",
-      description: `A new LPO for ${data.supplier} has been created.`,
+      description: `A new LPO for ${data.client} has been created.`,
     });
     form.reset();
   }
@@ -134,7 +120,7 @@ export default function NewLpoPage() {
                     Create New LPO
                   </CardTitle>
                   <CardDescription>
-                    Fill in the details for the new Local Purchase Order.
+                    Fill in the details for the new Local Purchase Order from the client.
                   </CardDescription>
                 </div>
               </div>
@@ -143,12 +129,12 @@ export default function NewLpoPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                      <FormField
                         control={form.control}
-                        name="supplier"
+                        name="client"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Supplier</FormLabel>
+                            <FormLabel>Client</FormLabel>
                             <FormControl>
-                            <Input placeholder="e.g., Tech Solutions Ltd." {...field} />
+                            <Input placeholder="e.g., Judiciary" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -314,15 +300,16 @@ export default function NewLpoPage() {
 
               <FormField
                 control={form.control}
-                name="attachment"
+                name="attachments"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Attach LPO Document (PDF, Word, Excel)</FormLabel>
+                    <FormLabel>Attach LPO Document(s) (PDF, Word, Excel)</FormLabel>
                     <FormControl>
                       <Input 
                         type="file" 
                         {...fileRef}
                         accept=".pdf,.doc,.docx,.xls,.xlsx"
+                        multiple
                       />
                     </FormControl>
                     <FormMessage />

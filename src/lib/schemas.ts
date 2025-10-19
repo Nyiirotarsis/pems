@@ -69,3 +69,47 @@ export const maintenanceLogSchema = z.object({
     message: "At least one issue type (Hardware or Software) must be selected.",
     path: ["hardware"], // you can pick any of the fields to attach the error to
 });
+
+const lpoItemSchema = z.object({
+  description: z.string().min(1, "Description is required."),
+  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
+  unitPrice: z.coerce.number().min(0, "Price must be a positive number."),
+});
+
+export const lpoFormSchema = z.object({
+  client: z.string().min(2, "Client name is required."),
+  date: z.date(),
+  status: z.enum(["Pending", "Delivered"]),
+  items: z.array(lpoItemSchema).min(1, "Please add at least one item."),
+  attachments: z.any().optional()
+  .refine((files) => !files || files.length <= 5, `Maximum 5 documents are allowed.`),
+});
+
+const quotationItemSchema = z.object({
+  description: z.string().min(1, "Description is required."),
+  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
+  days: z.coerce.number().min(1, "Days must be at least 1."),
+  unitCost: z.coerce.number().min(0, "Price must be a positive number."),
+});
+
+export const quotationFormSchema = z.object({
+  quotationNumber: z.string().default("QUO-2025-001"),
+  quotationDate: z.date(),
+  clientName: z.string().min(2, "Client name is required."),
+  venue: z.string().min(2, "Venue is required"),
+  eventDate: z.date(),
+  items: z.array(quotationItemSchema).min(1, "Please add at least one item."),
+  terms: z.string(),
+  validity: z.string(),
+  attachment: z.any().optional(),
+});
+
+export const invoiceFormSchema = z.object({
+  supplier: z.string().min(2, "Supplier name is required."),
+  invoiceNumber: z.string().min(1, "Invoice number is required."),
+  date: z.date(),
+  dueDate: z.date(),
+  amount: z.coerce.number().min(0, "Amount must be a positive number."),
+  status: z.enum(["Paid", "Unpaid", "Partially Paid"]),
+  attachment: z.any().optional(),
+});
