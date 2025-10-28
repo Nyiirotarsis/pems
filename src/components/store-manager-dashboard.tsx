@@ -13,16 +13,7 @@ export default function StoreManagerDashboard() {
   const [inventory, setInventory] = React.useState(initialInventory);
   const { toast } = useToast();
 
-  // The new inventory structure does not have nested assets,
-  // so the totals are now directly on the item.
-  const inventoryWithTotals = inventory.map(item => ({
-      ...item,
-      available: item.status === 'Available' ? item.quantityAvailable : 0,
-      total: item.quantityAvailable, // This might need re-evaluation based on desired logic
-      faulty: item.condition === 'Faulty' || item.condition === 'Under Repair' ? item.quantityAvailable : 0,
-  }));
-
-  const filteredInventory = inventoryWithTotals.filter((item) =>
+  const filteredInventory = inventory.filter((item) =>
     item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -49,3 +40,4 @@ export default function StoreManagerDashboard() {
     />
   );
 }
+
