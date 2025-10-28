@@ -76,14 +76,10 @@ export function ReportsView({
   const [timeFilter, setTimeFilter] = React.useState<TimeFilter>("monthly");
 
   const getInventoryTotals = (item: InventoryItem) => {
-    const total = item.assets.length;
-    const available = item.assets.filter(
-      (a) => a.status === "Available" && a.condition === "Good"
-    ).length;
-    const issued = item.assets.filter((a) => a.status === "Issued").length;
-    const faulty = item.assets.filter(
-      (a) => a.condition === "Faulty"
-    ).length;
+    const total = item.quantityAvailable + (item.status === 'Out' || item.status === 'Under Repair' ? 1 : 0); // Simplified total
+    const available = item.status === "Available" ? item.quantityAvailable : 0;
+    const issued = item.status === "Out" ? item.quantityAvailable : 0; // Assuming quantityAvailable represents issued when status is 'Out'
+    const faulty = item.condition === "Faulty" || item.status === "Under Repair" ? item.quantityAvailable : 0;
     return { total, available, issued, faulty };
   };
 
@@ -102,18 +98,18 @@ export function ReportsView({
   );
   const mostStocked = inventoryWithTotals.reduce(
     (max, item) => (item.total > max.total ? item : max),
-    inventoryWithTotals[0] || { name: "N/A", total: 0 }
+    inventoryWithTotals[0] || { itemName: "N/A", total: 0 }
   );
   const leastAvailable = inventoryWithTotals.reduce(
     (min, item) => (item.available < min.available ? item : min),
-    inventoryWithTotals[0] || { name: "N/A", available: 0 }
+    inventoryWithTotals[0] || { itemName: "N/A", available: 0 }
   );
 
   const categoryTotals = assetCategories
     .map((category) => {
       const total = inventory
         .filter((item) => item.category === category)
-        .reduce((sum, item) => sum + item.assets.length, 0);
+        .reduce((sum, item) => sum + item.quantityAvailable, 0);
       return { name: category, value: total };
     })
     .filter((c) => c.value > 0);
@@ -285,7 +281,7 @@ export function ReportsView({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {mostStocked?.name || "N/A"}
+                  {mostStocked?.itemName || "N/A"}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {mostStocked?.total || 0} total units
@@ -301,7 +297,7 @@ export function ReportsView({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {leastAvailable?.name || "N/A"}
+                  {leastAvailable?.itemName || "N/A"}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {leastAvailable?.available || 0} units available
@@ -324,7 +320,7 @@ export function ReportsView({
                   <RechartsBarChart data={inventoryWithTotals}>
                     <CartesianGrid vertical={false} />
                     <XAxis
-                      dataKey="name"
+                      dataKey="itemName"
                       tickLine={false}
                       tickMargin={10}
                       axisLine={false}
@@ -429,7 +425,7 @@ export function ReportsView({
               <TableBody>
                 {inventoryWithTotals.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell>{item.name}</TableCell>
+                    <TableCell>{item.itemName}</TableCell>
                     <TableCell>{item.available}</TableCell>
                     <TableCell>{item.issued}</TableCell>
                     <TableCell>{item.faulty}</TableCell>
