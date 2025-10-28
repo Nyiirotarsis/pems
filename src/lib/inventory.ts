@@ -1,76 +1,62 @@
 
-import type { InventoryItem, Asset, Condition, UserRole } from "@/types";
+import type { InventoryItem, Condition, UserRole } from "@/types";
 
+// This file needs to be updated to work with a Firestore backend.
+// The functions below are placeholders that operate on the mock data.
+
+/**
+ * Updates the inventory based on a transaction.
+ * This is a placeholder and should be replaced with Firestore transactions.
+ * @param currentInventory - The current state of the inventory.
+ * @param equipmentId - The ID of the equipment to update.
+ * @param transactionPayload - The details of the transaction.
+ * @param type - The type of transaction.
+ * @param condition - The condition of the item, for returns.
+ * @param userRole - The role of the user performing the action.
+ * @returns The updated inventory and the assets affected.
+ */
 export function updateInventory(
   currentInventory: InventoryItem[],
-  equipmentId: number,
-  transactionPayload: { assetIds: string[] } | { quantity: number },
+  equipmentId: string, // Changed to string to match new ID type
+  transactionPayload: { assetIds?: string[]; quantity?: number },
   type: "issue" | "return" | "restock",
   condition?: Condition,
   userRole?: UserRole
 ) {
-  let affectedAssets: Asset[] = [];
   const updatedInventory = currentInventory.map((item) => {
     if (item.id === equipmentId) {
-      let updatedAssetsList = [...item.assets];
-
-      if (type === 'restock' && 'quantity' in transactionPayload) {
-        const { quantity } = transactionPayload;
-        const namePrefix = item.name.substring(0, 3).toUpperCase();
-        const lastAssetIdNum =
-          item.assets.length > 0
-            ? parseInt(
-                item.assets[item.assets.length - 1].id.split("-").pop() || "0"
-              )
-            : 0;
-
-        for (let i = 1; i <= quantity; i++) {
-          const newAsset: Asset = {
-            id: `${namePrefix}-${item.id}-${String(lastAssetIdNum + i).padStart(
-              4,
-              "0"
-            )}`,
-            equipmentId: item.id,
-            condition: "Good",
-            status: "Available",
-            purchaseDate: new Date().toISOString().split("T")[0],
-          };
-          updatedAssetsList.push(newAsset);
-          affectedAssets.push(newAsset);
-        }
-      } else if (type === 'issue' && 'assetIds' in transactionPayload) {
-        const { assetIds } = transactionPayload;
-        affectedAssets = updatedAssetsList.filter(a => assetIds.includes(a.id));
-
-        affectedAssets.forEach((a) => {
-          const asset = updatedAssetsList.find((ua) => ua.id === a.id);
-          if (asset && asset.status === 'Available') {
-            asset.status = "Issued";
-            asset.assignedTo = userRole || "Unknown"; // Assign to current role for demo
+      const newItem = { ...item };
+      switch (type) {
+        case 'issue':
+          if (transactionPayload.quantity && newItem.quantityAvailable >= transactionPayload.quantity) {
+            newItem.quantityAvailable -= transactionPayload.quantity;
+            newItem.status = newItem.quantityAvailable > 0 ? 'Available' : 'Issued';
+            newItem.issuedTo = userRole || "Unknown";
+            newItem.dateIssued = new Date().toISOString();
           }
-        });
-      } else if (type === 'return' && 'assetIds' in transactionPayload) {
-        const { assetIds } = transactionPayload;
-        affectedAssets = updatedAssetsList.filter(a => assetIds.includes(a.id));
-        
-        affectedAssets.forEach((a) => {
-          const asset = updatedAssetsList.find((ua) => ua.id === a.id);
-          if (asset && asset.status === 'Issued') {
-            asset.status = "Available";
-            asset.condition = condition || "Good";
-            delete asset.assignedTo;
+          break;
+        case 'return':
+          if (transactionPayload.quantity) {
+            newItem.quantityAvailable += transactionPayload.quantity;
+            newItem.status = 'Available';
+            newItem.condition = condition || 'Good';
+            newItem.issuedTo = null;
+            newItem.dateIssued = null;
           }
-        });
+          break;
+        case 'restock':
+          if (transactionPayload.quantity) {
+            newItem.quantityAvailable += transactionPayload.quantity;
+          }
+          break;
       }
-
-      return {
-        ...item,
-        assets: updatedAssetsList,
-        lastUpdated: new Date().toISOString().split("T")[0],
-      };
+      newItem.totalCost = newItem.quantityAvailable * newItem.unitCost;
+      return newItem;
     }
     return item;
   });
 
-  return { updatedInventory, affectedAssets };
+  // Since we no longer manage individual assets in the frontend mock,
+  // the affectedAssets array is left empty.
+  return { updatedInventory, affectedAssets: [] };
 }

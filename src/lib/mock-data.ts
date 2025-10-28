@@ -1,13 +1,20 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Asset, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin"];
 
-export const assetCategories = ["IT Equipment", "AV Equipment", "Office Furniture", "Vehicles", "Software"];
+export const assetCategories = [
+    "Sound Equipment", 
+    "Lighting & Visuals",
+    "Streaming & Production Gear",
+    "Event Setup Materials",
+    "Electrical & Networking",
+    "Transport & Logistics"
+];
 
-export const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost", "Faulty"];
+export const CONDITIONS: Condition[] = ["New", "Good", "Fair", "Damaged", "Under Repair"];
 
 export const mockUsers: User[] = [
     { id: 1, username: 'ceo', password: '123', role: 'CEO' },
@@ -18,91 +25,120 @@ export const mockUsers: User[] = [
     { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
 ];
 
-function generateAssets(equipmentId: number, name: string, count: number, { faultyCount = 0, issuedCount = 0, damagedCount = 0 } = {}): Asset[] {
-    const assets: Asset[] = [];
-    const namePrefix = name.substring(0, 3).toUpperCase();
-    let issuedCounter = 0;
-    for (let i = 1; i <= count; i++) {
-        let condition: Condition = 'Good';
-        let status: 'Available' | 'Issued' = 'Available';
-        let assignedTo: string | undefined = undefined;
-
-        if (i <= faultyCount) {
-            condition = 'Faulty';
-        } else if (i <= faultyCount + damagedCount) {
-            condition = 'Damaged';
-        }
-
-        if (condition === 'Good' && issuedCounter < issuedCount) {
-            status = 'Issued';
-            // Assign to a random user for variety
-            assignedTo = mockUsers[Math.floor(Math.random() * mockUsers.length)].username;
-            issuedCounter++;
-        }
-
-        assets.push({
-            id: `${namePrefix}-${equipmentId}-${String(i).padStart(4, '0')}`,
-            equipmentId,
-            condition,
-            status,
-            assignedTo,
-            purchaseDate: `2023-0${Math.floor(Math.random() * 9) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`
-        });
-    }
-    return assets;
-}
-
 
 export const initialInventory: InventoryItem[] = [
   {
-    id: 1,
-    name: "Microphone",
-    category: "AV Equipment",
-    assets: generateAssets(1, "Microphone", 50, { faultyCount: 2, issuedCount: 10 }),
-    lastUpdated: "2023-10-26",
-    transactions: [],
+    id: "MIC-W-2025-001",
+    itemName: "Wireless Microphone Kit",
+    category: "Sound Equipment",
+    serialNo: "MIC-W-2025-001",
+    description: "Shure BLX288/PG58 Dual Channel Wireless Microphone System",
+    quantityAvailable: 10,
+    unitCost: 850000,
+    totalCost: 8500000,
+    condition: "Good",
+    location: "Central Store - Kampala HQ",
+    supplier: "Sound Innovations",
+    datePurchased: "2025-01-20",
+    lastServiced: "2025-07-15",
+    status: "Available",
+    issuedTo: null,
+    issuedBy: null,
+    dateIssued: null,
+    returnDate: null,
+    addedBy: "UID_OF_IT_MANAGER",
+    createdAt: new Date().toISOString(),
   },
   {
-    id: 2,
-    name: "Projector",
-    category: "AV Equipment",
-    assets: generateAssets(2, "Projector", 20, { faultyCount: 1, issuedCount: 5 }),
-    lastUpdated: "2023-10-25",
-    transactions: [],
+    id: "LED-55-2025-001",
+    itemName: "LED Display Screen 55inch",
+    category: "Lighting & Visuals",
+    serialNo: "LED-55-2025-001",
+    description: "55-inch outdoor LED display with HDMI input",
+    quantityAvailable: 4,
+    unitCost: 1200000,
+    totalCost: 4800000,
+    condition: "Good",
+    location: "Central Store - Kampala HQ",
+    supplier: "Vision Electronics Ltd",
+    datePurchased: "2025-03-15",
+    lastServiced: "2025-08-02",
+    status: "Available",
+    issuedTo: null,
+    issuedBy: null,
+    dateIssued: null,
+    returnDate: null,
+    addedBy: "UID_OF_IT_MANAGER",
+    createdAt: new Date().toISOString()
   },
   {
-    id: 3,
-    name: "Laptop",
-    category: "IT Equipment",
-    assets: generateAssets(3, "Laptop", 100, { faultyCount: 5, issuedCount: 40, damagedCount: 3 }),
-    lastUpdated: "2023-10-27",
-    transactions: [],
+    id: "CAM-DSLR-2024-005",
+    itemName: "Canon EOS R5 Camera",
+    category: "Streaming & Production Gear",
+    serialNo: "CAM-DSLR-2024-005",
+    description: "Full-frame mirrorless camera for high-quality video production.",
+    quantityAvailable: 5,
+    unitCost: 15000000,
+    totalCost: 75000000,
+    condition: "New",
+    location: "Production Room",
+    supplier: "Camera Planet",
+    datePurchased: "2024-05-10",
+    lastServiced: "2025-05-10",
+    status: "Available",
+    issuedTo: null,
+    issuedBy: null,
+    dateIssued: null,
+    returnDate: null,
+    addedBy: "UID_OF_IT_MANAGER",
+    createdAt: new Date().toISOString()
   },
   {
-    id: 4,
-    name: "Conference Speaker",
-    category: "AV Equipment",
-    assets: generateAssets(4, "Conference Speaker", 30, { issuedCount: 8 }),
-    lastUpdated: "2023-10-22",
-    transactions: [],
+    id: "TENT-10X10-2023-015",
+    itemName: "Event Tent 10x10m",
+    category: "Event Setup Materials",
+    serialNo: "TENT-10X10-2023-015",
+    description: "Large canopy tent for outdoor events.",
+    quantityAvailable: 8,
+    unitCost: 2500000,
+    totalCost: 20000000,
+    condition: "Fair",
+    location: "Warehouse B",
+    supplier: "Shelter Solutions",
+    datePurchased: "2023-11-01",
+    lastServiced: "2025-06-01",
+    status: "Available",
+    issuedTo: null,
+    issuedBy: null,
+    dateIssued: null,
+    returnDate: null,
+    addedBy: "UID_OF_STORE_MANAGER",
+    createdAt: new Date().toISOString()
   },
-  {
-    id: 5,
-    name: "HDMI Cable (10ft)",
-    category: "IT Equipment",
-    assets: generateAssets(5, "HDMI Cable", 200, { faultyCount: 10, damagedCount: 20 }),
-    lastUpdated: "2023-10-27",
-    transactions: [],
-  },
-  {
-    id: 6,
-    name: "Whiteboard",
-    category: "Office Furniture",
-    assets: generateAssets(6, "Whiteboard", 15, { issuedCount: 2 }),
-    lastUpdated: "2023-10-24",
-    transactions: [],
+   {
+    id: "GEN-5KVA-2024-002",
+    itemName: "5KVA Diesel Generator",
+    category: "Electrical & Networking",
+    serialNo: "GEN-5KVA-2024-002",
+    description: "Portable generator for event power backup.",
+    quantityAvailable: 2,
+    unitCost: 4000000,
+    totalCost: 8000000,
+    condition: "Good",
+    location: "Central Store - Kampala HQ",
+    supplier: "Powerline Uganda",
+    datePurchased: "2024-02-18",
+    lastServiced: "2025-08-18",
+    status: "Under Repair",
+    issuedTo: null,
+    issuedBy: null,
+    dateIssued: null,
+    returnDate: null,
+    addedBy: "UID_OF_IT_MANAGER",
+    createdAt: new Date().toISOString()
   },
 ];
+
 
 export const mockQuotations: Quotation[] = [
     { id: 'Q001', number: 'QUO-2024-001', service: 'Office Stationery Supply', date: '2024-07-01', amount: 1500, status: 'Approved' },
@@ -231,3 +267,6 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
 export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
 
+// This is a placeholder since the previous implementation of assets is removed.
+// A proper implementation would have assets linked to inventory items.
+export const Asset = {};

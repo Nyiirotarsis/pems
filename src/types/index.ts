@@ -2,7 +2,9 @@
 
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
-export type Condition = "Good" | "Damaged" | "Lost" | "Faulty";
+export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair";
+
+export type InventoryStatus = "Available" | "Issued" | "Under Repair" | "Reserved";
 
 export interface User {
   id: number;
@@ -11,27 +13,30 @@ export interface User {
   role: UserRole;
 }
 
-export interface Asset {
-  id: string; // Engraved serial number
-  equipmentId: number;
-  condition: Condition;
-  status: 'Available' | 'Issued';
-  purchaseDate: string;
-  assignedTo?: string; // Username of person it's assigned to
-}
-
 export interface InventoryItem {
-  id: number;
-  name: string;
+  id: string; // Corresponds to document ID, e.g., "LED-55-2025-001"
+  itemName: string;
   category: string;
-  assets: Asset[]; // Now tracks individual assets
-  lastUpdated: string;
-  transactions: Transaction[];
+  serialNo: string;
+  description: string;
+  quantityAvailable: number;
+  unitCost: number;
+  totalCost: number;
+  condition: Condition;
+  location: string;
+  supplier: string;
+  datePurchased: string;
+  lastServiced: string;
+  status: InventoryStatus;
+  issuedTo: string | null;
+  issuedBy: string | null;
+  dateIssued: string | null;
+  returnDate: string | null;
+  imageURL?: string;
+  addedBy: string; // UID of user
+  createdAt: string; // ISO 8601 string
 }
 
-// Derived properties will be calculated on the fly, so we remove them from the core type.
-// total: number; 
-// available: number;
 
 export interface Transaction {
   type: 'issue' | 'return' | 'restock';
@@ -217,4 +222,14 @@ export interface MaintenanceLog {
     technicianName?: string;
     contact?: string;
     remarks?: string;
+}
+
+// Asset type removed as it's now incorporated into InventoryItem
+export interface Asset {
+  id: string; // Engraved serial number
+  equipmentId: number;
+  condition: "New" | "Good" | "Fair" | "Damaged" | "Under Repair";
+  status: 'Available' | 'Issued';
+  purchaseDate: string;
+  assignedTo?: string; // Username of person it's assigned to
 }

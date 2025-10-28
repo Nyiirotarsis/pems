@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -63,11 +64,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 type InventoryViewProps = {
-  inventory: (InventoryItem & {
-    available: number;
-    total: number;
-    faulty: number;
-  })[];
+  inventory: InventoryItem[];
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   onRestock: (values: z.infer<typeof restockFormSchema>) => void;
@@ -121,7 +118,7 @@ export function InventoryView({
                     Restock Inventory
                   </DialogTitle>
                   <DialogDescription>
-                    Add new serialized assets to the inventory.
+                    Add new items or update quantity for existing equipment.
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -150,7 +147,7 @@ export function InventoryView({
                                   key={item.id}
                                   value={item.id.toString()}
                                 >
-                                  {item.name}
+                                  {item.itemName}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -164,7 +161,7 @@ export function InventoryView({
                       name="quantity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Quantity</FormLabel>
+                          <FormLabel>Quantity Added</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
@@ -195,7 +192,7 @@ export function InventoryView({
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
                               This will add {form.getValues().quantity} new
-                              asset(s) to the inventory.
+                              item(s) to the inventory.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -221,38 +218,31 @@ export function InventoryView({
           <TableHeader>
             <TableRow>
               <TableHead>Equipment</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead className="text-center">Available</TableHead>
-              <TableHead className="text-center">Faulty</TableHead>
-              <TableHead className="text-center">Total</TableHead>
-              <TableHead>Last Updated</TableHead>
+              <TableHead className="text-center">Condition</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {inventory.length > 0 ? (
               inventory.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
+                  <TableCell className="font-medium">{item.itemName}</TableCell>
+                  <TableCell>{item.category}</TableCell>
                   <TableCell className="text-center">
                     <Badge
-                      variant={item.available > 0 ? "default" : "destructive"}
-                      className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      variant={item.quantityAvailable > 0 ? "default" : "destructive"}
                     >
-                      {item.available}
+                      {item.quantityAvailable}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge
-                      variant={item.faulty > 0 ? "destructive" : "outline"}
-                      className={cn(
-                        item.faulty > 0 &&
-                          "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-                      )}
-                    >
-                      {item.faulty}
-                    </Badge>
+                     <Badge variant={item.condition === 'Good' || item.condition === 'New' ? 'default' : 'destructive'}>{item.condition}</Badge>
                   </TableCell>
-                  <TableCell className="text-center">{item.total}</TableCell>
-                  <TableCell>{item.lastUpdated}</TableCell>
+                  <TableCell>
+                    <Badge variant={item.status === 'Available' ? 'default' : 'secondary'}>{item.status}</Badge>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
