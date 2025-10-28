@@ -363,12 +363,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
          <>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store')} isActive={pathname === '/dashboard/store' || pathname === '/dashboard/store/inventory'}><PackageSearch /><span>Inventory</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/assets')} isActive={pathname.startsWith('/dashboard/assets')}><Wrench /><span>Assets</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname === '/dashboard/store/transactions'}><ArrowRightLeft /><span>Issue / Return</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname === '/dashboard/store/requests'}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/maintenance')} isActive={pathname === '/dashboard/store/maintenance'}><Wrench /><span>Maintenance</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname.startsWith('/dashboard/store/transactions')}><ArrowRightLeft /><span>Issue / Return</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname.startsWith('/dashboard/store/requests')}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/maintenance')} isActive={pathname.startsWith('/dashboard/store/maintenance')}><Wrench /><span>Maintenance</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname.startsWith('/dashboard/reports')}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname === '/dashboard/notifications'}>
+              <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname.startsWith('/dashboard/notifications')}>
                   <Bell /><span>Notifications</span>
                   {unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
               </SidebarMenuButton>
