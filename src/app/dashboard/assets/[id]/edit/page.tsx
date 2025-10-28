@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Calendar as CalendarIcon, Save } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -36,11 +36,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -51,18 +46,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { assetCategories, CONDITIONS, initialInventory } from "@/lib/mock-data";
+import { CONDITIONS, initialInventory } from "@/lib/mock-data";
+import { InventoryStatus } from "@/types";
 
 
 const assetFormSchema = z.object({
-  assetName: z.string().min(2, "Asset name is required."),
+  itemName: z.string().min(2, "Asset name is required."),
   category: z.string().min(1, "Please select a category."),
-  purchaseDate: z.date(),
+  datePurchased: z.date(),
   condition: z.string().min(1, "Please select a condition."),
-  assignedTo: z.string().optional(),
+  issuedTo: z.string().optional(),
   status: z.string().min(1, "Please select a status.")
 });
 
@@ -72,30 +66,19 @@ export default function EditAssetPage() {
   const params = useParams<{ id: string }>();
   const { toast } = useToast();
   
-  // Find the asset from mock data
   const asset = React.useMemo(() => {
-    for (const inventoryItem of initialInventory) {
-        const foundAsset = inventoryItem.assets.find(a => a.id === params.id);
-        if (foundAsset) {
-            return {
-                ...foundAsset,
-                assetName: inventoryItem.name,
-                category: inventoryItem.category
-            };
-        }
-    }
-    return null;
+    return initialInventory.find(a => a.id === params.id);
   }, [params.id]);
 
 
   const form = useForm<AssetFormValues>({
     resolver: zodResolver(assetFormSchema),
     values: asset ? {
-        assetName: asset.assetName,
+        itemName: asset.itemName,
         category: asset.category,
-        purchaseDate: new Date(asset.purchaseDate),
+        datePurchased: new Date(asset.datePurchased),
         condition: asset.condition,
-        assignedTo: asset.assignedTo || "",
+        issuedTo: asset.issuedTo || "",
         status: asset.status
     } : undefined
   });
@@ -122,7 +105,7 @@ export default function EditAssetPage() {
     console.log(data);
     toast({
       title: "Asset Updated",
-      description: `Asset "${data.assetName}" (${params.id}) has been updated.`,
+      description: `Asset "${data.itemName}" (${params.id}) has been updated.`,
     });
   }
 
@@ -149,7 +132,7 @@ export default function EditAssetPage() {
             <CardContent className="space-y-4">
                <FormField
                   control={form.control}
-                  name="assetName"
+                  name="itemName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Asset Name</FormLabel>
@@ -176,7 +159,7 @@ export default function EditAssetPage() {
                     />
                      <FormField
                       control={form.control}
-                      name="purchaseDate"
+                      name="datePurchased"
                       render={({ field }) => (
                         <FormItem>
                             <FormLabel>Purchase Date</FormLabel>
@@ -226,6 +209,7 @@ export default function EditAssetPage() {
                                 <SelectContent>
                                     <SelectItem value="Available">Available</SelectItem>
                                     <SelectItem value="Issued">Issued</SelectItem>
+                                    <SelectItem value="Under Repair">Under Repair</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />

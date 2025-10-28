@@ -18,9 +18,8 @@ import { useRouter } from "next/navigation";
 import {
   initialInventory,
   mockUsers,
-  assetCategories,
 } from "@/lib/mock-data";
-import type { Asset, InventoryItem } from "@/types";
+import type { InventoryItem } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,29 +54,21 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-type AssetWithDetails = Asset & {
-  assetName: string;
-  category: string;
-};
-
-type StatusFilter = "All" | "Available" | "Issued" | "Faulty" | "Damaged";
+type StatusFilter = "All" | "Available" | "Issued" | "Under Repair";
 
 const statusColors: Record<string, string> = {
   Available:
     "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
   Issued:
     "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700",
-  Faulty:
+  "Under Repair":
     "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700",
-  Damaged:
-    "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
 };
 
 const statusIcons: Record<string, React.ElementType> = {
   Available: Package,
   Issued: User,
-  Faulty: Wrench,
-  Damaged: Wrench,
+  "Under Repair": Wrench,
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -96,35 +87,26 @@ function StatusBadge({ status }: { status: string }) {
 export default function AssetsPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [assets, setAssets] = React.useState<AssetWithDetails[]>([]);
+  const [assets, setAssets] = React.useState<InventoryItem[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("All");
 
   React.useEffect(() => {
-    const allAssets = initialInventory.flatMap((item: InventoryItem) =>
-      item.assets.map((asset) => ({
-        ...asset,
-        assetName: item.name,
-        category: item.category,
-      }))
-    );
-    setAssets(allAssets);
+    // The initialInventory is now the list of all assets
+    setAssets(initialInventory);
   }, []);
 
   const filteredAssets = assets.filter((asset) => {
     if (statusFilter === "All") return true;
-    if (statusFilter === "Available" || statusFilter === "Issued") {
-      return asset.status === statusFilter;
-    }
-    return asset.condition === statusFilter;
+    return asset.status === statusFilter;
   });
   
-  const getAssignedToNameString = (username?: string) => {
+  const getAssignedToNameString = (username?: string | null) => {
     if (!username) return "Store Room";
     const user = mockUsers.find(u => u.username === username);
     return user ? user.role : username;
   }
 
-  const getAssignedToName = (username?: string) => {
+  const getAssignedToName = (username?: string | null) => {
     if (!username) return <span className="text-muted-foreground">Store Room</span>;
     const user = mockUsers.find(u => u.username === username);
     return user ? user.role : username;
@@ -145,10 +127,10 @@ export default function AssetsPage() {
       headers.join(','),
       ...filteredAssets.map(asset => [
         `"${asset.id}"`,
-        `"${asset.assetName}"`,
+        `"${asset.itemName}"`,
         `"${asset.category}"`,
-        `"${getAssignedToNameString(asset.assignedTo)}"`,
-        `"${asset.purchaseDate}"`,
+        `"${getAssignedToNameString(asset.issuedTo)}"`,
+        `"${asset.datePurchased}"`,
         `"${asset.condition}"`,
         `"${asset.status}"`,
       ].join(','))
@@ -203,8 +185,7 @@ export default function AssetsPage() {
                   <SelectItem value="All">All Statuses</SelectItem>
                   <SelectItem value="Available">Available</SelectItem>
                   <SelectItem value="Issued">Issued</SelectItem>
-                  <SelectItem value="Faulty">Faulty</SelectItem>
-                  <SelectItem value="Damaged">Damaged</SelectItem>
+                  <SelectItem value="Under Repair">Under Repair</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" onClick={handleExport}>
@@ -238,12 +219,12 @@ export default function AssetsPage() {
               {filteredAssets.map((asset) => (
                 <TableRow key={asset.id}>
                   <TableCell className="font-mono text-xs">{asset.id}</TableCell>
-                  <TableCell className="font-medium">{asset.assetName}</TableCell>
+                  <TableCell className="font-medium">{asset.itemName}</TableCell>
                   <TableCell>{asset.category}</TableCell>
-                  <TableCell>{getAssignedToName(asset.assignedTo)}</TableCell>
-                  <TableCell>{asset.purchaseDate}</TableCell>
+                  <TableCell>{getAssignedToName(asset.issuedTo)}</TableCell>
+                  <TableCell>{asset.datePurchased}</TableCell>
                   <TableCell>
-                     <Badge variant={asset.condition === 'Good' ? 'default' : 'destructive'}>{asset.condition}</Badge>
+                     <Badge variant={asset.condition === 'Good' || asset.condition === 'New' ? 'default' : 'destructive'}>{asset.condition}</Badge>
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={asset.status} />
