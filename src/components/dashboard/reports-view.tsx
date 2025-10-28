@@ -78,8 +78,8 @@ export function ReportsView({
   const getInventoryTotals = (item: InventoryItem) => {
     const total = item.quantityAvailable + (item.status === 'Out' || item.status === 'Under Repair' ? 1 : 0); // Simplified total
     const available = item.status === "Available" ? item.quantityAvailable : 0;
-    const issued = item.status === "Out" ? item.quantityAvailable : 0; // Assuming quantityAvailable represents issued when status is 'Out'
-    const faulty = item.condition === "Faulty" || item.status === "Under Repair" ? item.quantityAvailable : 0;
+    const issued = item.status === "Out" ? 1 : 0; // Simplified
+    const faulty = item.condition === "Faulty" || item.status === "Under Repair" ? (item.status === 'Out' ? 1 : item.quantityAvailable) : 0;
     return { total, available, issued, faulty };
   };
 
