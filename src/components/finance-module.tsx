@@ -25,7 +25,7 @@ import {
   mockInvoices,
   mockPayments,
 } from "@/lib/mock-data";
-import type { Quotation, LPO, Invoice, Payment, FinancialStatus, FinanceModuleProps } from "@/types";
+import type { Quotation, LPO, Invoice, Payment, FinancialStatus, FinanceModuleProps, UserRole } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +53,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const statusColors: Record<FinancialStatus, string> = {
     Pending: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700",
@@ -94,6 +95,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
 
   const canCreate = role === 'Finance Manager' || role === 'Director';
   const canCreateQuotations = canCreate || role === 'CEO';
+  const canApprove = role === 'CEO' || role === 'Director';
 
   const handleQuotationStatusChange = (id: string, status: 'Approved' | 'Rejected') => {
     setQuotations(prevQuotations =>
@@ -156,7 +158,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                     <TableCell>${q.amount.toFixed(2)}</TableCell>
                     <TableCell><StatusBadge status={q.status} /></TableCell>
                     <TableCell className="text-right">
-                      <ItemActions item={q} type="quotations" onStatusChange={handleQuotationStatusChange}/>
+                      <ItemActions item={q} type="quotations" role={role} onStatusChange={handleQuotationStatusChange}/>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -211,7 +213,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                             <TableCell>{lpo.date}</TableCell>
                             <TableCell>${lpo.amount.toFixed(2)}</TableCell>
                             <TableCell><StatusBadge status={lpo.status} /></TableCell>
-                            <TableCell className="text-right"><ItemActions item={lpo} type="lpos"/></TableCell>
+                            <TableCell className="text-right"><ItemActions item={lpo} type="lpos" role={role} /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -267,7 +269,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                             <TableCell>{inv.dueDate}</TableCell>
                             <TableCell>${inv.amount.toFixed(2)}</TableCell>
                             <TableCell><StatusBadge status={inv.status} /></TableCell>
-                            <TableCell className="text-right"><ItemActions item={inv} type="invoices" /></TableCell>
+                            <TableCell className="text-right"><ItemActions item={inv} type="invoices" role={role} /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -319,7 +321,7 @@ export function FinanceModule({ role }: FinanceModuleProps) {
                             <TableCell>{p.date}</TableCell>
                             <TableCell>${p.amount.toFixed(2)}</TableCell>
                             <TableCell>{p.method}</TableCell>
-                            <TableCell className="text-right"><ItemActions item={p} type="payments" /></TableCell>
+                            <TableCell className="text-right"><ItemActions item={p} type="payments" role={role} /></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -332,8 +334,9 @@ export function FinanceModule({ role }: FinanceModuleProps) {
 }
 
 
-function ItemActions({ item, type, onStatusChange }: { item: any, type: string, onStatusChange?: (id: string, status: 'Approved' | 'Rejected') => void }) {
+function ItemActions({ item, type, role, onStatusChange }: { item: any, type: string, role: UserRole | null, onStatusChange?: (id: string, status: 'Approved' | 'Rejected') => void }) {
     const router = useRouter();
+    const { toast } = useToast();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     
     const handleAction = (action: 'edit' | 'attach' | 'delete' | 'invoice' | 'view' | 'approve' | 'reject') => {
@@ -346,8 +349,7 @@ function ItemActions({ item, type, onStatusChange }: { item: any, type: string, 
                 fileInputRef.current?.click();
                 break;
             case 'delete':
-                // We can show a confirmation dialog here
-                alert(`Delete ${type} ${item.number || item.invoiceNumber}`);
+                toast({ variant: 'destructive', title: 'Deleted', description: `${type} ${item.number || item.invoiceNumber} deleted.`});
                 break;
             case 'invoice':
                 router.push(`/dashboard/finance/invoices/new`);
@@ -355,11 +357,13 @@ function ItemActions({ item, type, onStatusChange }: { item: any, type: string, 
             case 'approve':
                  if(type === 'quotations' && onStatusChange) {
                     onStatusChange(item.id, 'Approved');
+                    toast({ title: 'Approved', description: `Quotation ${item.number} has been approved.` });
                 }
                 break;
             case 'reject':
                  if(type === 'quotations' && onStatusChange) {
                     onStatusChange(item.id, 'Rejected');
+                    toast({ variant: 'destructive', title: 'Rejected', description: `Quotation ${item.number} has been rejected.` });
                 }
                 break;
         }
@@ -369,11 +373,11 @@ function ItemActions({ item, type, onStatusChange }: { item: any, type: string, 
         const file = event.target.files?.[0];
         if (file) {
             console.log(`Attaching ${file.name} to ${type} ${item.id}`);
-            // Here you would typically upload the file to a server
-            alert(`File "${file.name}" selected for attachment.`);
+            toast({ title: 'File Attached', description: `File "${file.name}" selected for attachment.` });
         }
     };
     
+    const canApprove = role === 'CEO' || role === 'Director';
     const canIssueInvoice = (type === 'quotations' && item.status === 'Approved') || (type === 'lpos' && item.status === 'Delivered');
 
 
@@ -401,7 +405,7 @@ function ItemActions({ item, type, onStatusChange }: { item: any, type: string, 
                         <Edit className="mr-2 h-4 w-4" />
                         <span>Edit</span>
                     </DropdownMenuItem>
-                    {type === 'quotations' && item.status === 'Pending' && (
+                    {type === 'quotations' && item.status === 'Pending' && canApprove && (
                         <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => handleAction('approve')}>
@@ -417,11 +421,11 @@ function ItemActions({ item, type, onStatusChange }: { item: any, type: string, 
                     )}
                      {canIssueInvoice && (
                         <>
-                            <DropdownMenuItem onClick={() => handleAction('invoice')}>
-                                <Receipt className="mr-2 h-4 w-4" />
-                                <span>Issue Invoice</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleAction('invoice')}>
+                              <Receipt className="mr-2 h-4 w-4" />
+                              <span>Issue Invoice</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                         </>
                     )}
                     <DropdownMenuItem onClick={() => handleAction('attach')}>
