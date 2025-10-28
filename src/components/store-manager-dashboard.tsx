@@ -2,11 +2,17 @@
 "use client";
 
 import React from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import type { InventoryItem } from "@/types";
 import { InventoryView } from "./dashboard/inventory-view";
 import { initialInventory } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
-import { updateInventory } from "@/lib/inventory";
+import AnalyticsDashboard from "./dashboard/analytics-dashboard";
 
 export default function StoreManagerDashboard() {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -22,8 +28,6 @@ export default function StoreManagerDashboard() {
     quantity: number;
     receivedBy: string;
   }) => {
-    // This logic needs to be updated to match the new data structure.
-    // For now, it will show a toast.
     const item = inventory.find(i => i.id === values.equipmentId);
     toast({
       title: "Restock Logged (Demo)",
@@ -32,12 +36,22 @@ export default function StoreManagerDashboard() {
   };
 
   return (
-    <InventoryView
-      inventory={filteredInventory}
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-      onRestock={handleRestock}
-    />
+    <Tabs defaultValue="overview">
+        <TabsList>
+            <TabsTrigger value="overview">Analytics Overview</TabsTrigger>
+            <TabsTrigger value="inventory">Detailed Inventory</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">
+            <AnalyticsDashboard inventory={inventory} />
+        </TabsContent>
+        <TabsContent value="inventory">
+            <InventoryView
+              inventory={filteredInventory}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              onRestock={handleRestock}
+            />
+        </TabsContent>
+    </Tabs>
   );
 }
-
