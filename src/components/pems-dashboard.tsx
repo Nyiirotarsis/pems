@@ -322,7 +322,30 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <Home /><span>Dashboard</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {['inventory', 'assets', 'transactions', 'requests', 'systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => {
+
+        <SidebarMenuItem>
+            <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/store') || pathname.startsWith('/dashboard/assets')}><div className="flex items-center gap-2"><Package /><span>Inventory</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        {['inventory', 'assets', 'transactions', 'requests'].map(key => {
+                            const Icon = navItems[key].icon;
+                            return (
+                                <SidebarMenuItem key={key}>
+                                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+                                        <Icon /><span>{navItems[key].label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
+        
+        {['systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => {
             const Icon = navItems[key].icon;
             return (
               <SidebarMenuItem key={key}>
