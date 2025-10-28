@@ -1,6 +1,6 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin"];
@@ -14,7 +14,7 @@ export const assetCategories = [
     "Transport & Logistics"
 ];
 
-export const CONDITIONS: Condition[] = ["New", "Good", "Fair", "Damaged", "Under Repair"];
+export const CONDITIONS: Condition[] = ["New", "Good", "Fair", "Damaged", "Under Repair", "Faulty"];
 
 export const mockUsers: User[] = [
     { id: 1, username: 'ceo', password: '123', role: 'CEO' },
@@ -137,6 +137,24 @@ export const initialInventory: InventoryItem[] = [
     addedBy: "UID_OF_IT_MANAGER",
     createdAt: new Date().toISOString()
   },
+];
+
+
+export const mockInventoryIssues: InventoryIssue[] = [
+    {
+        issueId: 'ISS-2025-010',
+        dateOut: '2024-07-25T09:30:00Z',
+        category: 'Sound Equipment',
+        itemsIssued: [
+            { itemId: 'MIC-W-2025-001', itemName: 'Wireless Microphone Kit', quantity: 2 }
+        ],
+        venue: 'Serena Conference Hall',
+        issuedTo: 'Alice Sound',
+        issuedBy: 'storemanager',
+        status: 'Out',
+        remarks: 'Used for corporate event',
+        createdAt: '2024-07-25T09:30:00Z'
+    }
 ];
 
 
@@ -266,7 +284,3 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
 // Duplicate export of USERS removed to avoid conflicts
 export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
-
-// This is a placeholder since the previous implementation of assets is removed.
-// A proper implementation would have assets linked to inventory items.
-export const Asset = {};

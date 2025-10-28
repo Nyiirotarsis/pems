@@ -1,6 +1,34 @@
 
 import { z } from "zod";
 
+export const issueItemSchema = z.object({
+  itemId: z.string().min(1, "Please select an item."),
+  quantityOut: z.coerce.number().min(1, "Quantity must be at least 1."),
+});
+
+export const issueFormSchema = z.object({
+  dateOut: z.date(),
+  category: z.string().min(1, "Please select a category."),
+  itemsIssued: z.array(issueItemSchema).min(1, "Please add at least one item."),
+  issuedTo: z.string().min(1, "Please select the receiving officer."),
+  venue: z.string().min(2, "Venue/Event name is required."),
+  remarks: z.string().optional(),
+});
+
+export const returnItemSchema = z.object({
+  itemId: z.string(),
+  itemName: z.string(),
+  condition: z.string().min(1, "Please select a condition."),
+});
+
+export const returnFormSchema = z.object({
+  issueId: z.string().min(1, "Please select the issue reference."),
+  dateIn: z.date(),
+  itemsReturned: z.array(returnItemSchema),
+  remarks: z.string().optional(),
+});
+
+
 export const transactionFormSchema = z.object({
   equipmentId: z.string().min(1, "Please select an equipment."),
   date: z.date(),
@@ -90,7 +118,7 @@ const quotationItemSchema = z.object({
   quantity: z.coerce.number().min(1, "Qty must be at least 1."),
   days: z.coerce.number().min(1, "Days must be at least 1."),
   unitCost: z.coerce.number().min(0, "Price must be a positive number."),
-  discount: z.coerce.number().optional(),
+  discount: z.coerce.number().min(0).optional(),
 });
 
 export const quotationFormSchema = z.object({

@@ -2,9 +2,9 @@
 
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
 
-export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair";
+export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
 
-export type InventoryStatus = "Available" | "Issued" | "Under Repair" | "Reserved";
+export type InventoryStatus = "Available" | "Out" | "Under Repair" | "Reserved";
 
 export interface User {
   id: number;
@@ -30,11 +30,47 @@ export interface InventoryItem {
   status: InventoryStatus;
   issuedTo: string | null;
   issuedBy: string | null;
+  venue?: string | null;
   dateIssued: string | null;
   returnDate: string | null;
   imageURL?: string;
   addedBy: string; // UID of user
   createdAt: string; // ISO 8601 string
+}
+
+export interface InventoryIssue {
+  issueId: string;
+  dateOut: string;
+  category: string;
+  itemsIssued: {
+    itemId: string;
+    itemName: string;
+    quantity: number;
+  }[];
+  venue: string;
+  issuedTo: string;
+  issuedBy: string;
+  status: "Out" | "Returned" | "Partially Returned";
+  remarks?: string;
+  createdAt: string;
+  dateIn?: string;
+  itemsReturned?: {
+    itemId: string;
+    condition: Condition;
+  }[];
+  receivedBy?: string;
+}
+
+export interface RepairLog {
+  repairId: string;
+  itemId: string;
+  itemName: string;
+  problem: string;
+  reportedBy: string;
+  handledBy: string;
+  repairDate: string;
+  cost: number;
+  status: "Pending" | "In Progress" | "Fixed" | "Cannot Fix";
 }
 
 
@@ -60,6 +96,7 @@ export type FinancialStatus = "Pending" | "Approved" | "Rejected" | "Paid" | "Pa
 
 export interface FinanceModuleProps {
     role: UserRole | null;
+    status?: FinancialStatus;
 }
 
 export interface Quotation {
@@ -222,14 +259,4 @@ export interface MaintenanceLog {
     technicianName?: string;
     contact?: string;
     remarks?: string;
-}
-
-// Asset type removed as it's now incorporated into InventoryItem
-export interface Asset {
-  id: string; // Engraved serial number
-  equipmentId: number;
-  condition: "New" | "Good" | "Fair" | "Damaged" | "Under Repair";
-  status: 'Available' | 'Issued';
-  purchaseDate: string;
-  assignedTo?: string; // Username of person it's assigned to
 }
