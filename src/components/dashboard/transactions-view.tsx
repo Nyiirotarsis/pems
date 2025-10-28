@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { transactionFormSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
-import type { InventoryItem, Condition, Asset } from "@/types";
+import type { InventoryItem, Condition } from "@/types";
 import React from "react";
 
 import {
@@ -54,9 +54,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 
 const CONDITIONS: Condition[] = ["Good", "Damaged", "Lost", "Faulty"];
 
@@ -73,32 +70,31 @@ export function TransactionsView({
 }: TransactionsViewProps) {
   const issueForm = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
-    defaultValues: { date: new Date(), assetIds: [] },
+    defaultValues: { date: new Date(), quantity: 1 },
   });
 
   const returnForm = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
-    defaultValues: { date: new Date(), assetIds: [] },
+    defaultValues: { date: new Date(), quantity: 1 },
   });
 
   function handleIssueSubmit(values: z.infer<typeof transactionFormSchema>) {
-    const item = inventory.find((i) => i.id === parseInt(values.equipmentId));
-     if (!item) return;
-    const availableCount = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
-    if (availableCount < values.assetIds.length) {
-      issueForm.setError("assetIds", {
+    const item = inventory.find((i) => i.id === values.equipmentId);
+    if (!item) return;
+    if (item.quantityAvailable < values.quantity) {
+      issueForm.setError("quantity", {
         type: "manual",
-        message: `Not enough in stock. Only ${availableCount} available.`,
+        message: `Not enough in stock. Only ${item.quantityAvailable} available.`,
       });
       return;
     }
     onIssue(values);
-    issueForm.reset({ date: new Date(), assetIds: [] });
+    issueForm.reset({ date: new Date(), quantity: 1 });
   }
 
   function handleReturnSubmit(values: z.infer<typeof transactionFormSchema>) {
     onReturn(values);
-    returnForm.reset({ date: new Date(), assetIds: [] });
+    returnForm.reset({ date: new Date(), quantity: 1 });
   }
 
   return (
@@ -133,7 +129,7 @@ export function TransactionsView({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action will mark {issueForm.getValues("assetIds").length}{" "}
+                        This action will mark {issueForm.getValues("quantity")}{" "}
                         item(s) as issued.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -179,7 +175,7 @@ export function TransactionsView({
                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
                         This action will return{" "}
-                        {returnForm.getValues("assetIds").length} item(s) to the
+                        {returnForm.getValues("quantity")} item(s) to the
                         inventory.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -204,44 +200,6 @@ export function TransactionsView({
 
 
 function TransactionFormFields({ form, inventory, type }: { form: any; inventory: InventoryItem[]; type: "issue" | "return"; }) {
-  const selectedEquipmentId = form.watch("equipmentId");
-  const selectedCondition = form.watch("condition");
-  const selectedAssetIds = form.watch("assetIds");
-
-  const [assetsToList, setAssetsToList] = React.useState<Asset[]>([]);
-
-  React.useEffect(() => {
-    if (selectedEquipmentId) {
-      const item = inventory.find(i => i.id.toString() === selectedEquipmentId);
-      if (item) {
-        const relevantAssets = type === 'issue'
-          ? item.assets.filter(a => a.status === 'Available')
-          : item.assets.filter(a => a.status === 'Issued');
-        setAssetsToList(relevantAssets);
-      } else {
-        setAssetsToList([]);
-      }
-      form.setValue("assetIds", []); // Reset selection when equipment changes
-    }
-  }, [selectedEquipmentId, inventory, type, form]);
-  
-  const handleCheckboxChange = (assetId: string, checked: boolean) => {
-      const currentAssetIds = selectedAssetIds || [];
-      
-      const isFaultyFlow = type === 'return' && ['Faulty', 'Damaged', 'Lost'].includes(selectedCondition);
-
-      if (isFaultyFlow) {
-           form.setValue("assetIds", checked ? [assetId] : []);
-      } else {
-          const newAssetIds = checked
-            ? [...currentAssetIds, assetId]
-            : currentAssetIds.filter((id: string) => id !== assetId);
-          form.setValue("assetIds", newAssetIds);
-      }
-  }
-  
-  const isMultiSelectDisabled = type === 'return' && ['Faulty', 'Damaged', 'Lost'].includes(selectedCondition) && selectedAssetIds.length > 0;
-
 
   return (
     <>
@@ -261,7 +219,7 @@ function TransactionFormFields({ form, inventory, type }: { form: any; inventory
                   <SelectContent>
                     {inventory.map((item) => (
                       <SelectItem key={item.id} value={item.id.toString()}>
-                        {item.name} ({type === 'issue' ? `Available: ${item.assets.filter(a => a.status === 'Available').length}` : `Issued: ${item.assets.filter(a => a.status === 'Issued').length}`})
+                        {item.itemName} ({type === 'issue' ? `Available: ${item.quantityAvailable}` : `Issued: ${item.quantityAvailable - item.available}`})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -311,6 +269,21 @@ function TransactionFormFields({ form, inventory, type }: { form: any; inventory
             )}
           />
       </div>
+
+       <FormField
+        control={form.control}
+        name="quantity"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Quantity</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       {type === "return" && (
         <FormField
           control={form.control}
@@ -318,7 +291,7 @@ function TransactionFormFields({ form, inventory, type }: { form: any; inventory
           render={({ field }) => (
             <FormItem>
               <FormLabel>Condition</FormLabel>
-              <Select onValueChange={(value) => { field.onChange(value); form.setValue("assetIds", []) }} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select returned condition" />
@@ -335,41 +308,6 @@ function TransactionFormFields({ form, inventory, type }: { form: any; inventory
               <FormMessage />
             </FormItem>
           )}
-        />
-      )}
-
-      {selectedEquipmentId && (
-        <FormField
-            control={form.control}
-            name="assetIds"
-            render={() => (
-                <FormItem>
-                    <FormLabel>Select Assets ({selectedAssetIds?.length || 0} selected)</FormLabel>
-                     {isMultiSelectDisabled && <p className="text-sm text-destructive">Only one faulty/damaged asset can be returned at a time.</p>}
-                    <ScrollArea className="h-48 rounded-md border p-2">
-                         <div className="space-y-2">
-                         {assetsToList.length > 0 ? assetsToList.map((asset) => (
-                            <div key={asset.id} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={asset.id}
-                                    checked={selectedAssetIds?.includes(asset.id)}
-                                    onCheckedChange={(checked) => handleCheckboxChange(asset.id, !!checked)}
-                                    disabled={isMultiSelectDisabled && !selectedAssetIds?.includes(asset.id)}
-                                />
-                                <label
-                                    htmlFor={asset.id}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    {asset.id}
-                                    {type === 'return' && asset.assignedTo && <Badge variant="outline" className="ml-2">{asset.assignedTo}</Badge>}
-                                </label>
-                            </div>
-                         )) : <p className="text-sm text-muted-foreground text-center py-4">No assets to show.</p>}
-                         </div>
-                    </ScrollArea>
-                    <FormMessage />
-                </FormItem>
-            )}
         />
       )}
     </>

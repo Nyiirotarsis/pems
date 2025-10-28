@@ -13,8 +13,8 @@ export default function TransactionsPage() {
   const { toast } = useToast();
 
   const getInventoryTotals = (item: InventoryItem) => {
-    const total = item.assets.length;
-    const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
+    const total = item.quantityAvailable;
+    const available = item.status === 'Available' ? item.quantityAvailable : 0;
     return { total, available };
   };
 
@@ -23,24 +23,23 @@ export default function TransactionsPage() {
       <TransactionsView 
         inventory={inventory.map(item => ({...item, ...getInventoryTotals(item)}))} 
         onIssue={(values) => {
-          const equipmentId = parseInt(values.equipmentId);
-          const { updatedInventory } = updateInventory(inventory, equipmentId, {assetIds: values.assetIds}, "issue");
+          const { updatedInventory } = updateInventory(inventory, values.equipmentId, {quantity: values.quantity}, "issue");
           setInventory(updatedInventory);
           toast({
             title: "Success",
-            description: `${values.assetIds.length} unit(s) of ${inventory.find(i => i.id === equipmentId)?.name} issued.`,
+            description: `${values.quantity} unit(s) of ${inventory.find(i => i.id === values.equipmentId)?.itemName} issued.`,
           });
         }}
         onReturn={(values) => {
-          const equipmentId = parseInt(values.equipmentId);
-          const { updatedInventory } = updateInventory(inventory, equipmentId, {assetIds: values.assetIds}, "return", values.condition as any);
+          const { updatedInventory } = updateInventory(inventory, values.equipmentId, {quantity: values.quantity}, "return", values.condition as any);
           setInventory(updatedInventory);
           toast({
             title: "Success",
-            description: `${values.assetIds.length} unit(s) of ${inventory.find(i => i.id === equipmentId)?.name} returned in ${values.condition} condition.`,
+            description: `${values.quantity} unit(s) of ${inventory.find(i => i.id === values.equipmentId)?.itemName} returned in ${values.condition} condition.`,
           });
         }}
       />
     </PEMSDashboard>
   );
 }
+

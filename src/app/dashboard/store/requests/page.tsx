@@ -10,8 +10,8 @@ export default function RequestsPage() {
   const [inventory] = useState<InventoryItem[]>(initialInventory);
 
   const getInventoryTotals = (item: InventoryItem) => {
-    const total = item.assets.length;
-    const available = item.assets.filter(a => a.status === 'Available' && a.condition === 'Good').length;
+    const total = item.quantityAvailable;
+    const available = item.status === 'Available' ? item.quantityAvailable : 0;
     return { total, available };
   };
 
@@ -27,3 +27,4 @@ export default function RequestsPage() {
     </PEMSDashboard>
   );
 }
+

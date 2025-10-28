@@ -5,7 +5,7 @@ export const transactionFormSchema = z.object({
   equipmentId: z.string().min(1, "Please select an equipment."),
   date: z.date(),
   condition: z.string().optional(),
-  assetIds: z.array(z.string()).min(1, "Please select at least one asset."),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
 });
 
 export const restockFormSchema = z.object({
