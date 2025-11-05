@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, useFieldArray } from "react-hook-form";
@@ -322,13 +323,13 @@ function IssueFormFields({ form, inventory }: { form: any; inventory: InventoryI
                                 </FormItem>
                             )}
                         />
-                        <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
+                        <Button type="button" size="icon" onClick={() => remove(index)} disabled={fields.length <= 1}>
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 ))}
                 </div>
-                 <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => append({ itemId: "", quantityOut: 1 })}>
+                 <Button type="button" variant="default" size="sm" className="mt-2" onClick={() => append({ itemId: "", quantityOut: 1 })}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Item
                 </Button>
             </div>
