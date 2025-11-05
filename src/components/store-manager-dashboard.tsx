@@ -2,22 +2,30 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  FileDown,
+  FileUp,
+  PlusCircle
+} from "lucide-react";
 import type { InventoryItem } from "@/types";
 import { InventoryView } from "./dashboard/inventory-view";
 import { initialInventory } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import AnalyticsDashboard from "./dashboard/analytics-dashboard";
+import { Button } from "./ui/button";
 
 export default function StoreManagerDashboard() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [inventory, setInventory] = React.useState(initialInventory);
   const { toast } = useToast();
+  const router = useRouter();
 
   const filteredInventory = inventory.filter((item) =>
     item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -37,10 +45,23 @@ export default function StoreManagerDashboard() {
 
   return (
     <Tabs defaultValue="overview">
-        <TabsList>
-            <TabsTrigger value="overview">Analytics Overview</TabsTrigger>
-            <TabsTrigger value="inventory">Detailed Inventory</TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
+            <TabsList>
+                <TabsTrigger value="overview">Analytics Overview</TabsTrigger>
+                <TabsTrigger value="inventory">Detailed Inventory</TabsTrigger>
+            </TabsList>
+            <div className="flex gap-2">
+                <Button onClick={() => router.push('/dashboard/assets/new')}>
+                    <PlusCircle className="mr-2" /> Add New Asset
+                </Button>
+                <Button variant="outline">
+                    <FileDown className="mr-2" /> Export
+                </Button>
+                <Button variant="outline">
+                    <FileUp className="mr-2" /> Import
+                </Button>
+            </div>
+        </div>
         <TabsContent value="overview">
             <AnalyticsDashboard inventory={inventory} />
         </TabsContent>
