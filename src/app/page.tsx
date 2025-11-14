@@ -42,6 +42,11 @@ export default function Home() {
           </Button>
         </div>
       </main>
+       <footer className="bg-card border-t">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
+            </div>
+        </footer>
     </div>
   );
 }

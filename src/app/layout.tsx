@@ -32,7 +32,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning={true}>
-        {!isLandingPage && (
+        {isLandingPage ? (
+          <>
+            {children}
+          </>
+        ) : (
+          <>
             <header className="bg-card border-b shadow-sm sticky top-0 z-40">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
                     <div className="flex items-center gap-4">
@@ -46,15 +51,16 @@ export default function RootLayout({
                     </div>
                 </div>
             </header>
+            <main className="flex-1">
+              {children}
+            </main>
+            <footer className="bg-card border-t mt-auto">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
+                    &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
+                </div>
+            </footer>
+          </>
         )}
-        <main className="flex-1">
-          {children}
-        </main>
-        <footer className="bg-card border-t mt-auto">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
-            </div>
-        </footer>
         <Toaster />
       </body>
     </html>
