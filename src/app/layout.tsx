@@ -19,22 +19,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LanguageProvider, useLanguage } from '@/context/language-context';
+import { translations } from '@/lib/translations';
 
 // export const metadata: Metadata = {
 //   title: 'Pacific Events',
 //   description: 'Manage your events with ease.',
 // };
 
-export default function RootLayout({
+function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
   const showAvatar = pathname.startsWith('/dashboard');
+  const { language, setLanguage } = useLanguage();
+  const t = translations[language];
 
   return (
-    <html lang="en">
+    <html lang={language}>
       <head>
         <title>Pacific Events</title>
         <meta name="description" content="Manage your events with ease." />
@@ -51,19 +55,19 @@ export default function RootLayout({
             </Link>
             <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
               <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                Home
+                {t.navHome}
               </Link>
               <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                Users
+                {t.navUsers}
               </Link>
               <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                Roles
+                {t.navRoles}
               </Link>
               <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                Help
+                {t.navHelp}
               </Link>
               <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                Contact
+                {t.navContact}
               </Link>
             </nav>
             <div className="flex items-center gap-4">
@@ -78,19 +82,19 @@ export default function RootLayout({
                   <DropdownMenuLabel>International</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>English</DropdownMenuItem>
-                    <DropdownMenuItem>French</DropdownMenuItem>
-                    <DropdownMenuItem>Swahili</DropdownMenuItem>
-                    <DropdownMenuItem>Arabic</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Swahili</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Arabic</DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                    <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
                    <DropdownMenuSeparator />
                    <DropdownMenuGroup>
-                    <DropdownMenuItem>Luganda</DropdownMenuItem>
-                    <DropdownMenuItem>Runyankore</DropdownMenuItem>
-                    <DropdownMenuItem>Lusoga</DropdownMenuItem>
-                    <DropdownMenuItem>Acholi</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Luganda</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Runyankore</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Lusoga</DropdownMenuItem>
+                    <DropdownMenuItem disabled>Acholi</DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -102,7 +106,7 @@ export default function RootLayout({
               )}
                {!showAvatar && (
                   <Button asChild size="sm">
-                    <Link href="/login">Login</Link>
+                    <Link href="/login">{t.loginButton}</Link>
                   </Button>
               )}
             </div>
@@ -115,12 +119,25 @@ export default function RootLayout({
         
         <footer className="bg-black text-white mt-auto">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
-                &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
+                &copy; {new Date().getFullYear()} {t.footerText}
             </div>
         </footer>
 
         <Toaster />
       </body>
     </html>
+  );
+}
+
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <LanguageProvider>
+      <AppLayout>{children}</AppLayout>
+    </LanguageProvider>
   );
 }
