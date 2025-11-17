@@ -84,17 +84,17 @@ function AppLayout({
                   <DropdownMenuGroup>
                     <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Swahili</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Arabic</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('sw' as any)}>Swahili</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('ar' as any)}>Arabic</DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                    <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
                    <DropdownMenuSeparator />
                    <DropdownMenuGroup>
-                    <DropdownMenuItem disabled>Luganda</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Runyankore</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Lusoga</DropdownMenuItem>
-                    <DropdownMenuItem disabled>Acholi</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('lg' as any)}>Luganda</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('ny' as any)}>Runyankore</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('soga' as any)}>Lusoga</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('ach' as any)}>Acholi</DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
