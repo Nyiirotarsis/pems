@@ -20,7 +20,8 @@ export default function UsersPage() {
               High-level users who oversee operations and make strategic decisions.
             </p>
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li><strong>CEO/Director:</strong> Has a complete overview of all modules, including finance, HR, and store operations. They approve major requests and view comprehensive reports.</li>
+              <li><strong>Director:</strong> Has a complete overview of all modules for strategic oversight and final approvals.</li>
+              <li><strong>CEO:</strong> Manages day-to-day operations, approves major requests, and views comprehensive reports to ensure the business runs smoothly.</li>
               <li><strong>Finance Manager:</strong> Manages all financial aspects, including quotations, LPOs, invoices, and payments. They handle budget allocations and financial reporting.</li>
             </ul>
           </div>

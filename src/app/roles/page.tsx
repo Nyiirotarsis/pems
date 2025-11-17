@@ -15,9 +15,15 @@ export default function RolesPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="border-b pb-4">
-            <h3 className="font-semibold text-lg">Director / CEO</h3>
+            <h3 className="font-semibold text-lg">Director</h3>
             <p className="text-muted-foreground mt-1">
-              Provides high-level oversight and final approval. This role has read-only access to all modules but can approve or reject critical financial documents like quotations. They rely on the main dashboard and comprehensive reports to monitor business health.
+              Provides the highest level of oversight for the entire organization. The Director has read-only access to all modules and focuses on strategic direction and final approvals on major decisions.
+            </p>
+          </div>
+           <div className="border-b pb-4">
+            <h3 className="font-semibold text-lg">CEO</h3>
+            <p className="text-muted-foreground mt-1">
+              Reports to the Director and is responsible for ensuring all business operations are running smoothly. The CEO can approve or reject critical financial documents, monitor performance across departments, and relies on comprehensive reports to manage the company's health.
             </p>
           </div>
           <div className="border-b pb-4">
