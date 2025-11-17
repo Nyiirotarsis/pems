@@ -127,8 +127,8 @@ function MaintenanceLogForm({ onSave }: { onSave: (data: MaintenanceLogValues) =
                             </FormControl>
                             <SelectContent>
                             {initialInventory.map((item) => (
-                                <SelectItem key={item.id} value={item.name}>
-                                {item.name}
+                                <SelectItem key={item.id} value={item.itemName}>
+                                {item.itemName}
                                 </SelectItem>
                             ))}
                             </SelectContent>
