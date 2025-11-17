@@ -27,16 +27,15 @@ import { translations } from '@/lib/translations';
 //   description: 'Manage your events with ease.',
 // };
 
-function AppLayout({
+function AppContent({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
   const showAvatar = pathname.startsWith('/dashboard');
-  const { language, setLanguage } = useLanguage();
-  const t = translations[language];
-
+  const { language, setLanguage, t } = useLanguage();
+  
   return (
     <html lang={language}>
       <head>
@@ -137,7 +136,7 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
-      <AppLayout>{children}</AppLayout>
+      <AppContent>{children}</AppContent>
     </LanguageProvider>
   );
 }
