@@ -13,48 +13,41 @@ export default function DashboardPage() {
   const router = useRouter();
 
   React.useEffect(() => {
-    let storedRole: UserRole | null = null;
-    let attempts = 0;
+    const storedRole = localStorage.getItem("userRole") as UserRole | null;
 
-    const interval = setInterval(() => {
-      attempts++;
-      storedRole = localStorage.getItem("userRole") as UserRole | null;
-
-      if (storedRole && ROLES.includes(storedRole)) {
-        clearInterval(interval);
-        switch (storedRole) {
-          case "CEO":
-          case "Director":
-            router.replace("/dashboard/director");
-            break;
-          case "Finance Manager":
-            router.replace("/dashboard/finance");
-            break;
-          case "HR/Admin":
-            router.replace("/dashboard/hr");
-            break;
-          case "IT Managers":
-            router.replace("/dashboard/it");
-            break;
-          case "Store Manager":
-            router.replace("/dashboard/store");
-            break;
-          default:
-            router.replace("/login");
-            break;
-        }
-      } else if (attempts > 10) { // After 1 second, give up and go to login
-        clearInterval(interval);
-        router.replace("/login");
+    if (storedRole && ROLES.includes(storedRole)) {
+      switch (storedRole) {
+        case "CEO":
+        case "Director":
+          router.replace("/dashboard/director");
+          break;
+        case "Finance Manager":
+          router.replace("/dashboard/finance");
+          break;
+        case "HR/Admin":
+          router.replace("/dashboard/hr");
+          break;
+        case "IT Managers":
+          router.replace("/dashboard/it");
+          break;
+        case "Store Manager":
+          router.replace("/dashboard/store");
+          break;
+        default:
+          // Fallback for any other valid role, perhaps to a generic dashboard
+          router.replace("/dashboard/director");
+          break;
       }
-    }, 100); // Check every 100ms
-
-    return () => clearInterval(interval);
+    } else {
+      // If no role is found or the role is invalid, go back to login
+      router.replace("/login");
+    }
   }, [router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin" />
+      <p className="ml-2">Loading your dashboard...</p>
     </div>
   );
 }

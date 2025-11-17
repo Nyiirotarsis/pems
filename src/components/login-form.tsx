@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
 import { handleLogin } from "@/app/actions";
+import { UserRole } from "@/types";
 
 const loginFormSchema = z.object({
   username: z.string().min(1, "Please enter your username."),
@@ -50,18 +51,38 @@ export function LoginForm() {
     },
   });
 
+  const getDashboardUrlForRole = (role: UserRole) => {
+    switch (role) {
+      case "CEO":
+      case "Director":
+        return "/dashboard/director";
+      case "Finance Manager":
+        return "/dashboard/finance";
+      case "HR/Admin":
+        return "/dashboard/hr";
+      case "IT Managers":
+        return "/dashboard/it";
+      case "Store Manager":
+        return "/dashboard/store";
+      default:
+        return "/dashboard";
+    }
+  }
+
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
       const result = await handleLogin(values);
       if (result.success && result.user) {
-        // Store user role in localStorage for session persistence
         localStorage.setItem("userRole", result.user.role);
 
         toast({
           title: "Login Successful",
           description: `Welcome back, ${result.user?.role}!`,
         });
-        router.replace("/dashboard");
+
+        const dashboardUrl = getDashboardUrlForRole(result.user.role);
+        router.replace(dashboardUrl);
+        
       } else {
         toast({
           variant: "destructive",
