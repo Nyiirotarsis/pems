@@ -9,6 +9,16 @@ import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Globe } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // export const metadata: Metadata = {
 //   title: 'Pacific Events',
@@ -21,7 +31,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const showAuthButtons = !pathname.startsWith('/dashboard') && pathname !== '/login' && pathname !== '/signup';
   const showAvatar = pathname.startsWith('/dashboard');
 
   return (
@@ -58,16 +67,43 @@ export default function RootLayout({
               </Link>
             </nav>
             <div className="flex items-center gap-4">
-              {showAuthButtons && (
-                <Button asChild size="sm">
-                  <Link href="/login">Get Started</Link>
-                </Button>
-              )}
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Globe className="mr-2 h-4 w-4" />
+                    Language
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>International</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>English</DropdownMenuItem>
+                    <DropdownMenuItem>French</DropdownMenuItem>
+                    <DropdownMenuItem>Swahili</DropdownMenuItem>
+                    <DropdownMenuItem>Arabic</DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                   <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
+                   <DropdownMenuSeparator />
+                   <DropdownMenuGroup>
+                    <DropdownMenuItem>Luganda</DropdownMenuItem>
+                    <DropdownMenuItem>Runyankore</DropdownMenuItem>
+                    <DropdownMenuItem>Lusoga</DropdownMenuItem>
+                    <DropdownMenuItem>Acholi</DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {showAvatar && (
                  <Avatar>
                     <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
                     <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
+              )}
+               {!showAvatar && (
+                  <Button asChild size="sm">
+                    <Link href="/login">Login</Link>
+                  </Button>
               )}
             </div>
           </div>
