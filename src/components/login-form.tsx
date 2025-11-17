@@ -61,7 +61,7 @@ export function LoginForm() {
           title: "Login Successful",
           description: `Welcome back, ${result.user?.role}!`,
         });
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } else {
         toast({
           variant: "destructive",

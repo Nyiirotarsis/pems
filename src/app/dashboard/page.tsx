@@ -11,37 +11,45 @@ import { ROLES } from "@/lib/mock-data";
 // This page acts as a router to the correct default dashboard for the user's role.
 export default function DashboardPage() {
   const router = useRouter();
-  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const storedRole = localStorage.getItem("userRole") as UserRole | null;
-    if (!storedRole || !ROLES.includes(storedRole)) {
-      router.push("/login");
-      return;
-    }
+    let storedRole: UserRole | null = null;
+    let attempts = 0;
 
-    switch (storedRole) {
-      case "CEO":
-      case "Director":
-        // Directors see a special top-level dashboard
-        router.push("/dashboard/director");
-        break;
-      case "Finance Manager":
-        router.push("/dashboard/finance");
-        break;
-      case "HR/Admin":
-        router.push("/dashboard/hr");
-        break;
-      case "IT Managers":
-        router.push("/dashboard/it");
-        break;
-      case "Store Manager":
-        router.push("/dashboard/store");
-        break;
-      default:
-        router.push("/login");
-        break;
-    }
+    const interval = setInterval(() => {
+      attempts++;
+      storedRole = localStorage.getItem("userRole") as UserRole | null;
+
+      if (storedRole && ROLES.includes(storedRole)) {
+        clearInterval(interval);
+        switch (storedRole) {
+          case "CEO":
+          case "Director":
+            router.replace("/dashboard/director");
+            break;
+          case "Finance Manager":
+            router.replace("/dashboard/finance");
+            break;
+          case "HR/Admin":
+            router.replace("/dashboard/hr");
+            break;
+          case "IT Managers":
+            router.replace("/dashboard/it");
+            break;
+          case "Store Manager":
+            router.replace("/dashboard/store");
+            break;
+          default:
+            router.replace("/login");
+            break;
+        }
+      } else if (attempts > 10) { // After 1 second, give up and go to login
+        clearInterval(interval);
+        router.replace("/login");
+      }
+    }, 100); // Check every 100ms
+
+    return () => clearInterval(interval);
   }, [router]);
 
   return (
