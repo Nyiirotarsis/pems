@@ -7,24 +7,24 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="px-4 lg:px-6 h-16 flex items-center bg-card border-b">
-        <Link href="#" className="flex items-center justify-center">
+        <Link href="/" className="flex items-center justify-center">
           <PacificEventsLogo className="h-10 w-auto" />
           <span className="sr-only">Pacific Events</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
             Home
           </Link>
-          <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/users" className="text-sm font-medium hover:underline underline-offset-4">
             Users
           </Link>
-          <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/roles" className="text-sm font-medium hover:underline underline-offset-4">
             Roles
           </Link>
-          <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/help" className="text-sm font-medium hover:underline underline-offset-4">
             Help
           </Link>
-          <Link href="#" className="text-sm font-medium hover:underline underline-offset-4">
+          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
             Contact
           </Link>
         </nav>
