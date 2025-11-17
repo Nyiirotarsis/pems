@@ -3,6 +3,7 @@
 
 import './globals.css';
 import Link from 'next/link';
+import * as React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,6 +30,7 @@ function AppContent({
   const pathname = usePathname();
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
+  const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
   
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
@@ -39,8 +41,8 @@ function AppContent({
     router.push("/login");
   };
   
-  const getDashboardHome = () => {
-    if (typeof window !== 'undefined') {
+  React.useEffect(() => {
+    const getDashboardHome = () => {
         const role = localStorage.getItem("userRole") as UserRole;
         if (role) {
             switch (role) {
@@ -59,9 +61,10 @@ function AppContent({
                 return "/dashboard";
             }
         }
+        return "/dashboard";
     }
-    return "/dashboard";
-  }
+    setDashboardHome(getDashboardHome());
+  }, [pathname]);
 
 
   return (
@@ -77,7 +80,7 @@ function AppContent({
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning={true}>
         <header className="bg-card border-b shadow-sm sticky top-0 z-40">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <Link href={showDashboardHeader ? getDashboardHome() : "/"} className="flex items-center justify-center gap-2">
+            <Link href={showDashboardHeader ? dashboardHome : "/"} className="flex items-center justify-center gap-2">
               <PacificEventsLogo className="h-10 w-auto" />
             </Link>
             
