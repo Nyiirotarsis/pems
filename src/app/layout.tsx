@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster";
 import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import { Globe, LogOut, Settings, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LanguageProvider, useLanguage } from '@/context/language-context';
+import { UserRole } from '@/types';
 
 function AppContent({
   children,
@@ -26,9 +27,43 @@ function AppContent({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const showAvatar = pathname.startsWith('/dashboard');
+  const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   
+  const showDashboardHeader = pathname.startsWith('/dashboard');
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem("userRole");
+    }
+    router.push("/login");
+  };
+  
+  const getDashboardHome = () => {
+    if (typeof window !== 'undefined') {
+        const role = localStorage.getItem("userRole") as UserRole;
+        if (role) {
+            switch (role) {
+                case "CEO":
+                case "Director":
+                return "/dashboard/director";
+                case "Finance Manager":
+                return "/dashboard/finance";
+                case "HR/Admin":
+                return "/dashboard/hr";
+                case "IT Managers":
+                return "/dashboard/it";
+                case "Store Manager":
+                return "/dashboard/store";
+                default:
+                return "/dashboard";
+            }
+        }
+    }
+    return "/dashboard";
+  }
+
+
   return (
     <html lang={language}>
       <head>
@@ -42,26 +77,30 @@ function AppContent({
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning={true}>
         <header className="bg-card border-b shadow-sm sticky top-0 z-40">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center justify-center gap-2">
+            <Link href={showDashboardHeader ? getDashboardHome() : "/"} className="flex items-center justify-center gap-2">
               <PacificEventsLogo className="h-10 w-auto" />
             </Link>
-            <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
-              <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                {t.navHome}
-              </Link>
-              <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                {t.navUsers}
-              </Link>
-              <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                {t.navRoles}
-              </Link>
-              <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                {t.navHelp}
-              </Link>
-              <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                {t.navContact}
-              </Link>
-            </nav>
+            
+            {!showDashboardHeader && (
+                <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
+                    <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navHome}
+                    </Link>
+                    <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navUsers}
+                    </Link>
+                    <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navRoles}
+                    </Link>
+                    <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navHelp}
+                    </Link>
+                    <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navContact}
+                    </Link>
+                </nav>
+            )}
+            
             <div className="flex items-center gap-4">
                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -89,13 +128,36 @@ function AppContent({
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {showAvatar && (
-                 <Avatar>
-                    <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
-                    <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-              )}
-               {!showAvatar && (
+
+              {showDashboardHeader ? (
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Avatar className="cursor-pointer">
+                            <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
+                            <AvatarFallback>AD</AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end">
+                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <User className="mr-2 h-4 w-4" />
+                                <span>Profile</span>
+                            </DropdownMenuItem>
+                             <DropdownMenuItem>
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Settings</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                         <DropdownMenuItem onClick={handleLogout}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Log out</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                 </DropdownMenu>
+              ) : (
                   <Button asChild size="sm">
                     <Link href="/login">{t.loginButton}</Link>
                   </Button>
