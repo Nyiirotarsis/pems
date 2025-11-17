@@ -4,11 +4,9 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/language-context';
-import { translations } from '@/lib/translations';
 
 export default function Home() {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const { t } = useLanguage();
 
   return (
     <div className="flex flex-col flex-1 bg-background">
