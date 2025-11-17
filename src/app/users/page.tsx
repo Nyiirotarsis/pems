@@ -13,13 +13,13 @@ export default function UsersPage() {
             The Pacific Events Management System (PEMS) is designed for various roles within the organization, each with specific functions and access levels.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div>
             <h3 className="font-semibold text-lg">Management & Oversight</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               High-level users who oversee operations and make strategic decisions.
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
+            <ul className="list-disc list-inside mt-2 space-y-2">
               <li><strong>Director:</strong> Has a complete overview of all modules for strategic oversight and final approvals.</li>
               <li><strong>CEO:</strong> Manages day-to-day operations, approves major requests, and views comprehensive reports to ensure the business runs smoothly.</li>
               <li><strong>Finance Manager:</strong> Manages all financial aspects, including quotations, LPOs, invoices, and payments. They handle budget allocations and financial reporting.</li>
@@ -27,10 +27,10 @@ export default function UsersPage() {
           </div>
           <div>
             <h3 className="font-semibold text-lg">Departmental Staff</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               Users responsible for the day-to-day operations within their specific departments.
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
+            <ul className="list-disc list-inside mt-2 space-y-2">
               <li><strong>Store Manager:</strong> Responsible for inventory and asset management, including issuing, returning, and tracking all physical equipment.</li>
               <li><strong>HR/Admin:</strong> Manages all human resources functions, such as employee records, attendance, payroll, leave, and recruitment.</li>
               <li><strong>IT Managers:</strong> Oversee system health, security, user management, and provide technical support across the platform.</li>
