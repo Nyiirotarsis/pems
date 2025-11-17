@@ -3,10 +3,12 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
+import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster";
 import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 // export const metadata: Metadata = {
 //   title: 'Pacific Events',
@@ -19,7 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isLandingPage = pathname === '/';
+  const showAuthButtons = !pathname.startsWith('/dashboard') && pathname !== '/login' && pathname !== '/signup';
+  const showAvatar = pathname.startsWith('/dashboard');
 
   return (
     <html lang="en">
@@ -32,35 +35,54 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning={true}>
-        {isLandingPage ? (
-          <>
-            {children}
-          </>
-        ) : (
-          <>
-            <header className="bg-card border-b shadow-sm sticky top-0 z-40">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-                    <div className="flex items-center gap-4">
-                        <PacificEventsLogo className="h-10 w-auto" />
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Avatar>
-                            <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
-                            <AvatarFallback>AD</AvatarFallback>
-                        </Avatar>
-                    </div>
-                </div>
-            </header>
-            <main className="flex-1">
-              {children}
-            </main>
-            <footer className="bg-card border-t mt-auto">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
-                    &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
-                </div>
-            </footer>
-          </>
-        )}
+        <header className="bg-card border-b shadow-sm sticky top-0 z-40">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center justify-center gap-2">
+              <PacificEventsLogo className="h-10 w-auto" />
+            </Link>
+            <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
+              <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
+                Home
+              </Link>
+              <Link href="/users" className="text-sm font-medium hover:underline underline-offset-4">
+                Users
+              </Link>
+              <Link href="/roles" className="text-sm font-medium hover:underline underline-offset-4">
+                Roles
+              </Link>
+              <Link href="/help" className="text-sm font-medium hover:underline underline-offset-4">
+                Help
+              </Link>
+              <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
+                Contact
+              </Link>
+            </nav>
+            <div className="flex items-center gap-4">
+              {showAuthButtons && (
+                <Button asChild size="sm">
+                  <Link href="/login">Get Started</Link>
+                </Button>
+              )}
+              {showAvatar && (
+                 <Avatar>
+                    <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
+                    <AvatarFallback>AD</AvatarFallback>
+                </Avatar>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1">
+          {children}
+        </main>
+        
+        <footer className="bg-card border-t mt-auto">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
+            </div>
+        </footer>
+
         <Toaster />
       </body>
     </html>
