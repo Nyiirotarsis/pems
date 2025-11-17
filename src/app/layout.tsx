@@ -41,19 +41,19 @@ export default function RootLayout({
               <PacificEventsLogo className="h-10 w-auto" />
             </Link>
             <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
-              <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                 Home
               </Link>
-              <Link href="/users" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                 Users
               </Link>
-              <Link href="/roles" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                 Roles
               </Link>
-              <Link href="/help" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                 Help
               </Link>
-              <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">
+              <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                 Contact
               </Link>
             </nav>
@@ -77,8 +77,8 @@ export default function RootLayout({
           {children}
         </main>
         
-        <footer className="bg-card border-t mt-auto">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-muted-foreground">
+        <footer className="bg-black text-white mt-auto">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
                 &copy; {new Date().getFullYear()} Pacific Events Management System. All Rights Reserved.
             </div>
         </footer>
