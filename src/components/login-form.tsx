@@ -5,7 +5,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -36,8 +35,7 @@ const loginFormSchema = z.object({
   password: z.string().min(1, "Please enter your password."),
 });
 
-export function LoginForm() {
-  const router = useRouter();
+export function LoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const { toast } = useToast();
   const [isPending, startTransition] = React.useTransition();
   const [showPassword, setShowPassword] = React.useState(false);
@@ -61,7 +59,7 @@ export function LoginForm() {
           title: "Login Successful",
           description: `Welcome back, ${result.user?.role}!`,
         });
-        router.push("/dashboard");
+        onLoginSuccess();
       } else {
         toast({
           variant: "destructive",
