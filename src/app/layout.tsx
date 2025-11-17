@@ -1,7 +1,6 @@
 
 "use client";
 
-import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
 import { Toaster } from "@/components/ui/toaster";
@@ -20,12 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LanguageProvider, useLanguage } from '@/context/language-context';
-import { translations } from '@/lib/translations';
-
-// export const metadata: Metadata = {
-//   title: 'Pacific Events',
-//   description: 'Manage your events with ease.',
-// };
 
 function AppContent({
   children,
@@ -83,17 +76,16 @@ function AppContent({
                   <DropdownMenuGroup>
                     <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('sw' as any)}>Swahili</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('ar' as any)}>Arabic</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                    <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
                    <DropdownMenuSeparator />
                    <DropdownMenuGroup>
-                    <DropdownMenuItem onSelect={() => setLanguage('lg' as any)}>Luganda</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('ny' as any)}>Runyankore</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('soga' as any)}>Lusoga</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('ach' as any)}>Acholi</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>

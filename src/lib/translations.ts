@@ -25,9 +25,22 @@ const fr = {
   footerText: 'Système de Gestion d\'Événements Pacific. Tous droits réservés.',
 };
 
+// Placeholder translations - they will show English text.
+const sw = { ...en, navHome: 'Nyumbani' };
+const ar = { ...en, navHome: 'الرئيسية' };
+const lg = { ...en, navHome: 'Enyumba' };
+const ny = { ...en, navHome: 'Ahabw\'enju' };
+const soga = { ...en, navHome: 'Aka' };
+
+
 export const translations = {
   en,
   fr,
+  sw,
+  ar,
+  lg,
+  ny,
+  soga,
 };
 
 export type Language = keyof typeof translations;
