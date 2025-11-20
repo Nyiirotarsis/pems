@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useTransition } from "react";
@@ -68,20 +69,14 @@ export function RequestsView({
     setInStock(null);
     setOutOfStockMessage(null);
 
-    const notificationRoles: UserRole[] = [
-      "CEO",
-      "Director",
-      "Finance Manager",
-      "HR/Admin",
-      "IT Managers",
-    ];
+    const notificationRoles: UserRole[] = ["Store Manager", "CEO", "Director"];
     onNotify(
-      `A request was made for ${values.quantity} of "${values.item}".`,
+      `A request was made by ${role} for ${values.quantity} of "${values.item}".`,
       notificationRoles
     );
 
     const requestedItem = inventory.find(
-      (item) => item.name.toLowerCase() === values.item.toLowerCase()
+      (item) => item.itemName.toLowerCase() === values.item.toLowerCase()
     );
 
     if (requestedItem && requestedItem.available >= values.quantity) {
@@ -89,34 +84,29 @@ export function RequestsView({
     } else {
       setInStock(false);
       const availableCount = requestedItem?.available || 0;
-      if (role === "Store Manager" || role === "IT Managers") {
-        setOutOfStockMessage(
-          `The number of available equipment is ${availableCount}, which is less than requested. Please contact the Finance Manager for outsourcing.`
-        );
-      } else {
-        startTransition(async () => {
-          try {
-            const response = await handleSuggestOutsourcing({
-              item: values.item,
-              quantity: values.quantity,
-            });
-            if (response.suggestions && response.suggestions.length > 0) {
-              setAiResponse(response);
-            } else {
-              setOutOfStockMessage(
-                "This item is unavailable, and we could not fetch outsourcing suggestions at this time. Please contact the Finance Manager directly."
-              );
-            }
-          } catch (e) {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description:
-                "An unexpected error occurred while fetching suggestions.",
-            });
+      
+      startTransition(async () => {
+        try {
+          const response = await handleSuggestOutsourcing({
+            item: values.item,
+            quantity: values.quantity,
+          });
+          if (response.suggestions && response.suggestions.length > 0) {
+            setAiResponse(response);
+          } else {
+            setOutOfStockMessage(
+              "This item is unavailable, and we could not fetch outsourcing suggestions at this time. Please contact the Finance Manager directly."
+            );
           }
-        });
-      }
+        } catch (e) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description:
+              "An unexpected error occurred while fetching suggestions.",
+          });
+        }
+      });
     }
   }
 
@@ -166,7 +156,7 @@ export function RequestsView({
           <CardFooter className="flex flex-col items-start gap-4">
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              <span>Check Availability</span>
+              <span>Check Availability & Send Request</span>
             </Button>
             {isPending && (
               <div className="text-sm text-muted-foreground flex items-center">
@@ -182,8 +172,7 @@ export function RequestsView({
                     Available In Stock!
                   </CardTitle>
                   <CardDescription className="text-green-700 dark:text-green-400">
-                    This item is available for reservation. Please proceed
-                    through the standard issue process.
+                    Your request has been sent to the Store Manager for processing.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -210,7 +199,7 @@ export function RequestsView({
                   </CardTitle>
                   <CardDescription>
                     This item is unavailable. Here is a suggested outsourcing
-                    plan.
+                    plan. Your request has been sent to the Store Manager.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

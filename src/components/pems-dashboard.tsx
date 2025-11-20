@@ -133,13 +133,16 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   visitors: { label: "Visitors", icon: UserCheck, isPage: true, href: "/dashboard/hr/visitors" },
   'exit-management': { label: "Exit", icon: UserMinus, isPage: true, href: "/dashboard/hr/exit" },
   kpi: { label: "KPIs", icon: ClipboardCheck, isPage: true, href: "/dashboard/hr/kpi" },
-  
+
   // IT Sub-items
   systems: { label: "Systems", icon: Cog, isPage: true, href: "/dashboard/it/systems" },
   security: { label: "Security", icon: Shield, isPage: true, href: "/dashboard/it/security" },
   users: { label: "Users", icon: Users, isPage: true, href: "/dashboard/it/users" },
   settings: { label: "Settings", icon: Cog, isPage: true, href: "/dashboard/it/settings" },
   "album-show": { label: "Album Show", icon: Clapperboard, isPage: true, href: "/dashboard/album-show" },
+  
+  // Field Ops Sub-items
+  'field-ops-requests': { label: "Make Request", icon: BotMessageSquare, isPage: true, href: "/dashboard/field-ops/requests" },
 };
 
 
@@ -381,7 +384,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const fieldOpsNav = (
       <>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops')} isActive={pathname === '/dashboard/field-ops'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname === '/dashboard/store/requests'}><BotMessageSquare /><span>Make Request</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/requests')} isActive={pathname === '/dashboard/field-ops/requests'}><BotMessageSquare /><span>Make Request</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
       </>
     );

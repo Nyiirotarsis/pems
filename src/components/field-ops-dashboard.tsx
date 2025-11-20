@@ -28,7 +28,7 @@ const moduleCards = [
     title: "Make Store Request",
     icon: BotMessageSquare,
     description: "Request equipment and materials from the store.",
-    href: "/dashboard/store/requests",
+    href: "/dashboard/field-ops/requests",
   },
   {
     title: "Approve Tasks",
