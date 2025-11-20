@@ -39,6 +39,12 @@ export default function RolesPage() {
             </p>
           </div>
           <div className="border-b pb-4">
+            <h3 className="font-semibold text-lg">Field Operational Officer</h3>
+            <p className="text-muted-foreground mt-1">
+              Reports to the CEO and Director, makes requests to the store manager, oversees, and approves all activities taking place at the site.
+            </p>
+          </div>
+          <div className="border-b pb-4">
             <h3 className="font-semibold text-lg">HR/Admin</h3>
             <p className="text-muted-foreground mt-1">
               Oversees all employee-related activities. This role involves managing staff records, tracking attendance and KPIs, processing field staff payments, and handling the recruitment and exit processes.
