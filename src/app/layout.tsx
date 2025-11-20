@@ -48,17 +48,19 @@ function AppContent({
             switch (role) {
                 case "CEO":
                 case "Director":
-                return "/dashboard/director";
+                  return "/dashboard/director";
                 case "Finance Manager":
-                return "/dashboard/finance";
+                  return "/dashboard/finance";
                 case "HR/Admin":
-                return "/dashboard/hr";
+                  return "/dashboard/hr";
                 case "IT Managers":
-                return "/dashboard/it";
+                  return "/dashboard/it";
                 case "Store Manager":
-                return "/dashboard/store";
+                  return "/dashboard/store";
+                case "Field Operational Officer":
+                    return "/dashboard/field-ops";
                 default:
-                return "/dashboard";
+                  return "/dashboard";
             }
         }
         return "/dashboard";

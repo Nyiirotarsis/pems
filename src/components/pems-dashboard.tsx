@@ -38,6 +38,7 @@ import {
   Clapperboard,
   Home,
   PackageSearch,
+  Construction,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -103,7 +104,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show";
+  | "album-show" | "field-ops";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -111,6 +112,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   finance: { label: "Finance", icon: Landmark, isPage: true, href: "/dashboard/finance" },
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
+  'field-ops': { label: "Field Ops", icon: Construction, isPage: true, href: "/dashboard/field-ops" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
 
@@ -376,6 +378,14 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
          </>
     );
 
+    const fieldOpsNav = (
+      <>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops')} isActive={pathname === '/dashboard/field-ops'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname === '/dashboard/store/requests'}><BotMessageSquare /><span>Make Request</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
+      </>
+    );
+
     switch(currentRole) {
         case 'CEO':
         case 'Director':
@@ -388,6 +398,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return itNav;
         case 'Store Manager':
             return storeNav;
+        case 'Field Operational Officer':
+            return fieldOpsNav;
         default:
             return null;
     }

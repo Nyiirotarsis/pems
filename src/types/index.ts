@@ -1,6 +1,6 @@
 
 
-export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers";
+export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
 
