@@ -27,6 +27,12 @@ export default function RolesPage() {
             </p>
           </div>
           <div className="border-b pb-4">
+            <h3 className="font-semibold text-lg">Field Operational Officer</h3>
+            <p className="text-muted-foreground mt-1">
+              Reports to the CEO and Director, makes requests to the store manager, oversees, and approves all activities taking place at the site.
+            </p>
+          </div>
+          <div className="border-b pb-4">
             <h3 className="font-semibold text-lg">Finance Manager</h3>
             <p className="text-muted-foreground mt-1">
               Operates the financial heart of the system. This user can create quotations, issue LPOs, capture invoices, and record payments. They manage the flow of funds and are responsible for all financial documentation and reporting.
@@ -36,12 +42,6 @@ export default function RolesPage() {
             <h3 className="font-semibold text-lg">Store Manager</h3>
             <p className="text-muted-foreground mt-1">
               Manages the company's physical assets. Their portal is focused on inventory control, including adding new assets, issuing equipment for events, processing returns, logging maintenance, and tracking stock levels.
-            </p>
-          </div>
-          <div className="border-b pb-4">
-            <h3 className="font-semibold text-lg">Field Operational Officer</h3>
-            <p className="text-muted-foreground mt-1">
-              Reports to the CEO and Director, makes requests to the store manager, oversees, and approves all activities taking place at the site.
             </p>
           </div>
           <div className="border-b pb-4">
