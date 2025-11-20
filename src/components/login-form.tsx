@@ -29,7 +29,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
-import { handleLogin } from "@/app/actions";
 import { UserRole } from "@/types";
 
 const loginFormSchema = z.object({
@@ -73,24 +72,40 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
-      const result = await handleLogin(values);
-      if (result.success && result.user) {
-        localStorage.setItem("userRole", result.user.role);
-
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${result.user?.role}!`,
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
         });
 
-        const dashboardUrl = getDashboardUrlForRole(result.user.role);
-        router.replace(dashboardUrl);
-        
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: result.error || "Invalid username or password.",
-        });
+        const result = await response.json();
+
+        if (result.success && result.user) {
+          localStorage.setItem("userRole", result.user.role);
+
+          toast({
+            title: "Login Successful",
+            description: `Welcome back, ${result.user?.role}!`,
+          });
+
+          const dashboardUrl = getDashboardUrlForRole(result.user.role);
+          router.replace(dashboardUrl);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: result.error || "Invalid username or password.",
+          });
+        }
+      } catch (error) {
+         toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "An unexpected error occurred. Please try again.",
+          });
       }
     });
   }

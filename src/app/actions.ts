@@ -15,16 +15,6 @@ export async function handleSuggestOutsourcing(input: SuggestOutsourcingOptionsI
   }
 }
 
-export async function handleLogin(credentials: {username: string, password: string}): Promise<{success: boolean, user?: User, error?: string}> {
-  const user = USERS.find(u => u.username === credentials.username && u.password === credentials.password);
-  if (user) {
-    // In a real app, you'd create a session here.
-    // For this prototype, we'll just return success.
-    return { success: true, user: { id: user.id, username: user.username, role: user.role } };
-  }
-  return { success: false, error: 'Invalid credentials' };
-}
-
 export async function handleSignup(data: {email: string; password: string, role: string}): Promise<{success: boolean; error?: string}> {
     const existingUser = USERS.find(u => u.username === data.email);
 
