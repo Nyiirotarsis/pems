@@ -15,9 +15,9 @@ export default function RolesPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="border-b pb-4">
-            <h3 className="font-semibold text-lg">Director</h3>
+            <h3 className="font-semibold text-lg">Managing Director</h3>
             <p className="text-muted-foreground mt-1">
-              Provides the highest level of oversight for the entire organization. The Director has read-only access to all modules and focuses on strategic direction and final approvals on major decisions.
+              The Managing Director holds the highest oversight authority within the Pacific Events Management System. This role provides strategic leadership, supervises organizational performance, and ensures that all departments align with the company’s mission and long-term goals. The Managing Director has read-only access across all modules, with the ability to perform final approvals on major financial, operational, and contractual decisions.
             </p>
           </div>
            <div className="border-b pb-4">
@@ -35,7 +35,7 @@ export default function RolesPage() {
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg">Finance Manager</h3>
             <p className="text-muted-foreground mt-1">
-              The Finance Manager oversees the complete financial lifecycle of all events and company operations within PEMS. They handle budgeting, quotations, supplier financials, LPOs, client invoicing, payment tracking, expenditure management, and financial reporting. The Finance Manager ensures accurate, timely, and well-documented financial records that support smooth event execution and strategic decision-making.
+             The Finance Manager oversees the complete financial lifecycle of all events and company operations within PEMS. They handle budgeting, quotations, supplier financials, LPOs, client invoicing, payment tracking, expenditure management, and financial reporting. The Finance Manager ensures accurate, timely, and well-documented financial records that support smooth event execution and strategic decision-making.
             </p>
           </div>
           <div className="border-b pb-4">

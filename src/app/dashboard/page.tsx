@@ -33,6 +33,9 @@ export default function DashboardPage() {
         case "Store Manager":
           router.replace("/dashboard/store");
           break;
+        case "Field Operational Officer":
+          router.replace("/dashboard/field-ops");
+          break;
         default:
           // Fallback for any other valid role, perhaps to a generic dashboard
           router.replace("/dashboard/director");
