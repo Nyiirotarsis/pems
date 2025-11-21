@@ -31,7 +31,7 @@ export default function UsersPage() {
               Users responsible for the day-to-day operations within their specific departments.
             </p>
             <ul className="list-disc list-inside mt-2 space-y-2">
-              <li><strong>Field Operational Officer:</strong> Oversees all on-site activities, makes requests to the store manager, and approves operational tasks.</li>
+              <li><strong>Field Operational Officer:</strong> Oversees all on-site activities, manages crew, handles logistics requisitions, makes equipment requests to the store manager, and approves operational tasks.</li>
               <li><strong>Store Manager:</strong> Responsible for inventory and asset management, including issuing, returning, and tracking all physical equipment.</li>
               <li><strong>HR/Admin:</strong> Manages all human resources functions, such as employee records, attendance, payroll, leave, and recruitment.</li>
               <li><strong>IT Managers:</strong> Oversee system health, security, user management, and provide technical support across the platform.</li>

@@ -6,6 +6,9 @@ import {
   BotMessageSquare,
   CheckSquare,
   FileText,
+  Fuel,
+  Users,
+  QrCode,
 } from "lucide-react";
 import {
   Card,
@@ -19,10 +22,10 @@ import { Button } from "./ui/button";
 
 const moduleCards = [
   {
-    title: "Oversee Site Activities",
-    icon: Activity,
-    description: "Monitor and manage ongoing on-site operations.",
-    href: "/dashboard/field-ops/activities",
+    title: "Fuel & Logistics",
+    icon: Fuel,
+    description: "Request fuel, transport, and manage mileage.",
+    href: "/dashboard/field-ops/logistics",
   },
   {
     title: "Make Store Request",
@@ -31,16 +34,16 @@ const moduleCards = [
     href: "/dashboard/field-ops/requests",
   },
   {
-    title: "Approve Tasks",
-    icon: CheckSquare,
-    description: "Review and approve completed tasks from field staff.",
-    href: "/dashboard/field-ops/approvals",
+    title: "Manage Crew",
+    icon: Users,
+    description: "Oversee on-site personnel and their assignments.",
+    href: "/dashboard/field-ops/crew",
   },
   {
-    title: "View Reports",
-    icon: FileText,
-    description: "Access reports related to field operations.",
-    href: "/dashboard/reports",
+    title: "Site Attendance",
+    icon: QrCode,
+    description: "Generate QR codes and manage worker attendance.",
+    href: "/dashboard/field-ops/attendance",
   },
 ];
 

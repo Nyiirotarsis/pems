@@ -39,6 +39,8 @@ import {
   Home,
   PackageSearch,
   Construction,
+  Fuel,
+  QrCode,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -143,6 +145,9 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   
   // Field Ops Sub-items
   'field-ops-requests': { label: "Make Request", icon: BotMessageSquare, isPage: true, href: "/dashboard/field-ops/requests" },
+  'field-ops-logistics': { label: "Fuel & Logistics", icon: Fuel, isPage: true, href: "/dashboard/field-ops/logistics" },
+  'field-ops-crew': { label: "Manage Crew", icon: Users, isPage: true, href: "/dashboard/field-ops/crew" },
+  'field-ops-attendance': { label: "Site Attendance", icon: QrCode, isPage: true, href: "/dashboard/field-ops/attendance" },
 };
 
 
@@ -384,7 +389,10 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const fieldOpsNav = (
       <>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops')} isActive={pathname === '/dashboard/field-ops'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/requests')} isActive={pathname === '/dashboard/field-ops/requests'}><BotMessageSquare /><span>Make Request</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/logistics')} isActive={pathname === '/dashboard/field-ops/logistics'}><Fuel /><span>Fuel & Logistics</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/requests')} isActive={pathname === '/dashboard/field-ops/requests'}><BotMessageSquare /><span>Store Request</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/crew')} isActive={pathname === '/dashboard/field-ops/crew'}><Users /><span>Manage Crew</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/attendance')} isActive={pathname === '/dashboard/field-ops/attendance'}><QrCode /><span>Site Attendance</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
       </>
     );
