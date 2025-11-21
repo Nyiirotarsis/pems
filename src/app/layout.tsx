@@ -139,10 +139,15 @@ function AppContent({
               {showDashboardHeader ? (
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Avatar className="cursor-pointer">
+                      <Button
+                        variant="ghost"
+                        className="relative h-8 w-8 rounded-full"
+                      >
+                        <Avatar className="h-9 w-9">
                             <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
                             <AvatarFallback>AD</AvatarFallback>
                         </Avatar>
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
