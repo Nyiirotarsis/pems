@@ -125,6 +125,13 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   requests: { label: "Requests", icon: BotMessageSquare, isPage: true, href: "/dashboard/store/requests" },
   maintenance: { label: "Maintenance", icon: Wrench, isPage: true, href: "/dashboard/store/maintenance" },
 
+  // Finance Sub-items
+  'finance-quotations': { label: "Quotations", icon: FileText, isPage: true, href: "/dashboard/finance/quotations" },
+  'finance-lpos': { label: "LPOs", icon: Landmark, isPage: true, href: "/dashboard/finance/lpos" },
+  'finance-invoices': { label: "Invoices", icon: Receipt, isPage: true, href: "/dashboard/finance/invoices" },
+  'finance-payments': { label: "Payments", icon: DollarSign, isPage: true, href: "/dashboard/finance/payments" },
+
+
   // HR Sub-items
   employees: { label: "Employees", icon: Users, isPage: true, href: "/dashboard/hr/employees" },
   payroll: { label: "Payroll", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll" },
@@ -230,7 +237,25 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
         </SidebarMenuItem>
 
         <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => router.push('/dashboard/finance')} isActive={pathname.startsWith('/dashboard/finance')}><Landmark /><span>Finance</span></SidebarMenuButton>
+            <Collapsible className="w-full">
+                 <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/finance')}><div className="flex items-center gap-2"><Landmark /><span>Finance</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        {['finance-quotations', 'finance-lpos', 'finance-invoices', 'finance-payments'].map(key => {
+                            const Icon = navItems[key].icon;
+                            return (
+                                <SidebarMenuItem key={key}>
+                                    <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+                                        <Icon /><span>{navItems[key].label}</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
         </SidebarMenuItem>
         
         <SidebarMenuItem>
@@ -293,8 +318,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
 
     const financeNav = (
         <>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/finance')} isActive={pathname.startsWith('/dashboard/finance')}><Landmark /><span>Finance Hub</span></SidebarMenuButton></SidebarMenuItem>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['requests'].href!)} isActive={pathname === navItems['requests'].href}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/finance')} isActive={pathname === '/dashboard/finance'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['finance-quotations'].href!)} isActive={pathname.startsWith(navItems['finance-quotations'].href!)}><FileText /><span>Quotations</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['finance-lpos'].href!)} isActive={pathname.startsWith(navItems['finance-lpos'].href!)}><Landmark /><span>LPOs</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['finance-invoices'].href!)} isActive={pathname.startsWith(navItems['finance-invoices'].href!)}><Receipt /><span>Invoices</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['finance-payments'].href!)} isActive={pathname.startsWith(navItems['finance-payments'].href!)}><DollarSign /><span>Payments</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['reports'].href!)} isActive={pathname === navItems['reports'].href}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname === '/dashboard/notifications'}>
@@ -454,10 +482,31 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </Select>
               <span className="text-xs text-muted-foreground">Viewing as {role}</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="shrink-0">
-                <LogOut className="size-4" />
-                <span className="sr-only">Log Out</span>
-            </Button>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="shrink-0">
+                  <MoreVertical className="size-4" />
+                  <span className="sr-only">User Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                      <Cog className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                  </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </SidebarFooter>
       </Sidebar>
