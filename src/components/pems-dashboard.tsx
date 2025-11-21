@@ -75,31 +75,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { updateInventory } from "@/lib/inventory";
-import { InventoryView } from "@/components/dashboard/inventory-view";
-import { TransactionsView } from "@/components/dashboard/transactions-view";
-import { RequestsView } from "@/components/dashboard/requests-view";
-import { ReportsView } from "@/components/dashboard/reports-view";
-import { NotificationsView } from "@/components/dashboard/notifications-view";
-import { KpiTrackerView } from "@/components/dashboard/kpi-tracker-view";
-import { AttendanceView } from "@/components/dashboard/attendance-view";
-import { FinanceModule } from "@/components/finance-module";
-import HrDashboard from "@/components/hr-dashboard";
-import ITDashboard from "@/components/it-dashboard";
 import {
-  mockAttendance,
-  mockKpis,
-  mockVisitors,
-  mockQuotations,
-  mockLPOs,
-  mockInvoices,
-  mockPayments,
-} from "@/lib/mock-data";
-import { addKpi, completeKpi, addAttendanceRecord } from "@/lib/hr";
-import { addVisitor } from "@/lib/hr-visitors";
-import { format } from "date-fns";
-import DirectorDashboard from "./director-dashboard";
-import StoreManagerDashboard from "./store-manager-dashboard";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type View = 
   | "director" | "store" | "finance" | "hr" | "it" | "reports" | "notifications"
