@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 bg-background">
       <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
-        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
+        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline text-primary">
           {t.homeTitle}
         </h1>
         <p className="max-w-[600px] text-muted-foreground md:text-xl mt-4">
