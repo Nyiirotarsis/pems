@@ -107,32 +107,34 @@ function AppContent({
             )}
             
             <div className="flex items-center gap-4">
-               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Globe className="mr-2 h-4 w-4" />
-                    Language
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>International</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                   <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
-                   <DropdownMenuSeparator />
-                   <DropdownMenuGroup>
-                    <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+               {!showDashboardHeader && (
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Globe className="mr-2 h-4 w-4" />
+                        Language
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuLabel>International</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                       <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
+                       <DropdownMenuSeparator />
+                       <DropdownMenuGroup>
+                        <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+               )}
 
               {showDashboardHeader ? (
                  <DropdownMenu>
