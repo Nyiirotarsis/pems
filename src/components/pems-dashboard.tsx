@@ -41,6 +41,7 @@ import {
   Construction,
   Fuel,
   QrCode,
+  Receipt,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -151,7 +152,6 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   "album-show": { label: "Album Show", icon: Clapperboard, isPage: true, href: "/dashboard/album-show" },
   
   // Field Ops Sub-items
-  'field-ops-requests': { label: "Make Request", icon: BotMessageSquare, isPage: true, href: "/dashboard/field-ops/requests" },
   'field-ops-logistics': { label: "Fuel & Logistics", icon: Fuel, isPage: true, href: "/dashboard/field-ops/logistics" },
   'field-ops-crew': { label: "Manage Crew", icon: Users, isPage: true, href: "/dashboard/field-ops/crew" },
   'field-ops-attendance': { label: "Site Attendance", icon: QrCode, isPage: true, href: "/dashboard/field-ops/attendance" },
