@@ -63,21 +63,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { mockLPOs } from "@/lib/mock-data";
+import { lpoFormSchema } from "@/lib/schemas";
 
-
-const lpoItemSchema = z.object({
-  description: z.string().min(1, "Description is required."),
-  quantity: z.coerce.number().min(1, "Qty must be at least 1."),
-  unitPrice: z.coerce.number().min(0, "Price must be a positive number."),
-});
-
-const lpoFormSchema = z.object({
-  client: z.string().min(2, "Client name is required."),
-  date: z.date(),
-  status: z.enum(["Pending", "Delivered"]),
-  items: z.array(lpoItemSchema).min(1, "Please add at least one item."),
-  attachment: z.any().optional(),
-});
 
 type LpoFormValues = z.infer<typeof lpoFormSchema>;
 
@@ -99,7 +86,7 @@ export default function EditLpoPage() {
     name: "items",
   });
   
-  const fileRef = form.register("attachment");
+  const fileRef = form.register("attachments");
   
   const watchedItems = useWatch({
     control: form.control,
@@ -334,7 +321,7 @@ export default function EditLpoPage() {
 
               <FormField
                 control={form.control}
-                name="attachment"
+                name="attachments"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Attach LPO Document (PDF, Word, Excel)</FormLabel>
