@@ -16,7 +16,7 @@ export const assetCategories = [
 
 export const CONDITIONS: Condition[] = ["New", "Good", "Fair", "Damaged", "Under Repair", "Faulty"];
 
-export const mockUsers: User[] = [
+export const USERS: User[] = [
     { id: 1, username: 'ceo', password: '123', role: 'CEO' },
     { id: 2, username: 'director', password: '123', role: 'Director' },
     { id: 3, username: 'financemanager', password: '123', role: 'Finance Manager' },
@@ -25,6 +25,8 @@ export const mockUsers: User[] = [
     { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
     { id: 7, username: 'fieldops', password: '123', role: 'Field Operational Officer' },
 ];
+
+export const mockUsers: User[] = USERS;
 
 
 export const initialInventory: InventoryItem[] = [
@@ -282,6 +284,4 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
 ];
 
 
-// Duplicate export of USERS removed to avoid conflicts
-export { USERS } from './mock-data-users';
 export { mockFieldStaff } from './mock-field-staff';
