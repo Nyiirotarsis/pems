@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -122,13 +123,14 @@ export default function AssetsPage() {
       return;
     }
 
-    const headers = ["Asset ID", "Asset Name", "Category", "Assigned To", "Purchase Date", "Condition", "Status"];
+    const headers = ["Asset ID", "Asset Name", "Category", "Location", "Assigned To", "Purchase Date", "Condition", "Status"];
     const csvRows = [
       headers.join(','),
       ...filteredAssets.map(asset => [
         `"${asset.id}"`,
         `"${asset.itemName}"`,
         `"${asset.category}"`,
+        `"${asset.location}"`,
         `"${getAssignedToNameString(asset.issuedTo)}"`,
         `"${asset.datePurchased}"`,
         `"${asset.condition}"`,
@@ -208,6 +210,7 @@ export default function AssetsPage() {
                 <TableHead>Asset ID</TableHead>
                 <TableHead>Asset Name</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Assigned To</TableHead>
                 <TableHead>Purchase Date</TableHead>
                 <TableHead>Condition</TableHead>
@@ -221,6 +224,7 @@ export default function AssetsPage() {
                   <TableCell className="font-mono text-xs">{asset.id}</TableCell>
                   <TableCell className="font-medium">{asset.itemName}</TableCell>
                   <TableCell>{asset.category}</TableCell>
+                  <TableCell>{asset.location}</TableCell>
                   <TableCell>{getAssignedToName(asset.issuedTo)}</TableCell>
                   <TableCell>{asset.datePurchased}</TableCell>
                   <TableCell>

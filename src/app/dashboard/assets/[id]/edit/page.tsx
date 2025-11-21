@@ -54,6 +54,7 @@ import { InventoryStatus } from "@/types";
 const assetFormSchema = z.object({
   itemName: z.string().min(2, "Asset name is required."),
   category: z.string().min(1, "Please select a category."),
+  location: z.string().min(2, "Location is required."),
   datePurchased: z.date(),
   condition: z.string().min(1, "Please select a condition."),
   issuedTo: z.string().optional(),
@@ -76,6 +77,7 @@ export default function EditAssetPage() {
     values: asset ? {
         itemName: asset.itemName,
         category: asset.category,
+        location: asset.location,
         datePurchased: new Date(asset.datePurchased),
         condition: asset.condition,
         issuedTo: asset.issuedTo || "",
@@ -157,6 +159,21 @@ export default function EditAssetPage() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location</FormLabel>
+                           <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <FormField
                       control={form.control}
                       name="datePurchased"
@@ -170,9 +187,7 @@ export default function EditAssetPage() {
                         </FormItem>
                       )}
                     />
-                 </div>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField
+                    <FormField
                         control={form.control}
                         name="condition"
                         render={({ field }) => (
@@ -194,29 +209,29 @@ export default function EditAssetPage() {
                             </FormItem>
                         )}
                         />
-                    <FormField
-                        control={form.control}
-                        name="status"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Status</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="Available">Available</SelectItem>
-                                    <SelectItem value="Issued">Issued</SelectItem>
-                                    <SelectItem value="Under Repair">Under Repair</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
                  </div>
+                 <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="Available">Available</SelectItem>
+                                <SelectItem value="Issued">Issued</SelectItem>
+                                <SelectItem value="Under Repair">Under Repair</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
             </CardContent>
             <CardFooter>
                  <AlertDialog>

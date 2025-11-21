@@ -59,6 +59,7 @@ import { assetCategories, CONDITIONS } from "@/lib/mock-data";
 const assetFormSchema = z.object({
   assetName: z.string().min(2, "Asset name is required."),
   category: z.string().min(1, "Please select a category."),
+  location: z.string().min(2, "Location is required."),
   purchaseDate: z.date(),
   condition: z.string().min(1, "Please select a condition."),
   serialNumber: z.string().optional(),
@@ -72,6 +73,7 @@ export default function NewAssetPage() {
     resolver: zodResolver(assetFormSchema),
     defaultValues: {
       assetName: "",
+      location: "",
       purchaseDate: new Date(),
     },
   });
@@ -156,6 +158,21 @@ export default function NewAssetPage() {
                     />
                      <FormField
                       control={form.control}
+                      name="location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Location</FormLabel>
+                           <FormControl>
+                            <Input placeholder="e.g., Central Store" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <FormField
+                      control={form.control}
                       name="purchaseDate"
                       render={({ field }) => (
                         <FormItem>
@@ -192,29 +209,29 @@ export default function NewAssetPage() {
                         </FormItem>
                       )}
                     />
+                     <FormField
+                        control={form.control}
+                        name="condition"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Initial Condition</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select initial condition" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {CONDITIONS.map((c) => (
+                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                  </div>
-                 <FormField
-                    control={form.control}
-                    name="condition"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Initial Condition</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select initial condition" />
-                            </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                            {CONDITIONS.map((c) => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                            ))}
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
             </CardContent>
             <CardFooter>
                  <AlertDialog>
