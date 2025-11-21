@@ -5,13 +5,22 @@ import PEMSDashboard from "@/components/pems-dashboard";
 import { TransactionsView } from "@/components/dashboard/transactions-view";
 import { initialInventory, mockInventoryIssues } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
-import type { InventoryItem, InventoryIssue } from "@/types";
+import type { InventoryItem, InventoryIssue, UserRole } from "@/types";
 import { format } from "date-fns";
+import React from "react";
 
 export default function TransactionsPage() {
   const [inventory, setInventory] = useState<InventoryItem[]>(initialInventory);
   const [inventoryIssues, setInventoryIssues] = useState<InventoryIssue[]>(mockInventoryIssues);
+  const [role, setRole] = React.useState<UserRole | null>(null);
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const storedRole = localStorage.getItem("userRole") as UserRole | null;
+    if (storedRole) {
+      setRole(storedRole);
+    }
+  }, []);
 
   const handleIssue = (values: any) => {
     // 1. Create new issue record
@@ -26,7 +35,7 @@ export default function TransactionsPage() {
         })),
         venue: values.venue,
         issuedTo: values.issuedTo,
-        issuedBy: 'storemanager', // Logged in user
+        issuedBy: role || 'Unknown',
         status: 'Out',
         remarks: values.remarks,
         createdAt: new Date().toISOString(),
@@ -76,7 +85,7 @@ export default function TransactionsPage() {
                 status: 'Returned' as 'Returned', // Assuming full return for now
                 dateIn: format(values.dateIn, 'yyyy-MM-dd'),
                 itemsReturned: values.itemsReturned,
-                receivedBy: 'storemanager', // Logged in user
+                receivedBy: role || 'Unknown',
                 remarks: `${issue.remarks || ''}\nReturn Remarks: ${values.remarks || ''}`
             };
         }
@@ -112,7 +121,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <PEMSDashboard initialRole="Store Manager">
+    <PEMSDashboard initialRole={role}>
       <TransactionsView 
         inventory={inventory} 
         inventoryIssues={inventoryIssues}

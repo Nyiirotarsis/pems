@@ -1,5 +1,6 @@
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -49,7 +50,7 @@ export interface InventoryIssue {
   }[];
   venue: string;
   issuedTo: string;
-  issuedBy: string;
+  issuedBy: UserRole | string;
   status: "Out" | "Returned" | "Partially Returned";
   remarks?: string;
   createdAt: string;
@@ -58,7 +59,7 @@ export interface InventoryIssue {
     itemId: string;
     condition: Condition;
   }[];
-  receivedBy?: string;
+  receivedBy?: UserRole | string;
 }
 
 export interface RepairLog {

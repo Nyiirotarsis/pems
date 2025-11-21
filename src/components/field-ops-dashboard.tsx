@@ -9,6 +9,7 @@ import {
   Fuel,
   Users,
   QrCode,
+  ArrowRightLeft,
 } from "lucide-react";
 import {
   Card,
@@ -28,10 +29,10 @@ const moduleCards = [
     href: "/dashboard/field-ops/logistics",
   },
   {
-    title: "Make Store Request",
-    icon: BotMessageSquare,
-    description: "Request equipment and materials from the store.",
-    href: "/dashboard/field-ops/requests",
+    title: "Manage Equipments at Site",
+    icon: ArrowRightLeft,
+    description: "Issue and return equipment for events.",
+    href: "/dashboard/store/transactions",
   },
   {
     title: "Manage Crew",
