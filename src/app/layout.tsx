@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import './globals.css';
@@ -9,7 +10,7 @@ import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Globe, LogOut, Settings, User } from 'lucide-react';
+import { Globe, LogOut, Settings, User, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +32,12 @@ function AppContent({
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
   const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
+  const [isMounted, setIsMounted] = React.useState(false);
   
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
   const handleLogout = () => {
@@ -42,31 +48,45 @@ function AppContent({
   };
   
   React.useEffect(() => {
-    const getDashboardHome = () => {
-        const role = localStorage.getItem("userRole") as UserRole;
-        if (role) {
-            switch (role) {
-                case "CEO":
-                case "Director":
-                  return "/dashboard/director";
-                case "Finance Manager":
-                  return "/dashboard/finance";
-                case "HR/Admin":
-                  return "/dashboard/hr";
-                case "IT Managers":
-                  return "/dashboard/it";
-                case "Store Manager":
-                  return "/dashboard/store";
-                case "Field Operational Officer":
-                    return "/dashboard/field-ops";
-                default:
-                  return "/dashboard";
+    if (typeof window !== 'undefined') {
+        const getDashboardHome = () => {
+            const role = localStorage.getItem("userRole") as UserRole;
+            if (role) {
+                switch (role) {
+                    case "CEO":
+                    case "Director":
+                      return "/dashboard/director";
+                    case "Finance Manager":
+                      return "/dashboard/finance";
+                    case "HR/Admin":
+                      return "/dashboard/hr";
+                    case "IT Managers":
+                      return "/dashboard/it";
+                    case "Store Manager":
+                      return "/dashboard/store";
+                    case "Field Operational Officer":
+                        return "/dashboard/field-ops";
+                    default:
+                      return "/dashboard";
+                }
             }
+            return "/dashboard";
         }
-        return "/dashboard";
+        setDashboardHome(getDashboardHome());
     }
-    setDashboardHome(getDashboardHome());
   }, [pathname]);
+
+  if (!isMounted) {
+    return (
+        <html lang={language}>
+            <body>
+                <div className="flex min-h-screen items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+            </body>
+        </html>
+    );
+  }
 
 
   return (
@@ -96,6 +116,9 @@ function AppContent({
                     </Link>
                     <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                         {t.navRoles}
+                    </Link>
+                    <Link href="/policies" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                        {t.navPolicies}
                     </Link>
                     <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
                         {t.navHelp}
@@ -139,7 +162,7 @@ function AppContent({
               {showDashboardHeader ? (
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
+                       <Button
                         variant="ghost"
                         className="relative h-8 w-8 rounded-full"
                       >
