@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LanguageProvider, useLanguage } from '@/context/language-context';
 import { UserRole } from '@/types';
+import { useIsClient } from '@/hooks/use-is-client';
 
 function AppContent({
   children,
@@ -30,26 +31,19 @@ function AppContent({
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useLanguage();
+  const isClient = useIsClient();
   const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
-  const [isClient, setIsClient] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem("userRole");
-    }
+    localStorage.removeItem("userRole");
     router.push("/login");
   };
   
   React.useEffect(() => {
     if (isClient) {
         const getDashboardHome = () => {
-          if (typeof window !== 'undefined') {
             const role = localStorage.getItem("userRole") as UserRole;
             if (role) {
                 switch (role) {
@@ -72,7 +66,6 @@ function AppContent({
                       return "/dashboard";
                 }
             }
-          }
           return "/dashboard";
         }
         setDashboardHome(getDashboardHome());
@@ -211,7 +204,6 @@ function UserDropdown({ onLogout }: { onLogout: () => void }) {
         </DropdownMenu>
     );
 }
-
 
 export default function RootLayout({
   children,
