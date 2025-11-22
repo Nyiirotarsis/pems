@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import ClientProvider from "./client-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { ClientProvider } from "@/components/client-provider";
 
 export const metadata: Metadata = {
   title: "Pacific Events",
