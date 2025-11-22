@@ -1,3 +1,4 @@
+
 "use client";
 
 import { LanguageProvider } from "@/context/language-context";
