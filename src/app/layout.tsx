@@ -77,17 +77,9 @@ function AppContent({
     }
   }, [pathname]);
 
-  if (!isMounted) {
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-    );
-  }
-
   return (
     <>
-        <header className="bg-card border-b shadow-sm sticky top-0 z-40">
+      <header className="bg-card border-b shadow-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <Link href={showDashboardHeader ? dashboardHome : "/"} className="flex items-center justify-center gap-2">
             <PacificEventsLogo className="h-10 w-auto" />
