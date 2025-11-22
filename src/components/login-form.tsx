@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -64,6 +65,8 @@ export function LoginForm() {
         return "/dashboard/store";
       case "Field Operational Officer":
         return "/dashboard/field-ops";
+      case "Media and Communication Officer":
+        return "/dashboard/media";
       default:
         return "/dashboard";
     }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -127,6 +128,8 @@ export function AppContent({
                       return "/dashboard/store";
                     case "Field Operational Officer":
                         return "/dashboard/field-ops";
+                    case "Media and Communication Officer":
+                        return "/dashboard/media";
                     default:
                       return "/dashboard";
                 }
