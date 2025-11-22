@@ -1,11 +1,10 @@
-
-import type { Metadata } from "next";
-import { ClientProvider } from "@/components/client-provider";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { ClientProvider } from '@/components/client-provider';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Pacific Events",
-  description: "Manage your events with ease.",
+  title: 'Pacific Events',
+  description: 'Manage your events with ease.',
 };
 
 export default function RootLayout({
