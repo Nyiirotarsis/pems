@@ -143,3 +143,23 @@ export const invoiceFormSchema = z.object({
   status: z.enum(["Paid", "Unpaid", "Partially Paid"]),
   attachment: z.any().optional(),
 });
+
+export const userFormSchema = z.object({
+    email: z.string().email("Please enter a valid email address."),
+    role: z.string().min(1, "Please select a role."),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
+})
+.refine(data => {
+    if (data.password && !data.confirmPassword) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Please confirm your password.",
+    path: ["confirmPassword"],
+})
+.refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+});

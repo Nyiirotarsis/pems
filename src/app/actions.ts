@@ -1,9 +1,10 @@
+
 'use server';
 
 import { suggestOutsourcingOptions } from '@/ai/flows/suggest-outsourcing-options';
 import type { SuggestOutsourcingOptionsInput } from '@/ai/flows/suggest-outsourcing-options';
 import { USERS, mockInvoices } from '@/lib/mock-data';
-import type { User, Invoice } from '@/types';
+import type { User, Invoice, UserRole } from '@/types';
 
 export async function handleSuggestOutsourcing(input: SuggestOutsourcingOptionsInput) {
   try {
@@ -47,4 +48,47 @@ export async function updateInvoiceStatus(invoiceNumber: string, payments: { amo
 
   // In a real app, this would save to a DB. Here we're mutating mock data.
   return { success: true, invoice };
+}
+
+
+// Mock User Management Actions
+export async function addUser(data: { email: string; role: string; password?: string }): Promise<{success: boolean; user?: User; error?: string}> {
+    if (USERS.find(u => u.username === data.email)) {
+        return { success: false, error: "User with this email already exists." };
+    }
+    const newUser: User = {
+        id: USERS.length + 1,
+        username: data.email,
+        role: data.role as UserRole,
+        password: data.password || "123" // a mock password
+    };
+    console.log("Adding new user (mock):", newUser);
+    // USERS.push(newUser); // In a real app, you would persist this
+    return { success: true, user: newUser };
+}
+
+export async function updateUser(userId: number, data: { email: string; role: string; password?: string }): Promise<{success: boolean; user?: User; error?: string}> {
+    const userIndex = USERS.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        return { success: false, error: "User not found." };
+    }
+    const updatedUser: User = {
+        ...USERS[userIndex],
+        username: data.email,
+        role: data.role as UserRole,
+        password: data.password || USERS[userIndex].password,
+    };
+    console.log("Updating user (mock):", updatedUser);
+    // USERS[userIndex] = updatedUser; // In a real app, you would persist this
+    return { success: true, user: updatedUser };
+}
+
+export async function deleteUser(userId: number): Promise<{success: boolean; error?: string}> {
+    const userIndex = USERS.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        return { success: false, error: "User not found." };
+    }
+    console.log("Deleting user (mock):", USERS[userIndex]);
+    // USERS.splice(userIndex, 1); // In a real app, you would persist this
+    return { success: true };
 }
