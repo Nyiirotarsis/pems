@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -42,6 +43,7 @@ import {
   QrCode,
   Receipt,
   Camera,
+  Rss,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -90,7 +92,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops";
+  | "album-show" | "field-ops" | "media";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -99,6 +101,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
   'field-ops': { label: "Field Ops", icon: Construction, isPage: true, href: "/dashboard/field-ops" },
+  media: { label: "Media", icon: Rss, isPage: true, href: "/dashboard/media" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
 
@@ -139,6 +142,12 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   'field-ops-crew': { label: "Manage Crew", icon: Users, isPage: true, href: "/dashboard/field-ops/crew" },
   'field-ops-attendance': { label: "Site Attendance", icon: QrCode, isPage: true, href: "/dashboard/field-ops/attendance" },
   'field-ops-equipment': { label: "Manage Equipments at Site", icon: ArrowRightLeft, isPage: true, href: "/dashboard/store/transactions" },
+
+  // Media Sub-items
+  'media-social': { label: "Social Media", icon: Rss, href: "#" },
+  'media-gallery': { label: "Media Gallery", icon: Clapperboard, href: "/dashboard/album-show" },
+  'media-press': { label: "Press Releases", icon: Newspaper, href: "#" },
+  'media-calendar': { label: "Content Calendar", icon: CalendarIcon, href: "#" },
 };
 
 
@@ -284,6 +293,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleContent>
             </Collapsible>
         </SidebarMenuItem>
+
+         <SidebarMenuItem>
+          <SidebarMenuButton onClick={() => router.push(navItems['media'].href!)} isActive={pathname.startsWith(navItems['media'].href!)}>
+            <Rss /><span>Media</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
         
         <SidebarMenuItem>
             <SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}>
@@ -408,6 +423,22 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
       </>
     );
+    
+    const mediaNav = (
+        <>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/media')} isActive={pathname === '/dashboard/media'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
+            {Object.keys(navItems).filter(k => k.startsWith('media-')).map(key => {
+                const Icon = navItems[key].icon;
+                return (
+                    <SidebarMenuItem key={key}>
+                        <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
+                            <Icon /><span>{navItems[key].label}</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                );
+            })}
+        </>
+    );
 
     switch(currentRole) {
         case 'CEO':
@@ -423,6 +454,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return storeNav;
         case 'Field Operational Officer':
             return fieldOpsNav;
+        case 'Media and Communication Officer':
+            return mediaNav;
         default:
             return null;
     }
