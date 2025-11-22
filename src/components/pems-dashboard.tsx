@@ -44,6 +44,7 @@ import {
   Receipt,
   Camera,
   Rss,
+  Newspaper,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -172,8 +173,15 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
   React.useEffect(() => {
     if (initialRole) {
       setRole(initialRole);
+    } else {
+        const storedRole = localStorage.getItem("userRole") as UserRole | null;
+        if (storedRole && ROLES.includes(storedRole)) {
+            setRole(storedRole);
+        } else {
+            router.push('/login');
+        }
     }
-  }, [initialRole]);
+  }, [initialRole, router]);
   
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
