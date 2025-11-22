@@ -66,6 +66,8 @@ function AppContent({
                       return "/dashboard/store";
                     case "Field Operational Officer":
                         return "/dashboard/field-ops";
+                    case "Media & Communications Officer":
+                        return "/dashboard/media";
                     default:
                       return "/dashboard";
                 }
@@ -75,19 +77,6 @@ function AppContent({
         setDashboardHome(getDashboardHome());
     }
   }, [pathname]);
-
-  if (!isMounted) {
-    return (
-        <html lang={language}>
-            <body>
-                <div className="flex min-h-screen items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                </div>
-            </body>
-        </html>
-    );
-  }
-
 
   return (
     <html lang={language}>
@@ -100,118 +89,126 @@ function AppContent({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning={true}>
-        <header className="bg-card border-b shadow-sm sticky top-0 z-40">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <Link href={showDashboardHeader ? dashboardHome : "/"} className="flex items-center justify-center gap-2">
-              <PacificEventsLogo className="h-10 w-auto" />
-            </Link>
-            
-            {!showDashboardHeader && (
-                <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
-                    <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navHome}
-                    </Link>
-                    <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navUsers}
-                    </Link>
-                    <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navRoles}
-                    </Link>
-                    <Link href="/policies" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navPolicies}
-                    </Link>
-                    <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navHelp}
-                    </Link>
-                    <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
-                        {t.navContact}
-                    </Link>
-                </nav>
-            )}
-            
-            <div className="flex items-center gap-4">
-               {!showDashboardHeader && (
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <Globe className="mr-2 h-4 w-4" />
-                        Language
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuLabel>International</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
-                      </DropdownMenuGroup>
-                      <DropdownMenuSeparator />
-                       <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
-                       <DropdownMenuSeparator />
-                       <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-               )}
-
-              {showDashboardHeader ? (
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                       <Button
-                        variant="ghost"
-                        className="relative h-8 w-8 rounded-full"
-                      >
-                        <Avatar className="h-9 w-9">
-                            <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
-                            <AvatarFallback>AD</AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </DropdownMenuItem>
-                             <DropdownMenuItem>
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>Settings</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                         <DropdownMenuItem onClick={handleLogout}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                 </DropdownMenu>
-              ) : (
-                  <Button asChild size="sm">
-                    <Link href="/login">{t.loginButton}</Link>
-                  </Button>
-              )}
+        {!isMounted ? (
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin" />
             </div>
-          </div>
-        </header>
+        ) : (
+            <>
+                <header className="bg-card border-b shadow-sm sticky top-0 z-40">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+                    <Link href={showDashboardHeader ? dashboardHome : "/"} className="flex items-center justify-center gap-2">
+                    <PacificEventsLogo className="h-10 w-auto" />
+                    </Link>
+                    
+                    {!showDashboardHeader && (
+                        <nav className="hidden md:flex gap-4 sm:gap-6 items-center">
+                            <Link href="/" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navHome}
+                            </Link>
+                            <Link href="/users" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navUsers}
+                            </Link>
+                            <Link href="/roles" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navRoles}
+                            </Link>
+                            <Link href="/policies" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navPolicies}
+                            </Link>
+                            <Link href="/help" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navHelp}
+                            </Link>
+                            <Link href="/contact" className="text-sm font-medium text-blue-600 hover:underline underline-offset-4">
+                                {t.navContact}
+                            </Link>
+                        </nav>
+                    )}
+                    
+                    <div className="flex items-center gap-4">
+                    {!showDashboardHeader && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                                <Globe className="mr-2 h-4 w-4" />
+                                Language
+                            </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                            <DropdownMenuLabel>International</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
 
-        <main className="flex-1">
-          {children}
-        </main>
-        
-        <footer className="bg-black text-white mt-auto">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
-                &copy; {new Date().getFullYear()} {t.footerText}
-            </div>
-        </footer>
+                    {showDashboardHeader ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className="relative h-8 w-8 rounded-full"
+                            >
+                                <Avatar className="h-9 w-9">
+                                    <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
+                                    <AvatarFallback>AD</AvatarFallback>
+                                </Avatar>
+                            </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="end">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem>
+                                        <User className="mr-2 h-4 w-4" />
+                                        <span>Profile</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        <span>Settings</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout}>
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <Button asChild size="sm">
+                            <Link href="/login">{t.loginButton}</Link>
+                        </Button>
+                    )}
+                    </div>
+                </div>
+                </header>
 
-        <Toaster />
+                <main className="flex-1">
+                {children}
+                </main>
+                
+                <footer className="bg-black text-white mt-auto">
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
+                        &copy; {new Date().getFullYear()} {t.footerText}
+                    </div>
+                </footer>
+
+                <Toaster />
+            </>
+        )}
       </body>
     </html>
   );
