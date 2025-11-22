@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -91,7 +90,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops" | "media";
+  | "album-show" | "field-ops";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -100,7 +99,6 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
   'field-ops': { label: "Field Ops", icon: Construction, isPage: true, href: "/dashboard/field-ops" },
-  media: { label: "Media", icon: Camera, isPage: true, href: "/dashboard/media" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
 
@@ -411,16 +409,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
       </>
     );
 
-    const mediaNav = (
-      <>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/media')} isActive={pathname === '/dashboard/media'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><FileText /><span>Content</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><Camera /><span>Media Library</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><BotMessageSquare /><span>Campaigns</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
-      </>
-    );
-
     switch(currentRole) {
         case 'CEO':
         case 'Director':
@@ -435,8 +423,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return storeNav;
         case 'Field Operational Officer':
             return fieldOpsNav;
-        case 'Media & Communications Officer':
-            return mediaNav;
         default:
             return null;
     }

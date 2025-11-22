@@ -15,7 +15,7 @@ export default function UsersPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold text-lg">Management & Oversight</h3>
+            <h3 className="font-semibold text-lg">Management &amp; Oversight</h3>
             <p className="text-muted-foreground mt-1">
               High-level users who oversee operations and make strategic decisions.
             </p>

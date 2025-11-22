@@ -36,9 +36,6 @@ export default function DashboardPage() {
         case "Field Operational Officer":
           router.replace("/dashboard/field-ops");
           break;
-        case "Media & Communications Officer":
-            router.replace("/dashboard/media");
-            break;
         default:
           // Fallback for any other valid role, perhaps to a generic dashboard
           router.replace("/dashboard/director");
