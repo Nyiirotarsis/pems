@@ -38,6 +38,12 @@ export default function RolesPage() {
              The Finance Manager oversees the complete financial lifecycle of all events and company operations within PEMS. They handle budgeting, quotations, supplier financials, LPOs, client invoicing, payment tracking, expenditure management, and financial reporting. The Finance Manager ensures accurate, timely, and well-documented financial records that support smooth event execution and strategic decision-making.
             </p>
           </div>
+           <div className="border-b pb-4">
+            <h3 className="font-semibold text-lg">Media & Communications Officer</h3>
+            <p className="text-muted-foreground mt-1">
+              The Media & Communications Officer is responsible for managing the organization’s public image, brand visibility, and communication channels. The officer ensures that Pacific Events Ltd maintains a consistent corporate identity, strong stakeholder engagement, and effective digital presence across all platforms. Through content creation, media coordination, and strategic communication, this role supports marketing, business development, and event execution.
+            </p>
+          </div>
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg">Store Manager</h3>
             <p className="text-muted-foreground mt-1">

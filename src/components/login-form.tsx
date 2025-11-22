@@ -65,6 +65,8 @@ export function LoginForm() {
         return "/dashboard/store";
       case "Field Operational Officer":
         return "/dashboard/field-ops";
+      case "Media & Communications Officer":
+        return "/dashboard/media";
       default:
         return "/dashboard";
     }

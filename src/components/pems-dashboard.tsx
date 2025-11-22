@@ -42,6 +42,7 @@ import {
   Fuel,
   QrCode,
   Receipt,
+  Camera,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -90,7 +91,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops";
+  | "album-show" | "field-ops" | "media";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -99,6 +100,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
   'field-ops': { label: "Field Ops", icon: Construction, isPage: true, href: "/dashboard/field-ops" },
+  media: { label: "Media", icon: Camera, isPage: true, href: "/dashboard/media" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
 
@@ -138,7 +140,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   'field-ops-logistics': { label: "Fuel & Logistics", icon: Fuel, isPage: true, href: "/dashboard/field-ops/logistics" },
   'field-ops-crew': { label: "Manage Crew", icon: Users, isPage: true, href: "/dashboard/field-ops/crew" },
   'field-ops-attendance': { label: "Site Attendance", icon: QrCode, isPage: true, href: "/dashboard/field-ops/attendance" },
-  'field-ops-equipment': { label: "Manage Site Equipment", icon: ArrowRightLeft, isPage: true, href: "/dashboard/store/transactions" },
+  'field-ops-equipment': { label: "Manage Equipments at Site", icon: ArrowRightLeft, isPage: true, href: "/dashboard/store/transactions" },
 };
 
 
@@ -401,10 +403,20 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const fieldOpsNav = (
       <>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops')} isActive={pathname === '/dashboard/field-ops'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/logistics')} isActive={pathname === '/dashboard/field-ops/logistics'}><Fuel /><span>Fuel & Logistics</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname === '/dashboard/store/transactions'}><ArrowRightLeft /><span>Manage Site Equipment</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/crew')} isActive={pathname === '/dashboard/field-ops/crew'}><Users /><span>Manage Crew</span></SidebarMenuButton></SidebarMenuItem>
-        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops/attendance')} isActive={pathname === '/dashboard/field-ops/attendance'}><QrCode /><span>Site Attendance</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-logistics'].href!)} isActive={pathname === navItems['field-ops-logistics'].href}><Fuel /><span>Fuel & Logistics</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-equipment'].href!)} isActive={pathname.startsWith(navItems['field-ops-equipment'].href!)}><ArrowRightLeft /><span>Manage Equipments at Site</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-crew'].href!)} isActive={pathname === navItems['field-ops-crew'].href}><Users /><span>Manage Crew</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-attendance'].href!)} isActive={pathname === navItems['field-ops-attendance'].href}><QrCode /><span>Site Attendance</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
+      </>
+    );
+
+    const mediaNav = (
+      <>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/media')} isActive={pathname === '/dashboard/media'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><FileText /><span>Content</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><Camera /><span>Media Library</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => {}} disabled><BotMessageSquare /><span>Campaigns</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
       </>
     );
@@ -423,6 +435,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return storeNav;
         case 'Field Operational Officer':
             return fieldOpsNav;
+        case 'Media & Communications Officer':
+            return mediaNav;
         default:
             return null;
     }
