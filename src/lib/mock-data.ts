@@ -24,6 +24,7 @@ export const USERS: User[] = [
     { id: 7, username: 'fieldops', password: '123', role: 'Field Operational Officer' },
     { id: 8, username: 'media', password: '123', role: 'Media and Communication Officer' },
     { id: 9, username: 'communication', password: '123', role: 'Media and Communication Officer' },
+    { id: 10, username: 'commofficer', password: '123', role: 'Media and Communication Officer' },
 ];
 
 export const mockUsers: User[] = USERS;
