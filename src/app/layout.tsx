@@ -1,8 +1,7 @@
 
-import "./globals.css";
 import type { Metadata } from "next";
-import { Toaster } from "@/components/ui/toaster";
 import { ClientProvider } from "@/components/client-provider";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Pacific Events",
@@ -34,7 +33,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
         <ClientProvider>{children}</ClientProvider>
-        <Toaster />
       </body>
     </html>
   );
