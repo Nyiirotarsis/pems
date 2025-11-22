@@ -40,13 +40,16 @@ function AppContent({
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
   const handleLogout = () => {
-    localStorage.removeItem("userRole");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("userRole");
+    }
     router.push("/login");
   };
   
   React.useEffect(() => {
     if (isClient) {
         const getDashboardHome = () => {
+          if (typeof window !== 'undefined') {
             const role = localStorage.getItem("userRole") as UserRole;
             if (role) {
                 switch (role) {
@@ -69,7 +72,8 @@ function AppContent({
                       return "/dashboard";
                 }
             }
-            return "/dashboard";
+          }
+          return "/dashboard";
         }
         setDashboardHome(getDashboardHome());
     }
