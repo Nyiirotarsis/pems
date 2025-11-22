@@ -31,18 +31,21 @@ function AppContent({
   const router = useRouter();
   const { t } = useLanguage();
   const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem("userRole");
-    }
+    localStorage.removeItem("userRole");
     router.push("/login");
   };
   
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isClient) {
         const getDashboardHome = () => {
             const role = localStorage.getItem("userRole") as UserRole;
             if (role) {
@@ -70,7 +73,7 @@ function AppContent({
         }
         setDashboardHome(getDashboardHome());
     }
-  }, [pathname]);
+  }, [pathname, isClient]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -108,12 +111,14 @@ function AppContent({
                 <LanguageDropdown />
             )}
 
-            {showDashboardHeader ? (
-                <UserDropdown onLogout={handleLogout} />
-            ) : (
-                <Button asChild size="sm">
-                    <Link href="/login">{t.loginButton}</Link>
-                </Button>
+            {isClient && (
+              showDashboardHeader ? (
+                  <UserDropdown onLogout={handleLogout} />
+              ) : (
+                  <Button asChild size="sm">
+                      <Link href="/login">{t.loginButton}</Link>
+                  </Button>
+              )
             )}
             </div>
         </div>
