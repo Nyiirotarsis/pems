@@ -17,7 +17,7 @@ export default function RolesPage() {
           <div className="border-b pb-4">
             <h3 className="font-semibold text-lg">Managing Director</h3>
             <p className="text-muted-foreground mt-1">
-              The Managing Director holds the highest oversight authority within the Pacific Events Management System. This role provides strategic leadership, supervises organizational performance, and ensures that all departments align with the company’s mission and long-term goals. The Managing Director has read-only access across all modules, with the ability to perform final approvals on major financial, operational, and contractual decisions.
+             The Managing Director holds the highest oversight authority within the Pacific Events Management System. This role provides strategic leadership, supervises organizational performance, and ensures that all departments align with the company’s mission and long-term goals. The Managing Director has read-only access across all modules, with the ability to perform final approvals on major financial, operational, and contractual decisions.
             </p>
           </div>
            <div className="border-b pb-4">
@@ -45,9 +45,9 @@ export default function RolesPage() {
             </p>
           </div>
           <div className="border-b pb-4">
-            <h3 className="font-semibold text-lg">HR/Admin</h3>
+            <h3 className="font-semibold text-lg">HR & Administration Officer</h3>
             <p className="text-muted-foreground mt-1">
-              Oversees all employee-related activities. This role involves managing staff records, tracking attendance and KPIs, processing field staff payments, and handling the recruitment and exit processes.
+              The HR & Administration Officer ensures effective people management, organizational compliance, professional conduct, and administrative support across Pacific Events Ltd. This role manages all staff records, performance monitoring, recruitment processes, compensation structures, staff welfare, and regulatory compliance according to Ugandan labour laws.
             </p>
           </div>
           <div>
