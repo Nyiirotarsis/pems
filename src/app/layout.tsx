@@ -9,7 +9,7 @@ import { PacificEventsLogo } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Globe, LogOut, Settings, User, Loader2 } from 'lucide-react';
+import { Globe, LogOut, Settings, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,13 +29,8 @@ function AppContent({
 }>) {
   const pathname = usePathname();
   const router = useRouter();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
-  const [isMounted, setIsMounted] = React.useState(false);
-  
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const showDashboardHeader = pathname.startsWith('/dashboard');
 
@@ -78,7 +73,7 @@ function AppContent({
   }, [pathname]);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <header className="bg-card border-b shadow-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <Link href={showDashboardHeader ? dashboardHome : "/"} className="flex items-center justify-center gap-2">
@@ -110,67 +105,11 @@ function AppContent({
             
             <div className="flex items-center gap-4">
             {!showDashboardHeader && (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                        <Globe className="mr-2 h-4 w-4" />
-                        Language
-                    </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>International</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <LanguageDropdown />
             )}
 
             {showDashboardHeader ? (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="ghost"
-                        className="relative h-8 w-8 rounded-full"
-                    >
-                        <Avatar className="h-9 w-9">
-                            <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
-                            <AvatarFallback>AD</AvatarFallback>
-                        </Avatar>
-                    </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>Settings</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Log out</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <UserDropdown onLogout={handleLogout} />
             ) : (
                 <Button asChild size="sm">
                     <Link href="/login">{t.loginButton}</Link>
@@ -178,21 +117,90 @@ function AppContent({
             )}
             </div>
         </div>
-        </header>
+      </header>
 
-        <main className="flex-1">
+      <main className="flex-1">
         {children}
-        </main>
-        
-        <footer className="bg-black text-white mt-auto">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
-                &copy; {new Date().getFullYear()} {t.footerText}
-            </div>
-        </footer>
+      </main>
+      
+      <footer className="bg-black text-white mt-auto">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
+              &copy; {new Date().getFullYear()} {t.footerText}
+          </div>
+      </footer>
 
-        <Toaster />
-    </>
+      <Toaster />
+    </div>
   );
+}
+
+function LanguageDropdown() {
+    const { setLanguage } = useLanguage();
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+                <Globe className="mr-2 h-4 w-4" />
+                Language
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>International</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <DropdownMenuItem onSelect={() => setLanguage('en')}>English</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLanguage('fr')}>French</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLanguage('sw')}>Swahili</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLanguage('ar')}>Arabic</DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Local Languages</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+                <DropdownMenuItem onSelect={() => setLanguage('lg')}>Luganda</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLanguage('ny')}>Runyankore</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setLanguage('soga')}>Lusoga</DropdownMenuItem>
+            </DropdownMenuGroup>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+function UserDropdown({ onLogout }: { onLogout: () => void }) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+            <Button
+                variant="ghost"
+                className="relative h-8 w-8 rounded-full"
+            >
+                <Avatar className="h-9 w-9">
+                    <AvatarImage src="https://i.pravatar.cc/150?u=admin" />
+                    <AvatarFallback>AD</AvatarFallback>
+                </Avatar>
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
 
@@ -211,7 +219,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased flex flex-col min-h-screen">
+      <body className="font-body antialiased">
         <LanguageProvider>
           <AppContent>{children}</AppContent>
         </LanguageProvider>
