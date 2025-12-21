@@ -87,7 +87,7 @@ function UserForm({ user, onSave, onFinished }: { user?: User | null, onSave: (d
         email: "",
         password: "",
         confirmPassword: "",
-        role: "",
+        role: undefined,
     },
   });
 
@@ -193,6 +193,7 @@ function UserForm({ user, onSave, onFinished }: { user?: User | null, onSave: (d
 
 export default function UsersPage() {
     const { toast } = useToast();
+    // This state should be replaced with data fetching in a real app
     const [users, setUsers] = React.useState<User[]>(USERS);
     const [isFormOpen, setIsFormOpen] = React.useState(false);
     const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
@@ -201,12 +202,14 @@ export default function UsersPage() {
         if (userId) { // Editing existing user
             const result = await updateUser(userId, data);
             if (result.success && result.user) {
+                // In a real app, you'd refetch the user list. Here we update state.
                 setUsers(users.map(u => u.id === userId ? result.user! : u));
             }
             return result;
         } else { // Adding new user
              const result = await addUser(data);
             if (result.success && result.user) {
+                 // In a real app, you'd refetch the user list. Here we update state.
                 setUsers([...users, result.user]);
             }
             return result;
@@ -216,6 +219,7 @@ export default function UsersPage() {
     const handleDeleteUser = async (userId: number) => {
         const result = await deleteUser(userId);
         if (result.success) {
+            // In a real app, you'd refetch the user list. Here we update state.
             setUsers(users.filter(u => u.id !== userId));
             toast({
                 title: "User Deleted",
@@ -232,7 +236,10 @@ export default function UsersPage() {
 
 
   return (
-    <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+    <Dialog open={isFormOpen} onOpenChange={(open) => {
+        setIsFormOpen(open);
+        if (!open) setSelectedUser(null);
+    }}>
         <Card>
             <CardHeader>
                 <div className="flex justify-between items-start">
@@ -320,7 +327,7 @@ export default function UsersPage() {
                 {selectedUser ? `Editing details for ${selectedUser.username}.` : "Fill in the form to create a new user account."}
             </DialogDescription>
             </DialogHeader>
-            <UserForm user={selectedUser} onSave={handleSaveUser} onFinished={() => setIsFormOpen(false)} />
+            <UserForm user={selectedUser} onSave={handleSaveUser} onFinished={() => setIsFormОpen(false)} />
         </DialogContent>
     </Dialog>
   );

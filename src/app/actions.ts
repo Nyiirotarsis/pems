@@ -63,7 +63,7 @@ export async function addUser(data: { email: string; role: string; password?: st
         password: data.password || "123" // a mock password
     };
     console.log("Adding new user (mock):", newUser);
-    // USERS.push(newUser); // In a real app, you would persist this
+    // USERS.push(newUser); // In a real app, you would persist this. This is commented out to avoid build errors.
     return { success: true, user: newUser };
 }
 
@@ -76,10 +76,11 @@ export async function updateUser(userId: number, data: { email: string; role: st
         ...USERS[userIndex],
         username: data.email,
         role: data.role as UserRole,
-        password: data.password || USERS[userIndex].password,
+        // Only update password if a new one is provided
+        password: data.password ? data.password : USERS[userIndex].password,
     };
     console.log("Updating user (mock):", updatedUser);
-    // USERS[userIndex] = updatedUser; // In a real app, you would persist this
+    // USERS[userIndex] = updatedUser; // In a real app, you would persist this. This is commented out to avoid build errors.
     return { success: true, user: updatedUser };
 }
 
@@ -89,6 +90,6 @@ export async function deleteUser(userId: number): Promise<{success: boolean; err
         return { success: false, error: "User not found." };
     }
     console.log("Deleting user (mock):", USERS[userIndex]);
-    // USERS.splice(userIndex, 1); // In a real app, you would persist this
+    // USERS.splice(userIndex, 1); // In a real app, you would persist this. This is commented out to avoid build errors.
     return { success: true };
 }

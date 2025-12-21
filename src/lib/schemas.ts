@@ -146,17 +146,18 @@ export const invoiceFormSchema = z.object({
 
 export const userFormSchema = z.object({
     email: z.string().email("Please enter a valid email address."),
-    role: z.string().min(1, "Please select a role."),
+    role: z.string({ required_error: "Please select a role."}).min(1, "Please select a role."),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
 })
 .refine(data => {
+    // If password is provided, confirmPassword must also be provided.
     if (data.password && !data.confirmPassword) {
         return false;
     }
     return true;
 }, {
-    message: "Please confirm your password.",
+    message: "Please confirm your new password.",
     path: ["confirmPassword"],
 })
 .refine(data => data.password === data.confirmPassword, {
