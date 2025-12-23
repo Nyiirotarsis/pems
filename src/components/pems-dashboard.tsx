@@ -97,7 +97,7 @@ type View =
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
-  store: { label: "Store", icon: Warehouse, isPage: true, href: "/dashboard/store" },
+  store: { label: "Store", icon: Warehouse, isPage: true, href: "/dashboard/store/inventory" },
   finance: { label: "Finance", icon: Landmark, isPage: true, href: "/dashboard/finance" },
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
@@ -406,7 +406,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     
     const storeNav = (
          <>
-            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store')} isActive={pathname === '/dashboard/store' || pathname === '/dashboard/store/inventory'}><PackageSearch /><span>Inventory</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/inventory')} isActive={pathname === '/dashboard/store/inventory'}><PackageSearch /><span>Inventory</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/assets')} isActive={pathname.startsWith('/dashboard/assets')}><Wrench /><span>Assets</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/transactions')} isActive={pathname.startsWith('/dashboard/store/transactions')}><ArrowRightLeft /><span>Issue / Return</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/store/requests')} isActive={pathname.startsWith('/dashboard/store/requests')}><BotMessageSquare /><span>Requests</span></SidebarMenuButton></SidebarMenuItem>
