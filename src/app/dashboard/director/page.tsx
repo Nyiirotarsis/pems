@@ -6,7 +6,7 @@ import DirectorDashboard from "@/components/director-dashboard";
 export default function DirectorDashboardPage() {
   return (
     <PEMSDashboard initialRole="Director">
-      <DirectorDashboard />
+      <DirectorDashboard role="Director" />
     </PEMSDashboard>
   );
 }

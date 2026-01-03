@@ -17,6 +17,7 @@ import {
 } from "./ui/card";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { UserRole } from "@/types";
 
 const moduleCards = [
   {
@@ -51,14 +52,14 @@ const moduleCards = [
   },
 ];
 
-export default function DirectorDashboard() {
+export default function DirectorDashboard({ role }: { role: UserRole }) {
   const router = useRouter();
 
   return (
     <div className="grid gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Director & CEO Dashboard</CardTitle>
+          <CardTitle>{role} Dashboard</CardTitle>
           <CardDescription>
             High-level overview of all business operations. Select a module to
             view its detailed dashboard.
