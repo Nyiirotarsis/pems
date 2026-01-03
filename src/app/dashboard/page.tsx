@@ -18,6 +18,8 @@ export default function DashboardPage() {
     if (storedRole && ROLES.includes(storedRole)) {
       switch (storedRole) {
         case "CEO":
+          router.replace("/dashboard/ceo");
+          break;
         case "Director":
           router.replace("/dashboard/director");
           break;

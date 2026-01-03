@@ -94,10 +94,11 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops" | "media" | "sustainability";
+  | "album-show" | "field-ops" | "media" | "sustainability" | "ceo";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
+  ceo: { label: "CEO Dashboard", icon: Home, isPage: true, href: "/dashboard/ceo" },
   store: { label: "Store", icon: Warehouse, isPage: true, href: "/dashboard/store/inventory" },
   finance: { label: "Finance", icon: Landmark, isPage: true, href: "/dashboard/finance" },
   hr: { label: "HR", icon: Users, isPage: true, href: "/dashboard/hr" },
@@ -208,10 +209,10 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
   
   const renderNavForRole = (currentRole: UserRole) => {
 
-    const directorNav = (
+    const managementNav = (
       <>
         <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => router.push('/dashboard/director')} isActive={pathname === '/dashboard/director'}>
+            <SidebarMenuButton onClick={() => router.push(currentRole === 'CEO' ? '/dashboard/ceo' : '/dashboard/director')} isActive={pathname === (currentRole === 'CEO' ? '/dashboard/ceo' : '/dashboard/director')}>
                 <Home /><span>Dashboard</span>
             </SidebarMenuButton>
         </SidebarMenuItem>
@@ -471,7 +472,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     switch(currentRole) {
         case 'CEO':
         case 'Director':
-            return directorNav;
+            return managementNav;
         case 'Finance Manager':
             return financeNav;
         case 'HR/Admin':

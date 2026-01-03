@@ -53,6 +53,7 @@ export function LoginForm() {
   const getDashboardUrlForRole = (role: UserRole) => {
     switch (role) {
       case "CEO":
+        return "/dashboard/ceo";
       case "Director":
         return "/dashboard/director";
       case "Finance Manager":
