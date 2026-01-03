@@ -127,6 +127,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   employees: { label: "Employees", icon: Users, isPage: true, href: "/dashboard/hr/employees" },
   payroll: { label: "Payroll", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll" },
   'payroll-salary': { label: "Salary List", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll/salary" },
+  'payroll-per-diem': { label: "Per Diem List", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll/per-diem" },
   'field-payments': { label: "Field Payments", icon: DollarSign, isPage: true, href: "/dashboard/hr/field-payments" },
   'leave-management': { label: "Leave", icon: CalendarOff, isPage: true, href: "/dashboard/hr/leave" },
   recruitment: { label: "Recruitment", icon: UserPlus, isPage: true, href: "/dashboard/hr/recruitment" },
@@ -399,6 +400,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                         <SidebarMenuItem>
                             <SidebarMenuButton onClick={() => router.push(navItems['payroll-salary'].href!)} isActive={pathname.startsWith(navItems['payroll-salary'].href!)}>
                                 <DollarSign /><span>Salary List</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton onClick={() => router.push(navItems['payroll-per-diem'].href!)} isActive={pathname.startsWith(navItems['payroll-per-diem'].href!)}>
+                                <DollarSign /><span>Per Diem List</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
