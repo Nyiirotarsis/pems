@@ -45,6 +45,7 @@ import {
   Camera,
   Rss,
   Newspaper,
+  ShieldCheck,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -93,7 +94,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops" | "media";
+  | "album-show" | "field-ops" | "media" | "sustainability";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -103,6 +104,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   it: { label: "IT", icon: Shield, isPage: true, href: "/dashboard/it" },
   'field-ops': { label: "Field Ops", icon: Construction, isPage: true, href: "/dashboard/field-ops" },
   media: { label: "Media", icon: Rss, isPage: true, href: "/dashboard/media" },
+  sustainability: { label: "Sustainability (ESMS)", icon: ShieldCheck, isPage: true, href: "/dashboard/sustainability" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
 
@@ -307,6 +309,12 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <Rss /><span>Media</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <SidebarMenuButton onClick={() => router.push(navItems['sustainability'].href!)} isActive={pathname.startsWith(navItems['sustainability'].href!)}>
+            <ShieldCheck /><span>Sustainability (ESMS)</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
         
         <SidebarMenuItem>
             <SidebarMenuButton onClick={() => router.push('/dashboard/reports')} isActive={pathname === '/dashboard/reports'}>
@@ -401,6 +409,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
               </SidebarMenuItem>
             );
         })}
+         <SidebarMenuItem>
+          <SidebarMenuButton onClick={() => router.push(navItems['sustainability'].href!)} isActive={pathname.startsWith(navItems['sustainability'].href!)}>
+            <ShieldCheck /><span>Sustainability (ESMS)</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </>
     );
     
@@ -447,6 +460,13 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             })}
         </>
     );
+    
+    const auditorNav = (
+        <>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['sustainability'].href!)} isActive={pathname.startsWith(navItems['sustainability'].href!)}><ShieldCheck /><span>Sustainability (ESMS)</span></SidebarMenuButton></SidebarMenuItem>
+            <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['reports'].href!)} isActive={pathname.startsWith(navItems['reports'].href!)}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
+        </>
+    );
 
     switch(currentRole) {
         case 'CEO':
@@ -464,6 +484,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return fieldOpsNav;
         case 'Media and Communication Officer':
             return mediaNav;
+        case 'Auditor':
+            return auditorNav;
         default:
             return null;
     }
