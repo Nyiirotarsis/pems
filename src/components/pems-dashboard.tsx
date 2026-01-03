@@ -126,6 +126,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   // HR Sub-items
   employees: { label: "Employees", icon: Users, isPage: true, href: "/dashboard/hr/employees" },
   payroll: { label: "Payroll", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll" },
+  'payroll-salary': { label: "Salary List", icon: DollarSign, isPage: true, href: "/dashboard/hr/payroll/salary" },
   'field-payments': { label: "Field Payments", icon: DollarSign, isPage: true, href: "/dashboard/hr/field-payments" },
   'leave-management': { label: "Leave", icon: CalendarOff, isPage: true, href: "/dashboard/hr/leave" },
   recruitment: { label: "Recruitment", icon: UserPlus, isPage: true, href: "/dashboard/hr/recruitment" },
@@ -301,7 +302,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => {
+                        {['employees', 'payroll-salary', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi'].map(key => {
                              const Icon = navItems[key].icon;
                              return (
                                 <SidebarMenuItem key={key}>
@@ -388,7 +389,23 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <Home /><span>Dashboard</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        {['employees', 'payroll', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => {
+        <SidebarMenuItem>
+            <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="justify-between" isActive={pathname.startsWith('/dashboard/hr/payroll')}><div className="flex items-center gap-2"><DollarSign /><span>Payroll</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                        <SidebarMenuItem>
+                            <SidebarMenuButton onClick={() => router.push(navItems['payroll-salary'].href!)} isActive={pathname.startsWith(navItems['payroll-salary'].href!)}>
+                                <DollarSign /><span>Salary List</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
+        {['employees', 'field-payments', 'leave-management', 'recruitment', 'attendance', 'visitors', 'exit-management', 'kpi', 'reports', 'notifications'].map(key => {
             const Icon = navItems[key].icon;
             return (
                 <SidebarMenuItem key={key}>
