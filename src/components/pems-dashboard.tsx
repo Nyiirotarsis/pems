@@ -50,7 +50,7 @@ import {
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, mockUsers } from "@/lib/mock-data";
+import { initialInventory, ROLES, mockUsers, mockVisitors } from "@/lib/mock-data";
 import type { UserRole, InventoryItem, AppNotification, Kpi, Visitor } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
@@ -159,9 +159,41 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
 export default function PEMSDashboard({ children, initialRole }: { children: React.ReactNode, initialRole: UserRole | null }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
 
   const [role, setRole] = React.useState<UserRole | null>(initialRole);
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
+  const [visitors, setVisitors] = React.useState<Visitor[]>(mockVisitors);
+  
+  React.useEffect(() => {
+    const newVisitorName = searchParams.get('new_visitor');
+    const visitedPerson = searchParams.get('visited_person');
+
+    if (newVisitorName && visitedPerson) {
+        addNotification(
+            `${newVisitorName} has arrived to see the ${visitedPerson}.`,
+            [visitedPerson as UserRole]
+        );
+        
+        // Also add a new visitor to the state for simulation
+        const newVisitor: Visitor = {
+            id: visitors.length + 1,
+            name: newVisitorName,
+            reason: "Meeting",
+            timeIn: new Date().toISOString(),
+            personVisiting: visitedPerson as UserRole
+        };
+        setVisitors(prev => [newVisitor, ...prev]);
+
+        toast({
+            title: "Visitor Registered",
+            description: `${newVisitorName} has been registered. The ${visitedPerson} has been notified.`
+        })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   
   const addNotification = React.useCallback((message: string, forRoles: UserRole[]) => {
     const newNotification: AppNotification = {

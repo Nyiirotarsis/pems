@@ -148,10 +148,13 @@ export default function HrDashboard({ visitors }: HrDashboardProps) {
         {/* Placeholder for other modules */}
         <Card>
             <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>HR Modules</CardTitle>
             </CardHeader>
-            <CardContent>
-                <p>Other HR activities will be shown here...</p>
+            <CardContent className="space-y-2">
+                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/dashboard/hr/employees')}>Employees</Button>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/dashboard/hr/attendance')}>Attendance</Button>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/dashboard/hr/kpi')}>KPIs</Button>
+                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/dashboard/hr/field-payments')}>Field Payments</Button>
             </CardContent>
         </Card>
       </div>

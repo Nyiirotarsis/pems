@@ -89,7 +89,7 @@ export default function VisitorRegistrationPage() {
         visited_person: data.personVisiting
       });
       
-      router.push(`/dashboard?${params.toString()}`);
+      router.push(`/dashboard/hr?${params.toString()}`);
       
     } else {
       toast({
@@ -108,7 +108,7 @@ export default function VisitorRegistrationPage() {
             <CardHeader>
                <div className="flex items-center gap-4">
                   <Button asChild variant="outline" size="icon">
-                    <Link href="/dashboard"><ArrowLeft className="h-4 w-4" /></Link>
+                    <Link href="/dashboard/hr"><ArrowLeft className="h-4 w-4" /></Link>
                   </Button>
                   <div>
                     <CardTitle className="font-headline text-2xl">
@@ -198,4 +198,3 @@ export default function VisitorRegistrationPage() {
     </div>
   );
 }
-
