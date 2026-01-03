@@ -178,14 +178,16 @@ export const equipmentRequisitionSchema = z.object({
 });
 
 export const payrollFormSchema = z.object({
-  staffId: z.string().min(1, "Please select a staff member."),
-  staffFileNo: z.string().min(1, "Staff File No. is required."),
-  position: z.string().min(1, "Position is required."),
-  tin: z.string().min(1, "TIN is required."),
-  nssf: z.string().min(1, "NSSF No. is required."),
+  staffId: z.string({required_error: "Please select a staff member."}).min(1, "Please select a staff member."),
+  staffFileNo: z.string().optional(),
+  position: z.string().optional(),
+  tin: z.string().optional(),
+  nssf: z.string().optional(),
   month: z.string().min(1, "Month is required."),
   year: z.coerce.number().min(2020, "Year must be valid."),
   basicPay: z.coerce.number().min(0, "Basic pay must be a positive number."),
   otherBenefits: z.coerce.number().min(0, "Benefits must be a positive number."),
   salaryAdvance: z.coerce.number().min(0, "Salary advance must be a positive number."),
 });
+
+    

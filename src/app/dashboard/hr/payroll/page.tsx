@@ -25,8 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -35,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, CheckCircle, XCircle } from "lucide-react";
+import { PlusCircle, MoreVertical, CheckCircle, XCircle, Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,6 +59,7 @@ import { mockUsers } from "@/lib/mock-data";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { User, UserRole } from "@/types";
 import { payrollFormSchema } from "@/lib/schemas";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
 // Mock data based on your spec
@@ -88,6 +87,7 @@ const mockPayrollData = [
 ];
 
 type PayrollFormValues = z.infer<typeof payrollFormSchema>;
+type PayrollRecord = typeof mockPayrollData[0];
 
 function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance: number) {
     const grossPay = basicPay + otherBenefits;
@@ -112,10 +112,15 @@ function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance
     return { grossPay, taxableIncome, nssf5, paye, lst, totalDeductions, netPay };
 }
 
-function PayrollForm({ user, onSave, onFinished }: { user?: User | null, onSave: (data: PayrollFormValues) => void, onFinished: () => void }) {
+function PayrollForm({ payrollRecord, onSave, onFinished }: { payrollRecord?: PayrollRecord | null, onSave: (data: PayrollFormValues, id?: number) => void, onFinished: () => void }) {
   const form = useForm<PayrollFormValues>({
     resolver: zodResolver(payrollFormSchema),
-    defaultValues: {
+    defaultValues: payrollRecord ? {
+        ...payrollRecord,
+        staffId: payrollRecord.staffId.toString(),
+        ...mockUsers.find(u => u.id === payrollRecord.staffId),
+        position: mockUsers.find(u => u.id === payrollRecord.staffId)?.role,
+    } : {
       year: new Date().getFullYear(),
       basicPay: 0,
       otherBenefits: 0,
@@ -140,8 +145,9 @@ function PayrollForm({ user, onSave, onFinished }: { user?: User | null, onSave:
   }, [watchedStaffId, form]);
 
   const handleSubmit = (data: PayrollFormValues) => {
-    onSave(data);
-    toast({ title: "Payroll record added.", description: "The record is pending approval." });
+    onSave(data, payrollRecord?.id);
+    const action = payrollRecord ? "updated" : "added";
+    toast({ title: `Payroll record ${action}.`, description: `The record has been successfully ${action}.` });
     onFinished();
   };
 
@@ -155,7 +161,7 @@ function PayrollForm({ user, onSave, onFinished }: { user?: User | null, onSave:
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Staff Member</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!payrollRecord}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select staff" /></SelectTrigger></FormControl>
                     <SelectContent>{mockUsers.filter(u => u.name).map(u => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}</SelectContent>
                   </Select>
@@ -272,7 +278,7 @@ function PayrollForm({ user, onSave, onFinished }: { user?: User | null, onSave:
             />
         </div>
         <DialogFooter>
-            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+            <Button variant="ghost" onClick={onFinished}>Cancel</Button>
             <Button type="submit">Save Record</Button>
         </DialogFooter>
       </form>
@@ -284,6 +290,7 @@ export default function PayrollPage() {
     const { toast } = useToast();
     const [payrollRecords, setPayrollRecords] = useState(mockPayrollData);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<PayrollRecord | null>(null);
     const [role, setRole] = React.useState<UserRole | null>(null);
 
     React.useEffect(() => {
@@ -296,19 +303,28 @@ export default function PayrollPage() {
     const canApprove = role === "Director" || role === "CEO";
     const canCreate = role === "HR/Admin";
 
-    const handleSaveRecord = (data: PayrollFormValues) => {
-        const newRecord = {
-            id: payrollRecords.length + 1,
-            staffId: parseInt(data.staffId),
-            month: data.month,
-            year: data.year,
-            basicPay: data.basicPay,
-            otherBenefits: data.otherBenefits,
-            salaryAdvance: data.salaryAdvance,
-            status: 'Pending' as 'Pending',
-        };
-        setPayrollRecords(prev => [...prev, newRecord]);
+    const handleSaveRecord = (data: PayrollFormValues, id?: number) => {
+        if (id) { // Editing existing record
+            setPayrollRecords(prev => prev.map(rec => rec.id === id ? { ...rec, ...data, staffId: parseInt(data.staffId) } : rec));
+        } else { // Adding new record
+            const newRecord = {
+                id: payrollRecords.length + 1,
+                staffId: parseInt(data.staffId),
+                month: data.month,
+                year: data.year,
+                basicPay: data.basicPay,
+                otherBenefits: data.otherBenefits,
+                salaryAdvance: data.salaryAdvance,
+                status: 'Pending' as 'Pending',
+            };
+            setPayrollRecords(prev => [...prev, newRecord]);
+        }
     };
+
+    const handleDeleteRecord = (id: number) => {
+        setPayrollRecords(prev => prev.filter(rec => rec.id !== id));
+        toast({ title: `Payroll record deleted.` });
+    }
 
     const handleUpdateStatus = (id: number, status: 'Approved' | 'Rejected') => {
         setPayrollRecords(prev => prev.map(rec => rec.id === id ? { ...rec, status } : rec));
@@ -325,7 +341,10 @@ export default function PayrollPage() {
 
   return (
     <PEMSDashboard initialRole="HR/Admin">
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={(isOpen) => {
+          setIsFormOpen(isOpen);
+          if (!isOpen) setSelectedRecord(null);
+      }}>
         <Card>
             <CardHeader>
                 <div className="flex justify-between items-start">
@@ -337,7 +356,7 @@ export default function PayrollPage() {
                     </div>
                     {canCreate && (
                       <DialogTrigger asChild>
-                          <Button>
+                          <Button onClick={() => setSelectedRecord(null)}>
                               <PlusCircle className="mr-2" /> Add Payroll Record
                           </Button>
                       </DialogTrigger>
@@ -399,7 +418,7 @@ export default function PayrollPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuItem>View Details</DropdownMenuItem>
-                                        {canCreate && <DropdownMenuItem>Edit</DropdownMenuItem>}
+                                        {canCreate && <DropdownMenuItem onSelect={() => { setSelectedRecord(record); setIsFormOpen(true); }}><Edit className="mr-2"/>Edit</DropdownMenuItem>}
                                         {canApprove && record.status === 'Pending' && (
                                             <>
                                                 <DropdownMenuItem onClick={() => handleUpdateStatus(record.id, 'Approved')}>
@@ -410,7 +429,23 @@ export default function PayrollPage() {
                                                 </DropdownMenuItem>
                                             </>
                                         )}
-                                        {canCreate && <DropdownMenuItem className="text-red-500 focus:text-red-500">Delete</DropdownMenuItem>}
+                                        {canCreate && (
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500 focus:text-red-500"><Trash2 className="mr-2"/>Delete</DropdownMenuItem>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>This action cannot be undone. This will permanently delete the payroll record.</AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDeleteRecord(record.id)}>Continue</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        )}
                                     </DropdownMenuContent>
                                </DropdownMenu>
                             </TableCell>
@@ -426,14 +461,16 @@ export default function PayrollPage() {
         </Card>
         <DialogContent className="max-w-4xl">
             <DialogHeader>
-                <DialogTitle>Add New Payroll Record</DialogTitle>
+                <DialogTitle>{selectedRecord ? "Edit" : "Add New"} Payroll Record</DialogTitle>
                 <DialogDescription>
-                    Fill in the details to create a new payroll entry for a staff member.
+                    Fill in the details to {selectedRecord ? "update the" : "create a new"} payroll entry for a staff member.
                 </DialogDescription>
             </DialogHeader>
-            <PayrollForm onSave={handleSaveRecord} onFinished={() => setIsFormOpen(false)} />
+            <PayrollForm payrollRecord={selectedRecord} onSave={handleSaveRecord} onFinished={() => setIsFormOpen(false)} />
         </DialogContent>
       </Dialog>
     </PEMSDashboard>
   );
 }
+
+    
