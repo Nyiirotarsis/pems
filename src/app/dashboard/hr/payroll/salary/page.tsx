@@ -55,39 +55,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { mockUsers } from "@/lib/mock-data";
+import { mockUsers, mockPayrollData } from "@/lib/mock-data";
 import PEMSDashboard from "@/components/pems-dashboard";
-import { User, UserRole } from "@/types";
+import { User, UserRole, PayrollRecord } from "@/types";
 import { payrollFormSchema } from "@/lib/schemas";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 
-// Mock data based on your spec
-const mockPayrollData = [
-    {
-        id: 1,
-        staffId: 12,
-        month: 'July',
-        year: 2024,
-        basicPay: 5000000,
-        otherBenefits: 500000,
-        salaryAdvance: 0,
-        status: 'Approved' as 'Pending' | 'Approved' | 'Rejected',
-    },
-    {
-        id: 2,
-        staffId: 13,
-        month: 'July',
-        year: 2024,
-        basicPay: 7000000,
-        otherBenefits: 1000000,
-        salaryAdvance: 500000,
-        status: 'Pending' as 'Pending' | 'Approved' | 'Rejected',
-    }
-];
-
 type PayrollFormValues = z.infer<typeof payrollFormSchema>;
-type PayrollRecord = typeof mockPayrollData[0];
 
 function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance: number) {
     const grossPay = basicPay + otherBenefits;
@@ -112,14 +87,13 @@ function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance
     return { grossPay, taxableIncome, nssf5, paye, lst, totalDeductions, netPay };
 }
 
-function PayrollForm({ payrollRecord, onSave, onFinished }: { payrollRecord?: PayrollRecord | null, onSave: (data: PayrollFormValues, id?: number) => void, onFinished: () => void }) {
+function PayrollForm({ payrollRecord, onSave, onFinished }: { payrollRecord?: (PayrollRecord & { staff?: User }) | null, onSave: (data: PayrollFormValues, id?: number) => void, onFinished: () => void }) {
   const form = useForm<PayrollFormValues>({
     resolver: zodResolver(payrollFormSchema),
     defaultValues: payrollRecord ? {
         ...payrollRecord,
         staffId: payrollRecord.staffId.toString(),
-        ...mockUsers.find(u => u.id === payrollRecord.staffId),
-        position: mockUsers.find(u => u.id === payrollRecord.staffId)?.role,
+        position: payrollRecord.staff?.role,
     } : {
       year: new Date().getFullYear(),
       basicPay: 0,
@@ -290,7 +264,7 @@ export default function SalaryListPage() {
     const { toast } = useToast();
     const [payrollRecords, setPayrollRecords] = useState(mockPayrollData);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState<PayrollRecord | null>(null);
+    const [selectedRecord, setSelectedRecord] = useState<(PayrollRecord & { staff?: User }) | null>(null);
     const [role, setRole] = React.useState<UserRole | null>(null);
 
     React.useEffect(() => {
@@ -307,7 +281,7 @@ export default function SalaryListPage() {
         if (id) { // Editing existing record
             setPayrollRecords(prev => prev.map(rec => rec.id === id ? { ...rec, ...data, staffId: parseInt(data.staffId) } : rec));
         } else { // Adding new record
-            const newRecord = {
+            const newRecord: PayrollRecord = {
                 id: payrollRecords.length + 1,
                 staffId: parseInt(data.staffId),
                 month: data.month,
@@ -315,7 +289,7 @@ export default function SalaryListPage() {
                 basicPay: data.basicPay,
                 otherBenefits: data.otherBenefits,
                 salaryAdvance: data.salaryAdvance,
-                status: 'Pending' as 'Pending',
+                status: 'Pending',
             };
             setPayrollRecords(prev => [...prev, newRecord]);
         }

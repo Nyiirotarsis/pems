@@ -279,4 +279,14 @@ export interface MaintenanceLog {
     remarks?: string;
 }
 
+export interface PayrollRecord {
+  id: number;
+  staffId: number;
+  month: string;
+  year: number;
+  basicPay: number;
+  otherBenefits: number;
+  salaryAdvance: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
+}
     

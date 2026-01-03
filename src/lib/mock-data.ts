@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -304,6 +304,29 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
         technicianName: "In-house IT",
         contact: "Ext 105",
         remarks: "Lamp ordered, awaiting delivery.",
+    }
+];
+
+export const mockPayrollData: PayrollRecord[] = [
+    {
+        id: 1,
+        staffId: 12,
+        month: 'July',
+        year: 2024,
+        basicPay: 5000000,
+        otherBenefits: 500000,
+        salaryAdvance: 0,
+        status: 'Approved',
+    },
+    {
+        id: 2,
+        staffId: 13,
+        month: 'July',
+        year: 2024,
+        basicPay: 7000000,
+        otherBenefits: 1000000,
+        salaryAdvance: 500000,
+        status: 'Pending',
     }
 ];
 
