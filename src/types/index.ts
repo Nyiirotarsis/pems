@@ -11,6 +11,10 @@ export interface User {
   username: string;
   password?: string; // Should not be sent to client
   role: UserRole;
+  staffFileNo?: string;
+  name?: string;
+  tin?: string;
+  nssf?: string;
 }
 
 export interface InventoryItem {

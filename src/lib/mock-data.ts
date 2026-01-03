@@ -27,6 +27,11 @@ export const USERS: User[] = [
     { id: 9, username: 'communication', password: '123', role: 'Media and Communication Officer' },
     { id: 10, username: 'commofficer', password: '123', role: 'Media and Communication Officer' },
     { id: 11, username: 'auditor', password: '123', role: 'Auditor' },
+    { id: 12, staffFileNo: "PE-001", name: "Busingye Shilla Allen", tin: "1001234567", nssf: "2001234567", username: 'Busingye Shilla Allen', password: '123', role: 'Finance Manager' },
+    { id: 13, staffFileNo: "PE-002", name: "Sarah Kamusiime", tin: "1002345678", nssf: "2002345678", username: 'Sarah Kamusiime', password: '123', role: 'HR/Admin' },
+    { id: 14, staffFileNo: "PE-003", name: "Barbra Margret Neema", tin: "1003456789", nssf: "2003456789", username: 'Barbra Margret Neema', password: '123', role: 'Director' },
+    { id: 15, staffFileNo: "PE-004", name: "Nyiiro Tarsis Ibrahim", tin: "1004567890", nssf: "2004567890", username: 'Nyiiro Tarsis Ibrahim', password: '123', role: 'IT Managers' },
+    { id: 16, staffFileNo: "PE-005", name: "Ngota Steven", tin: "1005678901", nssf: "2005678901", username: 'Ngota Steven', password: '123', role: 'Store Manager' },
 ];
 
 export const mockUsers: User[] = USERS;

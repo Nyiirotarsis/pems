@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { PlusCircle, MoreVertical, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,14 +59,15 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { mockUsers } from "@/lib/mock-data";
 import PEMSDashboard from "@/components/pems-dashboard";
-import { UserRole } from "@/types";
+import { User, UserRole } from "@/types";
+import { payrollFormSchema } from "@/lib/schemas";
 
 
 // Mock data based on your spec
 const mockPayrollData = [
     {
         id: 1,
-        staffId: 1,
+        staffId: 12,
         month: 'July',
         year: 2024,
         basicPay: 5000000,
@@ -76,7 +77,7 @@ const mockPayrollData = [
     },
     {
         id: 2,
-        staffId: 2,
+        staffId: 13,
         month: 'July',
         year: 2024,
         basicPay: 7000000,
@@ -86,15 +87,6 @@ const mockPayrollData = [
     }
 ];
 
-const payrollFormSchema = z.object({
-  staffId: z.string().min(1, "Please select a staff member."),
-  month: z.string().min(1, "Month is required."),
-  year: z.coerce.number().min(2020, "Year must be valid."),
-  basicPay: z.coerce.number().min(0, "Basic pay must be a positive number."),
-  otherBenefits: z.coerce.number().min(0, "Benefits must be a positive number."),
-  salaryAdvance: z.coerce.number().min(0, "Salary advance must be a positive number."),
-});
-
 type PayrollFormValues = z.infer<typeof payrollFormSchema>;
 
 function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance: number) {
@@ -102,7 +94,17 @@ function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance
     // Simplified tax calculation for demonstration
     const nssf5 = grossPay * 0.05;
     const taxableIncome = grossPay - nssf5;
-    const paye = taxableIncome > 410000 ? (taxableIncome - 410000) * 0.3 + 35500 : 0; // Simplified PAYE
+    let paye = 0;
+    if (taxableIncome > 10000000) {
+        paye = (taxableIncome - 10000000) * 0.4 + 2560000;
+    } else if (taxableIncome > 410000) {
+        paye = (taxableIncome - 410000) * 0.3 + 35500;
+    } else if (taxableIncome > 335000) {
+        paye = (taxableIncome - 335000) * 0.2 + 10000;
+    } else if (taxableIncome > 235000) {
+        paye = (taxableIncome - 235000) * 0.1;
+    }
+
     const lst = grossPay > 300000 ? 5000 : 0; // Simplified LST
     const totalDeductions = nssf5 + paye + lst + salaryAdvance;
     const netPay = grossPay - totalDeductions;
@@ -110,7 +112,7 @@ function calculatePayroll(basicPay: number, otherBenefits: number, salaryAdvance
     return { grossPay, taxableIncome, nssf5, paye, lst, totalDeductions, netPay };
 }
 
-function PayrollForm({ onSave, onFinished }: { onSave: (data: PayrollFormValues) => void, onFinished: () => void }) {
+function PayrollForm({ user, onSave, onFinished }: { user?: User | null, onSave: (data: PayrollFormValues) => void, onFinished: () => void }) {
   const form = useForm<PayrollFormValues>({
     resolver: zodResolver(payrollFormSchema),
     defaultValues: {
@@ -122,6 +124,20 @@ function PayrollForm({ onSave, onFinished }: { onSave: (data: PayrollFormValues)
   });
   
   const { toast } = useToast();
+
+  const watchedStaffId = form.watch("staffId");
+
+  React.useEffect(() => {
+    if (watchedStaffId) {
+        const selectedUser = mockUsers.find(u => u.id === parseInt(watchedStaffId));
+        if (selectedUser) {
+            form.setValue("staffFileNo", selectedUser.staffFileNo || "");
+            form.setValue("position", selectedUser.role || "");
+            form.setValue("tin", selectedUser.tin || "");
+            form.setValue("nssf", selectedUser.nssf || "");
+        }
+    }
+  }, [watchedStaffId, form]);
 
   const handleSubmit = (data: PayrollFormValues) => {
     onSave(data);
@@ -141,12 +157,60 @@ function PayrollForm({ onSave, onFinished }: { onSave: (data: PayrollFormValues)
                   <FormLabel>Staff Member</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select staff" /></SelectTrigger></FormControl>
-                    <SelectContent>{mockUsers.map(u => <SelectItem key={u.id} value={u.id.toString()}>{u.username}</SelectItem>)}</SelectContent>
+                    <SelectContent>{mockUsers.filter(u => u.name).map(u => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}</SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="staffFileNo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Staff File No.</FormLabel>
+                   <FormControl><Input {...field} readOnly /></FormControl>
+                   <FormMessage />
+                </FormItem>
+              )}
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <FormField
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Position</FormLabel>
+                   <FormControl><Input {...field} readOnly /></FormControl>
+                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="tin"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TIN No.</FormLabel>
+                   <FormControl><Input {...field} readOnly /></FormControl>
+                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="nssf"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>NSSF No.</FormLabel>
+                   <FormControl><Input {...field} readOnly /></FormControl>
+                   <FormMessage />
+                </FormItem>
+              )}
+            />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid grid-cols-2 gap-2">
                  <FormField
                   control={form.control}
@@ -235,8 +299,12 @@ export default function PayrollPage() {
     const handleSaveRecord = (data: PayrollFormValues) => {
         const newRecord = {
             id: payrollRecords.length + 1,
-            ...data,
             staffId: parseInt(data.staffId),
+            month: data.month,
+            year: data.year,
+            basicPay: data.basicPay,
+            otherBenefits: data.otherBenefits,
+            salaryAdvance: data.salaryAdvance,
             status: 'Pending' as 'Pending',
         };
         setPayrollRecords(prev => [...prev, newRecord]);
@@ -281,10 +349,20 @@ export default function PayrollPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Staff</TableHead>
-                            <TableHead>Period</TableHead>
+                            <TableHead>Staff File No</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Position</TableHead>
+                            <TableHead>TIN No.</TableHead>
+                            <TableHead>NSSF No.</TableHead>
+                            <TableHead className="text-right">Basic Pay</TableHead>
+                            <TableHead className="text-right">Other Benefits</TableHead>
                             <TableHead className="text-right">Gross Pay</TableHead>
-                            <TableHead className="text-right">Deductions</TableHead>
+                            <TableHead className="text-right">Taxable Income</TableHead>
+                            <TableHead className="text-right">NSSF 5%</TableHead>
+                            <TableHead className="text-right">PAYE/URA</TableHead>
+                            <TableHead className="text-right">LST</TableHead>
+                            <TableHead className="text-right">Salary Advance</TableHead>
+                            <TableHead className="text-right">Total Deductions</TableHead>
                             <TableHead className="text-right">Net Pay</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -293,10 +371,20 @@ export default function PayrollPage() {
                     <TableBody>
                         {fullPayrollData.map((record) => (
                         <TableRow key={record.id}>
-                            <TableCell className="font-medium">{record.staff?.username || 'N/A'}</TableCell>
-                            <TableCell>{record.month} {record.year}</TableCell>
-                            <TableCell className="text-right">UGX {record.grossPay.toLocaleString()}</TableCell>
-                            <TableCell className="text-right text-destructive">UGX {record.totalDeductions.toLocaleString()}</TableCell>
+                            <TableCell>{record.staff?.staffFileNo || 'N/A'}</TableCell>
+                            <TableCell className="font-medium">{record.staff?.name || 'N/A'}</TableCell>
+                            <TableCell>{record.staff?.role || 'N/A'}</TableCell>
+                            <TableCell>{record.staff?.tin || 'N/A'}</TableCell>
+                            <TableCell>{record.staff?.nssf || 'N/A'}</TableCell>
+                            <TableCell className="text-right">{record.basicPay.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{record.otherBenefits.toLocaleString()}</TableCell>
+                            <TableCell className="text-right font-medium">{record.grossPay.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{record.taxableIncome.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">{record.nssf5.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">{record.paye.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">{record.lst.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">{record.salaryAdvance.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-destructive">{record.totalDeductions.toLocaleString()}</TableCell>
                             <TableCell className="text-right font-bold">UGX {record.netPay.toLocaleString()}</TableCell>
                             <TableCell>
                                 <Badge variant={
@@ -333,10 +421,10 @@ export default function PayrollPage() {
             </div>
             </CardContent>
              <CardFooter>
-                <p className="text-xs text-muted-foreground">This table shows a summary. Detailed breakdown of deductions (NSSF, PAYE, LST) is available in the detailed view.</p>
+                <p className="text-xs text-muted-foreground">This table shows the full payroll breakdown for each staff member.</p>
             </CardFooter>
         </Card>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl">
             <DialogHeader>
                 <DialogTitle>Add New Payroll Record</DialogTitle>
                 <DialogDescription>
