@@ -164,3 +164,15 @@ export const userFormSchema = z.object({
     message: "Passwords do not match.",
     path: ["confirmPassword"],
 });
+
+
+const requisitionItemSchema = z.object({
+  itemName: z.string().min(1, "Item name is required."),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
+});
+
+export const equipmentRequisitionSchema = z.object({
+  eventName: z.string().min(2, "Event name is required."),
+  eventDate: z.date(),
+  items: z.array(requisitionItemSchema).min(1, "Please add at least one item."),
+});

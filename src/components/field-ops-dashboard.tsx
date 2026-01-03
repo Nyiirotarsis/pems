@@ -30,10 +30,10 @@ const moduleCards = [
     href: "/dashboard/field-ops/logistics",
   },
   {
-    title: "Request Equipment",
-    icon: PackagePlus,
-    description: "Request items needed for an event from the store.",
-    href: "/dashboard/store/requests",
+    title: "Equipment Requisition",
+    icon: FileText,
+    description: "Create and submit a list of required items for an event.",
+    href: "/dashboard/field-ops/requisition",
   },
   {
     title: "Manage Equipments at Site",

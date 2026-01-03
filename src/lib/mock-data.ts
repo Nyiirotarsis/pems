@@ -1,4 +1,5 @@
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue } from "@/types";
+
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -159,6 +160,22 @@ export const mockInventoryIssues: InventoryIssue[] = [
         status: 'Out',
         remarks: 'Used for corporate event',
         createdAt: '2024-07-25T09:30:00Z'
+    }
+];
+
+export const mockRequisitions: Requisition[] = [
+    {
+        id: "REQ-001",
+        eventName: "Judiciary Conference",
+        eventDate: "2024-08-15",
+        requestedBy: "Field Operational Officer",
+        status: "Pending",
+        items: [
+            { itemName: "Wireless Microphone Kit", quantity: 4, status: "Available" },
+            { itemName: "LED Display Screen 55inch", quantity: 2, status: "Available" },
+            { itemName: "5KVA Diesel Generator", quantity: 1, status: "Not Available" },
+        ],
+        createdAt: "2024-08-01T10:00:00Z"
     }
 ];
 

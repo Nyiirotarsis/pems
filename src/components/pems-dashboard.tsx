@@ -143,6 +143,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   
   // Field Ops Sub-items
   'field-ops-logistics': { label: "Fuel & Logistics", icon: Fuel, isPage: true, href: "/dashboard/field-ops/logistics" },
+  'field-ops-requisition': { label: "Equipment Requisition", icon: FileText, isPage: true, href: "/dashboard/field-ops/requisition" },
   'field-ops-crew': { label: "Manage Crew", icon: Users, isPage: true, href: "/dashboard/field-ops/crew" },
   'field-ops-attendance': { label: "Site Attendance", icon: QrCode, isPage: true, href: "/dashboard/field-ops/attendance" },
   'field-ops-equipment': { label: "Manage Equipments at Site", icon: ArrowRightLeft, isPage: true, href: "/dashboard/store/transactions" },
@@ -438,6 +439,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const fieldOpsNav = (
       <>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/field-ops')} isActive={pathname === '/dashboard/field-ops'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
+        <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-requisition'].href!)} isActive={pathname.startsWith(navItems['field-ops-requisition'].href!)}><FileText /><span>Equipment Requisition</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-logistics'].href!)} isActive={pathname === navItems['field-ops-logistics'].href}><Fuel /><span>Fuel & Logistics</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-equipment'].href!)} isActive={pathname.startsWith(navItems['field-ops-equipment'].href!)}><ArrowRightLeft /><span>Manage Equipments at Site</span></SidebarMenuButton></SidebarMenuItem>
         <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['field-ops-crew'].href!)} isActive={pathname === navItems['field-ops-crew'].href}><Users /><span>Manage Crew</span></SidebarMenuButton></SidebarMenuItem>

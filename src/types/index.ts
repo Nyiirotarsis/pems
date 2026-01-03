@@ -61,6 +61,20 @@ export interface InventoryIssue {
   receivedBy?: UserRole | string;
 }
 
+export interface Requisition {
+    id: string;
+    eventName: string;
+    eventDate: string;
+    requestedBy: UserRole | string;
+    status: "Pending" | "Approved" | "Rejected" | "Processed";
+    items: {
+        itemName: string;
+        quantity: number;
+        status: "Available" | "Not Available" | "Partially Available";
+    }[];
+    createdAt: string;
+}
+
 export interface RepairLog {
   repairId: string;
   itemId: string;
