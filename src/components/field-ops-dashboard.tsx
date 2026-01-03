@@ -10,6 +10,7 @@ import {
   Users,
   QrCode,
   ArrowRightLeft,
+  PackagePlus,
 } from "lucide-react";
 import {
   Card,
@@ -27,6 +28,12 @@ const moduleCards = [
     icon: Fuel,
     description: "Request fuel, transport, and manage mileage.",
     href: "/dashboard/field-ops/logistics",
+  },
+  {
+    title: "Request Equipment",
+    icon: PackagePlus,
+    description: "Request items needed for an event from the store.",
+    href: "/dashboard/store/requests",
   },
   {
     title: "Manage Equipments at Site",
@@ -61,7 +68,7 @@ export default function FieldOpsDashboard() {
           </CardDescription>
         </CardHeader>
       </Card>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {moduleCards.map((card, index) => (
           <Card key={index} className="flex flex-col">
             <CardHeader>
