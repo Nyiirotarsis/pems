@@ -220,3 +220,4 @@ export const eventRegistrySchema = z.object({
   status: z.enum(["Planned", "Ongoing", "Completed", "Delivered", "Archived", "Cancelled"]),
 });
     
+    

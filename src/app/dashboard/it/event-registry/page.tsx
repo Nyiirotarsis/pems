@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle, Download } from "lucide-react";
+import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle, Download, CalendarDays, Hourglass, PlayCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { mockEventRegistry } from "@/lib/mock-data";
@@ -180,6 +180,7 @@ function EventRegistryForm({ event, onSave, onFinished }: { event?: EventRegistr
                                         <SelectItem value="Completed">Completed</SelectItem>
                                         <SelectItem value="Delivered">Delivered</SelectItem>
                                         <SelectItem value="Archived">Archived</SelectItem>
+                                        <SelectItem value="Cancelled">Cancelled</SelectItem>
                                     </SelectContent></Select><FormMessage /></FormItem>)} />
                             </CardContent>
                         </Card>
@@ -219,9 +220,9 @@ export default function EventRegistryPage() {
     const summaryStats = React.useMemo(() => {
         const totalEvents = events.length;
         const completedEvents = events.filter(e => e.status === 'Completed' || e.status === 'Delivered' || e.status === 'Archived').length;
-        const totalParticipants = events.reduce((acc, e) => acc + (e.totalParticipants || 0), 0);
-        const totalVolume = events.reduce((acc, e) => acc + (e.volumeRecorded || 0), 0);
-
+        const plannedEvents = events.filter(e => e.status === 'Planned').length;
+        const ongoingEvents = events.filter(e => e.status === 'Ongoing').length;
+        
         const eventsByStatus = events.reduce((acc, event) => {
             acc[event.status] = (acc[event.status] || 0) + 1;
             return acc;
@@ -236,7 +237,7 @@ export default function EventRegistryPage() {
             { name: 'International', value: totalInternational },
         ].filter(d => d.value > 0);
         
-        return { totalEvents, completedEvents, totalParticipants, totalVolume, statusChartData, participantChartData };
+        return { totalEvents, completedEvents, plannedEvents, ongoingEvents, statusChartData, participantChartData };
     }, [events]);
 
     const handleSave = (data: z.infer<typeof eventRegistrySchema>) => {
@@ -308,17 +309,17 @@ export default function EventRegistryPage() {
                         </Card>
                          <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Participants</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-sm font-medium">Ongoing Events</CardTitle>
+                                <PlayCircle className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
-                            <CardContent><div className="text-2xl font-bold">{summaryStats.totalParticipants.toLocaleString()}</div></CardContent>
+                            <CardContent><div className="text-2xl font-bold">{summaryStats.ongoingEvents}</div></CardContent>
                         </Card>
                          <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Volume Recorded (GB)</CardTitle>
-                                <HardDrive className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-sm font-medium">Planned Events</CardTitle>
+                                <CalendarDays className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
-                            <CardContent><div className="text-2xl font-bold">{summaryStats.totalVolume.toLocaleString()}</div></CardContent>
+                            <CardContent><div className="text-2xl font-bold">{summaryStats.plannedEvents}</div></CardContent>
                         </Card>
                     </div>
                     
@@ -491,3 +492,5 @@ export default function EventRegistryPage() {
         </PEMSDashboard>
     )
 }
+
+    

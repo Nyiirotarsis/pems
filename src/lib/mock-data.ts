@@ -372,8 +372,30 @@ export const mockEventRegistry: EventRegistry[] = [
         challenges: "Last minute change in speaker lineup.",
         achievements: "High social media engagement, positive press coverage.",
         status: "Planned",
+    },
+    {
+        id: "EVT-003",
+        sn: "3",
+        startDate: "2024-07-20",
+        startTime: "10:00",
+        endDate: "2024-07-20",
+        endTime: "13:00",
+        eventDescription: "Internal Training Session",
+        client: "Internal",
+        participants: "Staff",
+        national: 40,
+        international: 0,
+        totalParticipants: 40,
+        activities: "Training on new software",
+        technologyUsed: "Zoom, Projector",
+        volumeRecorded: 15,
+        challenges: "N/A",
+        achievements: "All staff trained successfully.",
+        status: "Cancelled",
     }
 ];
 
 
 export { mockFieldStaff } from './mock-field-staff';
+
+    

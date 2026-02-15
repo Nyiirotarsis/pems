@@ -320,4 +320,5 @@ export interface EventRegistry {
   videoLink?: string;
   status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
 }
+
     
