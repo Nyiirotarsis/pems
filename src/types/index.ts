@@ -299,15 +299,15 @@ export interface EventRegistry {
   endTime: string;
   eventDescription: string;
   client: string;
-  participants: string;
-  national: number;
-  international: number;
+  participants?: string;
+  national?: number;
+  international?: number;
   totalParticipants: number;
-  activities: string;
+  activities?: string;
   technologyUsed: string;
-  volumeRecorded: number;
-  challenges: string;
-  achievements: string;
+  volumeRecorded?: number;
+  challenges?: string;
+  achievements?: string;
   youtubeLink?: string;
   websiteLink?: string;
   xLink?: string;
@@ -315,9 +315,9 @@ export interface EventRegistry {
   instagramLink?: string;
   linkedinLink?: string;
   whatsapp?: string;
-  deliveredDescription: string;
+  deliveredDescription?: string;
   photoLink?: string;
   videoLink?: string;
-  status: "Completed" | "In Progress" | "Cancelled";
+  status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
 }
     

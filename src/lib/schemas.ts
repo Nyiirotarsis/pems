@@ -201,7 +201,7 @@ export const eventRegistrySchema = z.object({
   participants: z.string().optional(),
   national: z.coerce.number().min(0, "Must be a positive number.").optional(),
   international: z.coerce.number().min(0, "Must be a positive number.").optional(),
-  totalParticipants: z.coerce.number().min(1, "Total participants are required."),
+  totalParticipants: z.coerce.number().min(0, "Total participants is required."),
   activities: z.string().optional(),
   technologyUsed: z.string().min(1, "Technology used is required."),
   volumeRecorded: z.coerce.number().min(0, "Volume must be a positive number.").optional(),
@@ -217,6 +217,6 @@ export const eventRegistrySchema = z.object({
   deliveredDescription: z.string().optional(),
   photoLink: z.string().url("Invalid URL").optional().or(z.literal('')),
   videoLink: z.string().url("Invalid URL").optional().or(z.literal('')),
-  status: z.enum(["Completed", "In Progress", "Cancelled"]),
+  status: z.enum(["Planned", "Ongoing", "Completed", "Delivered", "Archived", "Cancelled"]),
 });
     

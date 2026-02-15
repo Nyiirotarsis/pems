@@ -352,7 +352,26 @@ export const mockEventRegistry: EventRegistry[] = [
         youtubeLink: "https://youtube.com/watch?v=example",
         websiteLink: "https://example.com/blog/techcorp-agm-2024",
         status: "Completed",
-        deliveredDescription: "Full event coverage and live stream production.",
+    },
+    {
+        id: "EVT-002",
+        sn: "2",
+        startDate: "2024-09-15",
+        startTime: "10:00",
+        endDate: "2024-09-15",
+        endTime: "14:00",
+        eventDescription: "Product Launch: Fusion X",
+        client: "Innovate Inc.",
+        participants: "Media, Influencers, General Public",
+        national: 300,
+        international: 5,
+        totalParticipants: 305,
+        activities: "Keynote, Product Demos, Press Conference",
+        technologyUsed: "Large LED wall, professional lighting, multi-camera production",
+        volumeRecorded: 450,
+        challenges: "Last minute change in speaker lineup.",
+        achievements: "High social media engagement, positive press coverage.",
+        status: "Planned",
     }
 ];
 
