@@ -289,4 +289,35 @@ export interface PayrollRecord {
   salaryAdvance: number;
   status: 'Pending' | 'Approved' | 'Rejected';
 }
+
+export interface EventRegistry {
+  id: string;
+  sn: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  eventDescription: string;
+  client: string;
+  participants: string;
+  national: number;
+  international: number;
+  totalParticipants: number;
+  activities: string;
+  technologyUsed: string;
+  volumeRecorded: number;
+  challenges: string;
+  achievements: string;
+  youtubeLink?: string;
+  websiteLink?: string;
+  xLink?: string;
+  tiktokLink?: string;
+  instagramLink?: string;
+  linkedinLink?: string;
+  whatsapp?: string;
+  deliveredDescription: string;
+  photoLink?: string;
+  videoLink?: string;
+  status: "Completed" | "In Progress" | "Cancelled";
+}
     

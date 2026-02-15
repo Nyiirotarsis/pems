@@ -14,7 +14,8 @@ import {
   FileClock,
   CheckCircle2,
   FileText,
-  FileDown
+  FileDown,
+  Camera,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ const kpiCards = [
 
 const quickActions = [
   { id: "users", title: "Add User / Role", icon: UserPlus, href: "/dashboard/it/users" },
+  { id: "registry", title: "Event Registry", icon: Camera, href: "/dashboard/it/event-registry" },
   { id: "scan", title: "Run Security Scan", icon: ShieldCheck, href: "/dashboard/it/security" },
   { id: "logs", title: "Review Logs", icon: FileClock, href: "/dashboard/it/security" },
   { id: "backup", title: "Trigger Backup", icon: ListRestart, href: "/dashboard/it/systems" },

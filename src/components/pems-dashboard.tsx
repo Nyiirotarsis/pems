@@ -142,6 +142,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   users: { label: "Users", icon: Users, isPage: true, href: "/dashboard/it/users" },
   settings: { label: "Settings", icon: Cog, isPage: true, href: "/dashboard/it/settings" },
   "album-show": { label: "Album Show", icon: Clapperboard, isPage: true, href: "/dashboard/album-show" },
+  'event-registry': { label: 'Event Registry', icon: Camera, isPage: true, href: '/dashboard/it/event-registry'},
   
   // Field Ops Sub-items
   'field-ops-logistics': { label: "Fuel & Logistics", icon: Fuel, isPage: true, href: "/dashboard/field-ops/logistics" },
@@ -325,7 +326,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                        {['systems', 'security', 'users', 'settings', 'album-show'].map(key => {
+                        {['systems', 'security', 'users', 'settings', 'album-show', 'event-registry'].map(key => {
                             const Icon = navItems[key].icon;
                             return (
                                 <SidebarMenuItem key={key}>
@@ -455,7 +456,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             </Collapsible>
         </SidebarMenuItem>
         
-        {['systems', 'security', 'users', 'settings', 'album-show', 'reports', 'notifications'].map(key => {
+        {['systems', 'security', 'users', 'settings', 'album-show', 'event-registry', 'reports', 'notifications'].map(key => {
             const Icon = navItems[key].icon;
             return (
               <SidebarMenuItem key={key}>

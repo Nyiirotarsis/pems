@@ -190,4 +190,33 @@ export const payrollFormSchema = z.object({
   salaryAdvance: z.coerce.number().min(0, "Salary advance must be a positive number."),
 });
 
+export const eventRegistrySchema = z.object({
+  sn: z.string().min(1, "Serial Number is required."),
+  startDate: z.date(),
+  startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
+  endDate: z.date(),
+  endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
+  eventDescription: z.string().min(10, "Event description is required."),
+  client: z.string().min(2, "Client name is required."),
+  participants: z.string().optional(),
+  national: z.coerce.number().min(0, "Must be a positive number.").optional(),
+  international: z.coerce.number().min(0, "Must be a positive number.").optional(),
+  totalParticipants: z.coerce.number().min(1, "Total participants are required."),
+  activities: z.string().optional(),
+  technologyUsed: z.string().min(1, "Technology used is required."),
+  volumeRecorded: z.coerce.number().min(0, "Volume must be a positive number.").optional(),
+  challenges: z.string().optional(),
+  achievements: z.string().optional(),
+  youtubeLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  websiteLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  xLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  tiktokLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  instagramLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  linkedinLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  whatsapp: z.string().optional(),
+  deliveredDescription: z.string().optional(),
+  photoLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  videoLink: z.string().url("Invalid URL").optional().or(z.literal('')),
+  status: z.enum(["Completed", "In Progress", "Cancelled"]),
+});
     

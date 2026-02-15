@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -327,6 +327,32 @@ export const mockPayrollData: PayrollRecord[] = [
         otherBenefits: 1000000,
         salaryAdvance: 500000,
         status: 'Pending',
+    }
+];
+
+export const mockEventRegistry: EventRegistry[] = [
+    {
+        id: "EVT-001",
+        sn: "1",
+        startDate: "2024-08-01",
+        startTime: "09:00",
+        endDate: "2024-08-01",
+        endTime: "17:00",
+        eventDescription: "Annual General Meeting for TechCorp",
+        client: "TechCorp",
+        participants: "Shareholders, Board Members, Media",
+        national: 150,
+        international: 20,
+        totalParticipants: 170,
+        activities: "Presentations, Q&A Session, Voting, Networking Lunch",
+        technologyUsed: "Live streaming setup, multiple cameras, presentation systems, wireless mics",
+        volumeRecorded: 250,
+        challenges: "Minor audio feedback issue, resolved quickly.",
+        achievements: "Flawless stream with over 500 online viewers.",
+        youtubeLink: "https://youtube.com/watch?v=example",
+        websiteLink: "https://example.com/blog/techcorp-agm-2024",
+        status: "Completed",
+        deliveredDescription: "Full event coverage and live stream production.",
     }
 ];
 
