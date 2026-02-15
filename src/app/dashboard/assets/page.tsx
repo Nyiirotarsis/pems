@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import * as React from "react";
@@ -13,6 +12,7 @@ import {
   User,
   Wrench,
   Package,
+  QrCode,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -52,6 +52,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -90,6 +98,7 @@ export default function AssetsPage() {
   const { toast } = useToast();
   const [assets, setAssets] = React.useState<InventoryItem[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("All");
+  const [selectedAssetForQr, setSelectedAssetForQr] = React.useState<InventoryItem | null>(null);
 
   React.useEffect(() => {
     // The initialInventory is now the list of all assets
@@ -154,6 +163,10 @@ export default function AssetsPage() {
       description: `${filteredAssets.length} assets have been exported to CSV.`,
     })
   };
+  
+  const handlePrint = () => {
+    window.print();
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -245,6 +258,10 @@ export default function AssetsPage() {
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setSelectedAssetForQr(asset)}>
+                          <QrCode className="mr-2 h-4 w-4" />
+                          View QR Code
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="text-red-500 focus:text-red-500">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete
@@ -258,6 +275,32 @@ export default function AssetsPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={!!selectedAssetForQr} onOpenChange={(isOpen) => !isOpen && setSelectedAssetForQr(null)}>
+        <DialogContent className="printable-area">
+          <DialogHeader>
+            <DialogTitle>QR Code for: {selectedAssetForQr?.itemName}</DialogTitle>
+            <DialogDescription>
+              Asset ID: {selectedAssetForQr?.id}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            {selectedAssetForQr && (
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(selectedAssetForQr.id)}`}
+                alt={`QR code for ${selectedAssetForQr.itemName}`}
+                width={250}
+                height={250}
+                data-ai-hint="QR code"
+              />
+            )}
+          </div>
+          <DialogFooter className="no-print">
+              <Button variant="outline" onClick={() => setSelectedAssetForQr(null)}>Close</Button>
+              <Button onClick={handlePrint}>Print QR Code</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
