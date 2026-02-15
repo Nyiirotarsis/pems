@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle, Download, CalendarDays, Hourglass, PlayCircle } from "lucide-react";
+import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle, Download, CalendarDays, Hourglass, PlayCircle, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { mockEventRegistry } from "@/lib/mock-data";
@@ -236,8 +236,24 @@ export default function EventRegistryPage() {
             { name: 'National', value: totalNational },
             { name: 'International', value: totalInternational },
         ].filter(d => d.value > 0);
+
+        const clientCounts = events.reduce((acc, event) => {
+            acc[event.client] = (acc[event.client] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+    
+        const sortedClients = Object.entries(clientCounts).sort((a, b) => b[1] - a[1]);
+    
+        const mostServedClient = sortedClients.length > 0 ? { name: sortedClients[0][0], count: sortedClients[0][1] } : { name: 'N/A', count: 0 };
+        const leastServedClient = sortedClients.length > 0 ? { name: sortedClients[sortedClients.length - 1][0], count: sortedClients[sortedClients.length - 1][1] } : { name: 'N/A', count: 0 };
         
-        return { totalEvents, completedEvents, plannedEvents, ongoingEvents, statusChartData, participantChartData };
+        let medianClient = { name: 'N/A', count: 0 };
+        if (sortedClients.length > 0) {
+            const midIndex = Math.floor(sortedClients.length / 2);
+            medianClient = { name: sortedClients[midIndex][0], count: sortedClients[midIndex][1] };
+        }
+        
+        return { totalEvents, completedEvents, plannedEvents, ongoingEvents, statusChartData, participantChartData, mostServedClient, leastServedClient, medianClient };
     }, [events]);
 
     const handleSave = (data: z.infer<typeof eventRegistrySchema>) => {
@@ -320,6 +336,36 @@ export default function EventRegistryPage() {
                                 <CalendarDays className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent><div className="text-2xl font-bold">{summaryStats.plannedEvents}</div></CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Most Served Client</CardTitle>
+                                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{summaryStats.mostServedClient.name}</div>
+                                <p className="text-xs text-muted-foreground">{summaryStats.mostServedClient.count} events</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Median Client</CardTitle>
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{summaryStats.medianClient.name}</div>
+                                <p className="text-xs text-muted-foreground">{summaryStats.medianClient.count} events</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Least Served Client</CardTitle>
+                                <TrendingDown className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{summaryStats.leastServedClient.name}</div>
+                                <p className="text-xs text-muted-foreground">{summaryStats.leastServedClient.count} events</p>
+                            </CardContent>
                         </Card>
                     </div>
                     
@@ -492,5 +538,3 @@ export default function EventRegistryPage() {
         </PEMSDashboard>
     )
 }
-
-    
