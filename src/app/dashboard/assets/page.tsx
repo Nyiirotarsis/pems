@@ -13,6 +13,8 @@ import {
   Wrench,
   Package,
   QrCode,
+  Camera,
+  PackageX,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -62,6 +64,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { QrScanner } from "@/components/dashboard/qr-scanner";
 
 type StatusFilter = "All" | "Available" | "Issued" | "Under Repair";
 
@@ -69,15 +72,18 @@ const statusColors: Record<string, string> = {
   Available:
     "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700",
   Issued:
-    "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700",
+    "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700",
   "Under Repair":
     "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700",
+  Archived:
+    "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/50 dark:text-gray-300 dark:border-gray-700",
 };
 
 const statusIcons: Record<string, React.ElementType> = {
   Available: Package,
   Issued: User,
   "Under Repair": Wrench,
+  Archived: PackageX,
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -99,6 +105,7 @@ export default function AssetsPage() {
   const [assets, setAssets] = React.useState<InventoryItem[]>([]);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("All");
   const [selectedAssetForQr, setSelectedAssetForQr] = React.useState<InventoryItem | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = React.useState(false);
 
   React.useEffect(() => {
     // The initialInventory is now the list of all assets
@@ -120,6 +127,16 @@ export default function AssetsPage() {
     if (!username) return <span className="text-muted-foreground">Store Room</span>;
     const user = mockUsers.find(u => u.username === username);
     return user ? user.role : username;
+  }
+
+  const handleScanSuccess = (decodedText: string) => {
+    setIsScannerOpen(false);
+    toast({
+        title: "Scan Successful",
+        description: `Scanned value: ${decodedText}. Looking up equipment...`
+    });
+    // Here you would typically look up the equipment by the decodedText
+    // and then open an issue/return form.
   }
 
   const handleExport = () => {
@@ -206,6 +223,10 @@ export default function AssetsPage() {
               <Button variant="outline" onClick={handleExport}>
                 <FileDown className="mr-2" />
                 Export
+              </Button>
+              <Button variant="secondary" onClick={() => setIsScannerOpen(true)}>
+                <Camera className="mr-2" />
+                Scan Equipment
               </Button>
               <Button asChild>
                 <Link href="/dashboard/assets/new">
@@ -301,6 +322,22 @@ export default function AssetsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Scan Equipment QR Code</DialogTitle>
+                <DialogDescription>
+                    Use your camera to scan an equipment QR code, or enter the ID manually.
+                </DialogDescription>
+            </DialogHeader>
+            <QrScanner 
+                onScanSuccess={handleScanSuccess}
+                onClose={() => setIsScannerOpen(false)}
+            />
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
