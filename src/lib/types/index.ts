@@ -1,4 +1,5 @@
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -272,4 +273,59 @@ export interface MaintenanceLog {
     technicianName?: string;
     contact?: string;
     remarks?: string;
+}
+
+export interface PayrollRecord {
+  id: number;
+  staffId: number;
+  month: string;
+  year: number;
+  basicPay: number;
+  otherBenefits: number;
+  salaryAdvance: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
+}
+
+export interface EventRegistry {
+  id: string;
+  sn: string;
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  eventDescription: string;
+  client: string;
+  participants?: string;
+  national?: number;
+  international?: number;
+  totalParticipants: number;
+  activities?: string;
+  technologyUsed: string;
+  volumeRecorded?: number;
+  challenges?: string;
+  achievements?: string;
+  youtubeLink?: string;
+  websiteLink?: string;
+  xLink?: string;
+  tiktokLink?: string;
+  instagramLink?: string;
+  linkedinLink?: string;
+  whatsapp?: string;
+  deliveredDescription?: string;
+  photoLink?: string;
+  videoLink?: string;
+  status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
+}
+
+export interface Device {
+  id: string;
+  userId: number;
+  deviceName: string;
+  deviceType: 'mobile' | 'desktop' | 'scanner';
+  identifier: string;
+  status: 'pending' | 'verified' | 'approved' | 'blocked';
+  verifiedByOTP: boolean;
+  approvedByAdmin: boolean;
+  createdAt: string;
+  lastUsedAt: string;
 }

@@ -1,5 +1,6 @@
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -319,6 +320,19 @@ export interface EventRegistry {
   photoLink?: string;
   videoLink?: string;
   status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
+}
+
+export interface Device {
+  id: string;
+  userId: number;
+  deviceName: string;
+  deviceType: 'mobile' | 'desktop' | 'scanner';
+  identifier: string;
+  status: 'pending' | 'verified' | 'approved' | 'blocked';
+  verifiedByOTP: boolean;
+  approvedByAdmin: boolean;
+  createdAt: string;
+  lastUsedAt: string;
 }
 
     

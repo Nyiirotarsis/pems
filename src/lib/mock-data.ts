@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -392,6 +392,57 @@ export const mockEventRegistry: EventRegistry[] = [
         challenges: "N/A",
         achievements: "All staff trained successfully.",
         status: "Cancelled",
+    }
+];
+
+export const mockDevices: Device[] = [
+    {
+        id: 'dev-001',
+        userId: 5, // IT Manager
+        deviceName: "Admin's MacBook Pro",
+        deviceType: 'desktop',
+        identifier: 'uuid-abc-123',
+        status: 'approved',
+        verifiedByOTP: true,
+        approvedByAdmin: true,
+        createdAt: '2024-08-01T10:00:00Z',
+        lastUsedAt: '2024-09-04T14:00:00Z',
+    },
+    {
+        id: 'dev-002',
+        userId: 6, // Store Manager
+        deviceName: "Store's Zebra Scanner",
+        deviceType: 'scanner',
+        identifier: 'uuid-def-456',
+        status: 'approved',
+        verifiedByOTP: true,
+        approvedByAdmin: true,
+        createdAt: '2024-08-05T11:00:00Z',
+        lastUsedAt: '2024-09-03T18:00:00Z',
+    },
+    {
+        id: 'dev-003',
+        userId: 7, // Field Ops
+        deviceName: "Sarah's iPhone 13",
+        deviceType: 'mobile',
+        identifier: 'uuid-ghi-789',
+        status: 'pending',
+        verifiedByOTP: true,
+        approvedByAdmin: false,
+        createdAt: '2024-09-01T09:00:00Z',
+        lastUsedAt: '2024-09-01T09:05:00Z',
+    },
+    {
+        id: 'dev-004',
+        userId: 7, // Field Ops
+        deviceName: "Field Team's Tablet",
+        deviceType: 'mobile',
+        identifier: 'uuid-jkl-012',
+        status: 'blocked',
+        verifiedByOTP: false,
+        approvedByAdmin: false,
+        createdAt: '2024-08-20T15:00:00Z',
+        lastUsedAt: '2024-08-20T15:00:00Z',
     }
 ];
 
