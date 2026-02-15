@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle } from "lucide-react";
+import { PlusCircle, MoreVertical, Edit, Trash2, Eye, FileText, Users, HardDrive, CheckCircle, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { mockEventRegistry } from "@/lib/mock-data";
@@ -63,6 +63,8 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 
 function EventRegistryForm({ event, onSave, onFinished }: { event?: EventRegistry | null, onSave: (data: any) => void, onFinished: () => void }) {
@@ -219,8 +221,22 @@ export default function EventRegistryPage() {
         const completedEvents = events.filter(e => e.status === 'Completed' || e.status === 'Delivered' || e.status === 'Archived').length;
         const totalParticipants = events.reduce((acc, e) => acc + (e.totalParticipants || 0), 0);
         const totalVolume = events.reduce((acc, e) => acc + (e.volumeRecorded || 0), 0);
+
+        const eventsByStatus = events.reduce((acc, event) => {
+            acc[event.status] = (acc[event.status] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        const statusChartData = Object.entries(eventsByStatus).map(([name, value]) => ({ name, value }));
+
+        const totalNational = events.reduce((acc, e) => acc + (e.national || 0), 0);
+        const totalInternational = events.reduce((acc, e) => acc + (e.international || 0), 0);
+        const participantChartData = [
+            { name: 'National', value: totalNational },
+            { name: 'International', value: totalInternational },
+        ].filter(d => d.value > 0);
         
-        return { totalEvents, completedEvents, totalParticipants, totalVolume };
+        return { totalEvents, completedEvents, totalParticipants, totalVolume, statusChartData, participantChartData };
     }, [events]);
 
     const handleSave = (data: z.infer<typeof eventRegistrySchema>) => {
@@ -259,6 +275,8 @@ export default function EventRegistryPage() {
         Archived: "bg-zinc-100 text-zinc-800",
         Cancelled: "bg-red-100 text-red-800",
     };
+
+    const CHART_COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
     return (
         <PEMSDashboard initialRole="IT Managers">
@@ -303,6 +321,54 @@ export default function EventRegistryPage() {
                             <CardContent><div className="text-2xl font-bold">{summaryStats.totalVolume.toLocaleString()}</div></CardContent>
                         </Card>
                     </div>
+                    
+                    {/* Charts */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Event Status Distribution</CardTitle>
+                                <CardDescription>A breakdown of all events by their current status.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ChartContainer config={{}} className="min-h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height={250}>
+                                        <BarChart data={summaryStats.statusChartData}>
+                                            <CartesianGrid vertical={false} />
+                                            <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
+                                            <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`}/>
+                                            <Tooltip content={<ChartTooltipContent />} />
+                                            <Bar dataKey="value" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]}>
+                                                 {summaryStats.statusChartData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Participant Demographics</CardTitle>
+                                <CardDescription>National vs. International attendees across all events.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                               <ChartContainer config={{}} className="min-h-[250px] w-full">
+                                    <ResponsiveContainer width="100%" height={250}>
+                                        <PieChart>
+                                            <Tooltip content={<ChartTooltipContent />} />
+                                            <Legend />
+                                            <Pie data={summaryStats.participantChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                                {summaryStats.participantChartData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     {/* Main Table */}
                     <Card>
@@ -312,11 +378,17 @@ export default function EventRegistryPage() {
                                     <CardTitle className="font-headline text-2xl">Event Register</CardTitle>
                                     <CardDescription>A log of all recorded events.</CardDescription>
                                 </div>
-                                 <DialogTrigger asChild>
-                                    <Button onClick={() => setSelectedEvent(null)}>
-                                        <PlusCircle className="mr-2" /> Register Event
+                                 <div className="flex items-center gap-2">
+                                     <DialogTrigger asChild>
+                                        <Button onClick={() => setSelectedEvent(null)}>
+                                            <PlusCircle className="mr-2" /> Register Event
+                                        </Button>
+                                    </DialogTrigger>
+                                     <Button variant="outline">
+                                        <Download className="mr-2" />
+                                        Export to Excel
                                     </Button>
-                                </DialogTrigger>
+                                 </div>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -378,6 +450,33 @@ export default function EventRegistryPage() {
                              </Table>
                         </CardContent>
                     </Card>
+
+                     {/* Reporting Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Reports & Exports</CardTitle>
+                            <CardDescription>Generate and download reports for analysis and record-keeping.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Button variant="outline" className="w-full justify-start gap-2">
+                                <FileText className="h-4 w-4" />
+                                PDF Event Report
+                            </Button>
+                             <Button variant="outline" className="w-full justify-start gap-2">
+                                <FileText className="h-4 w-4" />
+                                Monthly Summary
+                            </Button>
+                             <Button variant="outline" className="w-full justify-start gap-2">
+                                <FileText className="h-4 w-4" />
+                                Annual Summary
+                            </Button>
+                             <Button variant="outline" className="w-full justify-start gap-2">
+                                <FileText className="h-4 w-4" />
+                                Participant Statistics
+                            </Button>
+                        </CardContent>
+                    </Card>
+
                 </div>
                  <DialogContent className="max-w-4xl">
                     <DialogHeader>
