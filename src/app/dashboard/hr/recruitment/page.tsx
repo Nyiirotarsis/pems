@@ -18,7 +18,8 @@ import {
   Trash2,
   FileText,
   PlusCircle,
-  Eye
+  Eye,
+  Link as LinkIcon,
 } from "lucide-react";
 
 import PEMSDashboard from "@/components/pems-dashboard";
@@ -73,6 +74,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 
 import { jobOpeningFormSchema } from "@/lib/schemas";
 import { mockJobOpenings, mockApplicants } from "@/lib/mock-data";
@@ -185,6 +187,9 @@ export default function RecruitmentPage() {
     const [isJobFormOpen, setIsJobFormOpen] = React.useState(false);
     const [isApplicantsViewOpen, setIsApplicantsViewOpen] = React.useState(false);
     const [selectedJob, setSelectedJob] = React.useState<JobOpening | null>(null);
+    
+    const [jobToShare, setJobToShare] = React.useState<JobOpening | null>(null);
+    const [isShareDialogOpen, setIsShareDialogOpen] = React.useState(false);
 
     const { toast } = useToast();
 
@@ -220,6 +225,11 @@ export default function RecruitmentPage() {
     const openApplicantsView = (job: JobOpening) => {
         setSelectedJob(job);
         setIsApplicantsViewOpen(true);
+    };
+
+    const openShareDialog = (job: JobOpening) => {
+        setJobToShare(job);
+        setIsShareDialogOpen(true);
     };
 
     return (
@@ -280,6 +290,10 @@ export default function RecruitmentPage() {
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onSelect={() => openApplicantsView(job)}><Eye className="mr-2 h-4 w-4" />View Applicants</DropdownMenuItem>
                                                     <DropdownMenuItem onSelect={() => { setSelectedJob(job); setIsJobFormOpen(true); }}><Edit className="mr-2 h-4 w-4" />Edit Job</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => openShareDialog(job)}>
+                                                        <LinkIcon className="mr-2 h-4 w-4" />
+                                                        Share Application Link
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-red-500 focus:text-red-500"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -349,7 +363,40 @@ export default function RecruitmentPage() {
                     </Table>
                 </DialogContent>
             </Dialog>
+            
+            <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Share Job Opening: {jobToShare?.title}</DialogTitle>
+                        <DialogDescription>
+                            Share this public link with potential applicants.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="job-link">Public Application Link</Label>
+                            <Input
+                                id="job-link"
+                                readOnly
+                                defaultValue={jobToShare ? `${window.location.origin}/apply/${jobToShare.id}` : ''}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="whatsapp-number">Send to WhatsApp</Label>
+                            <div className="flex gap-2">
+                                <Input id="whatsapp-number" placeholder="Enter phone number..." />
+                                <Button onClick={() => {
+                                    toast({ title: "Link Sent (Simulated)", description: "The job application link has been sent via WhatsApp."});
+                                    setIsShareDialogOpen(false);
+                                }}>Send</Button>
+                            </div>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
 
         </PEMSDashboard>
     );
 }
+
+    

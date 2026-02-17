@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format, differenceInDays, isWithinInterval, startOfMonth, endOfMonth, isToday } from "date-fns";
-import { Calendar as CalendarIcon, MoreVertical, PlusCircle, Check, X, Hand, Mail, Briefcase } from "lucide-react";
+import { Calendar as CalendarIcon, MoreVertical, PlusCircle, Check, X, Hand, Mail, Briefcase, Share2 } from "lucide-react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -73,6 +73,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart as RechartsBarChart, Pie, PieChart as RechartsPieChart, Cell, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const leaveTypeColors: Record<LeaveType, string> = {
     Annual: "bg-blue-100 text-blue-800",
@@ -181,6 +183,8 @@ function LeaveRequestForm({ onSave, onFinished, currentUserRole }: { onSave: (da
 export default function LeaveManagementPage() {
     const [leaveRequests, setLeaveRequests] = React.useState<LeaveRequest[]>(mockLeaveRequests);
     const [isFormOpen, setIsFormOpen] = React.useState(false);
+    const [isShareFormOpen, setIsShareFormOpen] = React.useState(false);
+    const [userToShareWith, setUserToShareWith] = React.useState<string | undefined>(undefined);
     const [role, setRole] = React.useState<UserRole | null>(null);
     const { toast } = useToast();
     
@@ -260,7 +264,12 @@ export default function LeaveManagementPage() {
                                     <CardDescription>Request, view, and manage employee leave.</CardDescription>
                                 </div>
                                 </div>
-                                <DialogTrigger asChild><Button><PlusCircle className="mr-2"/>Request Leave</Button></DialogTrigger>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" onClick={() => setIsShareFormOpen(true)}>
+                                        <Share2 className="mr-2 h-4 w-4" /> Share Form
+                                    </Button>
+                                    <DialogTrigger asChild><Button><PlusCircle className="mr-2"/>Request Leave</Button></DialogTrigger>
+                                </div>
                             </div>
                         </CardHeader>
                     </Card>
@@ -346,6 +355,53 @@ export default function LeaveManagementPage() {
                     <LeaveRequestForm onSave={handleSaveRequest} onFinished={() => setIsFormOpen(false)} currentUserRole={role} />
                 </DialogContent>
             </Dialog>
+
+             <Dialog open={isShareFormOpen} onOpenChange={setIsShareFormOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Share Leave Request Form</DialogTitle>
+                        <DialogDescription>
+                            Select an employee to generate a shareable link for them to fill out.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <Select onValueChange={setUserToShareWith}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select an employee..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {USERS.filter(u => u.name).map(u => (
+                                    <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {userToShareWith && (
+                            <>
+                                <div className="space-y-2">
+                                    <Label htmlFor="leave-link">Sharable Link</Label>
+                                    <Input
+                                        id="leave-link"
+                                        readOnly
+                                        defaultValue={`${window.location.origin}/request-leave/${userToShareWith}`}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="leave-whatsapp-number">Send to Employee's WhatsApp</Label>
+                                    <div className="flex gap-2">
+                                        <Input id="leave-whatsapp-number" placeholder="Enter phone number..." />
+                                        <Button onClick={() => {
+                                            toast({ title: "Link Sent (Simulated)", description: "The leave request link has been sent."});
+                                            setIsShareFormOpen(false);
+                                        }}>Send</Button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </PEMSDashboard>
     );
 }
+
+    
