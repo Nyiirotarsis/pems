@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -528,6 +528,12 @@ export const mockYouTubeVideos: YouTubeVideo[] = [
         thumbnailUrl: 'https://picsum.photos/seed/yt5/480/270',
         youtubeId: 'dQw4w9WgXcQ'
     }
+];
+
+export const mockScheduledPosts: ScheduledPost[] = [
+    { id: 'post-1', platform: 'Instagram', content: 'Highlights from the Judiciary Annual Conference. #EventProfs #Judiciary2024', scheduledDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(), status: 'Scheduled' },
+    { id: 'post-2', platform: 'X', content: 'Live now! Tune into the TechCorp AGM. #LiveStream #AnnualMeeting', scheduledDate: new Date().toISOString(), status: 'Published' },
+    { id: 'post-3', platform: 'LinkedIn', content: 'We are proud to have provided full technical support for the National Health Summit. A look at how we ensured a seamless virtual and physical experience for all attendees.', scheduledDate: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(), status: 'Draft' },
 ];
 
 

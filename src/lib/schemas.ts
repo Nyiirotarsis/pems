@@ -220,4 +220,9 @@ export const eventRegistrySchema = z.object({
   status: z.enum(["Planned", "Ongoing", "Completed", "Delivered", "Archived", "Cancelled"]),
 });
     
-    
+export const scheduledPostSchema = z.object({
+  platform: z.enum(['YouTube', 'TikTok', 'Instagram', 'X', 'LinkedIn']),
+  content: z.string().min(5, "Content must be at least 5 characters."),
+  scheduledDate: z.date(),
+  scheduledTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
+});

@@ -2,6 +2,7 @@
 
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -354,5 +355,13 @@ export interface YouTubeVideo {
   publishedDate: string;
   thumbnailUrl: string;
   youtubeId: string;
+}
+
+export interface ScheduledPost {
+  id: string;
+  platform: 'YouTube' | 'TikTok' | 'Instagram' | 'X' | 'LinkedIn';
+  content: string;
+  scheduledDate: string; // ISO String
+  status: 'Draft' | 'Scheduled' | 'Published';
 }
     
