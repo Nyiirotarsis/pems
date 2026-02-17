@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -17,7 +18,7 @@ import type {
   AttendanceRecord,
   AttendanceStatus,
 } from "@/types";
-import { mockUsers } from "@/lib/mock-data";
+import { USERS } from "@/lib/mock-data";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -153,7 +154,7 @@ function StaffAttendanceLogForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {mockUsers.map((user) => (
+                        {USERS.map((user) => (
                           <SelectItem key={user.id} value={user.id.toString()}>
                             {user.username} ({user.role})
                           </SelectItem>
@@ -287,7 +288,7 @@ function StaffAttendanceRecords({
   attendance: AttendanceRecord[];
 }) {
   const getUserDetails = (userId: number) => {
-    return mockUsers.find((u) => u.id === userId);
+    return USERS.find((u) => u.id === userId);
   };
 
   const statusColors: Record<AttendanceStatus, string> = {

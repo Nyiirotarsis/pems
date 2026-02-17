@@ -62,7 +62,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { equipmentRequisitionSchema } from "@/lib/schemas";
-import { assetCategories, initialInventory, mockUsers } from "@/lib/mock-data";
+import { assetCategories, initialInventory } from "@/lib/mock-data";
 import PEMSDashboard from "@/components/pems-dashboard";
 
 type RequisitionFormValues = z.infer<typeof equipmentRequisitionSchema>;

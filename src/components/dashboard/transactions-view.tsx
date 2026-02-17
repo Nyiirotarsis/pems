@@ -10,7 +10,7 @@ import { issueFormSchema, returnFormSchema } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 import type { InventoryItem, Condition, InventoryIssue } from "@/types";
 import React from "react";
-import { mockUsers } from "@/lib/mock-data";
+import { USERS } from "@/lib/mock-data";
 
 import {
   Card,
@@ -348,7 +348,7 @@ function IssueFormFields({ form, inventory }: { form: any; inventory: InventoryI
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                {mockUsers.map(user => (
+                                {USERS.map(user => (
                                     <SelectItem key={user.id} value={user.username}>
                                         {user.username} ({user.role})
                                     </SelectItem>

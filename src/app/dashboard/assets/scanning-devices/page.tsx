@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -24,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import PEMSDashboard from "@/components/pems-dashboard";
-import { mockDevices, mockUsers } from "@/lib/mock-data";
+import { mockDevices, USERS } from "@/lib/mock-data";
 import type { Device } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -107,7 +108,7 @@ export default function ScanningDevicesPage() {
                 </TableHeader>
                  <TableBody>
                     {devices.map(device => {
-                        const user = mockUsers.find(u => u.id === device.userId);
+                        const user = USERS.find(u => u.id === device.userId);
                         return (
                             <TableRow key={device.id}>
                                 <TableCell>

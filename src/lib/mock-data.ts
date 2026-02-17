@@ -34,9 +34,6 @@ export const USERS: User[] = [
     { id: 16, staffFileNo: "PE-005", name: "Ngota Steven", tin: "1005678901", nssf: "2005678901", username: 'Ngota Steven', password: '123', role: 'Store Manager' },
 ];
 
-export const mockUsers: User[] = USERS;
-
-
 export const initialInventory: InventoryItem[] = [
   {
     id: "MIC-W-2025-001",

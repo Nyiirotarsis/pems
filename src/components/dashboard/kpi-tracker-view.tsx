@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -7,7 +8,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { kpiFormSchema } from "@/lib/schemas";
 import { Kpi, KpiStatus } from "@/types";
-import { mockUsers } from "@/lib/mock-data";
+import { USERS } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 import {
@@ -116,7 +117,7 @@ export function KpiTrackerView({ kpis, onAddKpi, onCompleteKpi }: KpiTrackerView
   });
 
   const getUserDetails = (userId: number) => {
-    const user = mockUsers.find((u) => u.id === userId);
+    const user = USERS.find((u) => u.id === userId);
     return user ? { name: user.username, role: user.role } : { name: "Unknown", role: "Unknown" };
   };
 
@@ -185,7 +186,7 @@ export function KpiTrackerView({ kpis, onAddKpi, onCompleteKpi }: KpiTrackerView
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {mockUsers.map((user) => (
+                                {USERS.map((user) => (
                                   <SelectItem
                                     key={user.id}
                                     value={user.id.toString()}

@@ -55,7 +55,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { mockUsers, mockPayrollData } from "@/lib/mock-data";
+import { USERS, mockPayrollData } from "@/lib/mock-data";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { User, UserRole, PayrollRecord } from "@/types";
 import { payrollFormSchema } from "@/lib/schemas";
@@ -108,7 +108,7 @@ function PayrollForm({ payrollRecord, onSave, onFinished }: { payrollRecord?: (P
 
   React.useEffect(() => {
     if (watchedStaffId) {
-        const selectedUser = mockUsers.find(u => u.id === parseInt(watchedStaffId));
+        const selectedUser = USERS.find(u => u.id === parseInt(watchedStaffId));
         if (selectedUser) {
             form.setValue("staffFileNo", selectedUser.staffFileNo || "");
             form.setValue("position", selectedUser.role || "");
@@ -137,7 +137,7 @@ function PayrollForm({ payrollRecord, onSave, onFinished }: { payrollRecord?: (P
                   <FormLabel>Staff Member</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!payrollRecord}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Select staff" /></SelectTrigger></FormControl>
-                    <SelectContent>{mockUsers.filter(u => u.name).map(u => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}</SelectContent>
+                    <SelectContent>{USERS.filter(u => u.name).map(u => <SelectItem key={u.id} value={u.id.toString()}>{u.name}</SelectItem>)}</SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
@@ -307,7 +307,7 @@ export default function SalaryListPage() {
 
     const fullPayrollData = useMemo(() => {
         return payrollRecords.map(rec => {
-            const user = mockUsers.find(u => u.id === rec.staffId);
+            const user = USERS.find(u => u.id === rec.staffId);
             const calculations = calculatePayroll(rec.basicPay, rec.otherBenefits, rec.salaryAdvance);
             return { ...rec, ...calculations, staff: user };
         });

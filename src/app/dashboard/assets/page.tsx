@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   initialInventory,
-  mockUsers,
+  USERS,
 } from "@/lib/mock-data";
 import type { InventoryItem } from "@/types";
 
@@ -119,13 +119,13 @@ export default function AssetsPage() {
   
   const getAssignedToNameString = (username?: string | null) => {
     if (!username) return "Store Room";
-    const user = mockUsers.find(u => u.username === username);
+    const user = USERS.find(u => u.username === username);
     return user ? user.role : username;
   }
 
   const getAssignedToName = (username?: string | null) => {
     if (!username) return <span className="text-muted-foreground">Store Room</span>;
-    const user = mockUsers.find(u => u.username === username);
+    const user = USERS.find(u => u.username === username);
     return user ? user.role : username;
   }
 

@@ -4,7 +4,7 @@ import { format } from "date-fns";
 
 import { kpiFormSchema, attendanceFormSchema, fieldPaymentRequestSchema } from "./schemas";
 import type { Kpi, AttendanceRecord, FieldPaymentRequest, FieldPaymentStatus, KpiStatus } from "@/types";
-import { mockUsers, mockFieldStaff } from "./mock-data";
+import { USERS, mockFieldStaff } from "./mock-data";
 
 
 export function addKpi(kpis: Kpi[], values: z.infer<typeof kpiFormSchema>): { newKpi?: Kpi, error?: string } {
