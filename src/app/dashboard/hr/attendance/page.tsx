@@ -4,7 +4,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { AttendanceView } from "@/components/dashboard/attendance-view";
-import { mockAttendance, mockUsers } from "@/lib/mock-data";
+import { mockAttendance, USERS } from "@/lib/mock-data";
 import { addAttendanceRecord } from "@/lib/hr";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,7 +22,7 @@ export default function AttendancePage() {
                         toast({ variant: "destructive", title: "Error", description: error });
                     } else if(newRecord) {
                         setAttendance(prev => [newRecord, ...prev]);
-                        toast({ title: "Attendance Recorded", description: `Attendance for ${mockUsers.find(u => u.id.toString() === v.userId)?.username} on ${format(v.date, "PPP")} has been logged as ${v.status}.` });
+                        toast({ title: "Attendance Recorded", description: `Attendance for ${USERS.find(u => u.id.toString() === v.userId)?.username} on ${format(newRecord.date, "PPP")} has been logged as ${v.status}.` });
                     }
                 }}
             />
