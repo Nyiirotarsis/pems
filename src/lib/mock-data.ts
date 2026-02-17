@@ -2,7 +2,7 @@
 import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
-export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
+export const ROLES: UserRole[] = ["Store Manager", "Admin", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
 
 export const assetCategories = [
     "Sound Equipment", 
@@ -20,7 +20,7 @@ export const USERS: User[] = [
     { id: 2, username: 'director', password: '123', role: 'Director' },
     { id: 3, username: 'financemanager', password: '123', role: 'Finance Manager' },
     { id: 4, username: 'hr', password: '123', role: 'HR/Admin' },
-    { id: 5, username: 'it', password: '123', role: 'IT Managers' },
+    { id: 5, username: 'admin', password: '123', role: 'Admin' },
     { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
     { id: 7, username: 'fieldops', password: '123', role: 'Field Operational Officer' },
     { id: 8, username: 'media', password: '123', role: 'Media and Communication Officer' },
@@ -30,7 +30,7 @@ export const USERS: User[] = [
     { id: 12, staffFileNo: "PE-001", name: "Busingye Shilla Allen", tin: "1001234567", nssf: "2001234567", username: 'Busingye Shilla Allen', password: '123', role: 'Finance Manager' },
     { id: 13, staffFileNo: "PE-002", name: "Sarah Kamusiime", tin: "1002345678", nssf: "2002345678", username: 'Sarah Kamusiime', password: '123', role: 'HR/Admin' },
     { id: 14, staffFileNo: "PE-003", name: "Barbra Margret Neema", tin: "1003456789", nssf: "2003456789", username: 'Barbra Margret Neema', password: '123', role: 'Director' },
-    { id: 15, staffFileNo: "PE-004", name: "Nyiiro Tarsis Ibrahim", tin: "1004567890", nssf: "2004567890", username: 'Nyiiro Tarsis Ibrahim', password: '123', role: 'IT Managers' },
+    { id: 15, staffFileNo: "PE-004", name: "Nyiiro Tarsis Ibrahim", tin: "1004567890", nssf: "2004567890", username: 'Nyiiro Tarsis Ibrahim', password: '123', role: 'Admin' },
     { id: 16, staffFileNo: "PE-005", name: "Ngota Steven", tin: "1005678901", nssf: "2005678901", username: 'Ngota Steven', password: '123', role: 'Store Manager' },
 ];
 
@@ -397,7 +397,7 @@ export const DEVICE_TYPES: DeviceType[] = ['Smartphone', 'Tablet', 'Desktop', 'L
 export const mockDevices: Device[] = [
     {
         id: 'dev-001',
-        userId: 5, // IT Manager
+        userId: 5, // Admin
         deviceName: "Admin's MacBook Pro",
         deviceType: 'Desktop',
         identifier: 'uuid-abc-123',
@@ -407,8 +407,9 @@ export const mockDevices: Device[] = [
         approvedByAdmin: true,
         createdAt: '2024-08-01T10:00:00Z',
         lastUsedAt: '2024-09-04T14:00:00Z',
-        email: 'it@pacificevents.com',
-        phone: '0771234567'
+        email: 'admin@pacificevents.com',
+        phone: '0771234567',
+        scanCount: 152,
     },
     {
         id: 'dev-002',
@@ -423,7 +424,8 @@ export const mockDevices: Device[] = [
         createdAt: '2024-08-05T11:00:00Z',
         lastUsedAt: '2024-09-03T18:00:00Z',
         email: 'storemanager@pacificevents.com',
-        phone: '0772345678'
+        phone: '0772345678',
+        scanCount: 890,
     },
     {
         id: 'dev-003',
@@ -438,7 +440,8 @@ export const mockDevices: Device[] = [
         createdAt: '2024-09-01T09:00:00Z',
         lastUsedAt: '2024-09-01T09:05:00Z',
         email: 'fieldops@pacificevents.com',
-        phone: '0773456789'
+        phone: '0773456789',
+        scanCount: 45,
     },
     {
         id: 'dev-004',
@@ -453,7 +456,8 @@ export const mockDevices: Device[] = [
         createdAt: '2024-08-20T15:00:00Z',
         lastUsedAt: '2024-08-20T15:00:00Z',
         email: 'fieldops-tablet@pacificevents.com',
-        phone: '0774567890'
+        phone: '0774567890',
+        scanCount: 12,
     },
     {
         id: 'dev-005',
@@ -468,7 +472,24 @@ export const mockDevices: Device[] = [
         createdAt: '2024-09-05T10:00:00Z',
         lastUsedAt: '2024-09-05T10:00:00Z',
         email: '',
-        phone: ''
+        phone: '',
+        scanCount: 0,
+    },
+    {
+        id: 'dev-006',
+        userId: 6, // Store Manager
+        deviceName: "Old Samsung Tablet",
+        deviceType: 'Tablet',
+        identifier: 'uuid-pqr-678',
+        ipAddress: '192.168.1.106',
+        status: 'approved',
+        verifiedByOTP: true,
+        approvedByAdmin: true,
+        createdAt: '2023-01-15T11:00:00Z',
+        lastUsedAt: '2024-05-10T12:00:00Z', // Idle
+        email: 'storemanager@pacificevents.com',
+        phone: '0772345678',
+        scanCount: 1205,
     },
 ];
 

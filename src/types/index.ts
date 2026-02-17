@@ -337,6 +337,7 @@ export interface Device {
   lastUsedAt: string;
   email?: string;
   phone?: string;
+  scanCount: number;
 }
 
 export interface Album {
