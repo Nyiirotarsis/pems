@@ -335,4 +335,13 @@ export interface Device {
   lastUsedAt: string;
 }
 
+export interface Album {
+  id: string;
+  title: string;
+  client: string;
+  date: string;
+  photoCount: number;
+  views: number;
+  coverImageUrl: string;
+}
     

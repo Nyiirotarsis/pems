@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -440,6 +440,45 @@ export const mockDevices: Device[] = [
         approvedByAdmin: false,
         createdAt: '2024-08-20T15:00:00Z',
         lastUsedAt: '2024-08-20T15:00:00Z',
+    }
+];
+
+export const mockAlbums: Album[] = [
+    { 
+        id: 'ALB-001', 
+        title: 'Judiciary Annual Conference 2024', 
+        client: 'Judiciary', 
+        date: '2024-08-15', 
+        photoCount: 250, 
+        views: 1200,
+        coverImageUrl: 'https://picsum.photos/seed/album1/600/400'
+    },
+    { 
+        id: 'ALB-002', 
+        title: 'TechCorp AGM', 
+        client: 'TechCorp', 
+        date: '2024-08-01', 
+        photoCount: 180, 
+        views: 850,
+        coverImageUrl: 'https://picsum.photos/seed/album2/600/400'
+    },
+    { 
+        id: 'ALB-003', 
+        title: 'Innovate Inc. Product Launch', 
+        client: 'Innovate Inc.', 
+        date: '2024-09-15', 
+        photoCount: 320, 
+        views: 2500,
+        coverImageUrl: 'https://picsum.photos/seed/album3/600/400'
+    },
+    { 
+        id: 'ALB-004', 
+        title: 'National Health Summit', 
+        client: 'Ministry of Health', 
+        date: '2024-06-20', 
+        photoCount: 450, 
+        views: 3100,
+        coverImageUrl: 'https://picsum.photos/seed/album4/600/400'
     }
 ];
 
