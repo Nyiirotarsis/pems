@@ -1,6 +1,5 @@
 
-
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType, LeaveRequest, JobOpening, Applicant } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType, LeaveRequest, JobOpening, Applicant, ExitProcess } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "Admin", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -17,23 +16,17 @@ export const assetCategories = [
 export const CONDITIONS: Condition[] = ["New", "Good", "Fair", "Damaged", "Under Repair", "Faulty"];
 
 export const USERS: User[] = [
-    { id: 1, username: 'ceo', password: '123', role: 'CEO' },
-    { id: 2, username: 'director', password: '123', role: 'Director' },
-    { id: 3, username: 'financemanager', password: '123', role: 'Finance Manager' },
-    { id: 4, username: 'hr', password: '123', role: 'HR/Admin' },
-    { id: 5, username: 'admin', password: '123', role: 'Admin' },
-    { id: 6, username: 'storemanager', password: '123', role: 'Store Manager' },
-    { id: 7, username: 'fieldops', password: '123', role: 'Field Operational Officer' },
-    { id: 8, username: 'media', password: '123', role: 'Media and Communication Officer' },
-    { id: 9, username: 'communication', password: '123', role: 'Media and Communication Officer' },
-    { id: 10, username: 'commofficer', password: '123', role: 'Media and Communication Officer' },
-    { id: 11, username: 'auditor', password: '123', role: 'Auditor' },
-    { id: 12, staffFileNo: "PE-001", name: "Busingye Shilla Allen", tin: "1001234567", nssf: "2001234567", username: 'Busingye Shilla Allen', password: '123', role: 'Finance Manager' },
-    { id: 13, staffFileNo: "PE-002", name: "Sarah Kamusiime", tin: "1002345678", nssf: "2002345678", username: 'Sarah Kamusiime', password: '123', role: 'HR/Admin' },
-    { id: 14, staffFileNo: "PE-003", name: "Barbra Margret Neema", tin: "1003456789", nssf: "2003456789", username: 'Barbra Margret Neema', password: '123', role: 'Director' },
-    { id: 15, staffFileNo: "PE-004", name: "Nyiiro Tarsis Ibrahim", tin: "1004567890", nssf: "2004567890", username: 'Nyiiro Tarsis Ibrahim', password: '123', role: 'Admin' },
-    { id: 16, staffFileNo: "PE-005", name: "Ngota Steven", tin: "1005678901", nssf: "2005678901", username: 'Ngota Steven', password: '123', role: 'Store Manager' },
+    { id: 1, username: 'ceo', password: '123', role: 'CEO', name: 'Chris Executive' },
+    { id: 2, username: 'director', password: '123', role: 'Director', staffFileNo: "PE-003", name: "Barbra Margret Neema", tin: "1003456789", nssf: "2003456789" },
+    { id: 3, username: 'financemanager', password: '123', role: 'Finance Manager', staffFileNo: "PE-001", name: "Busingye Shilla Allen", tin: "1001234567", nssf: "2001234567" },
+    { id: 4, username: 'hr', password: '123', role: 'HR/Admin', staffFileNo: "PE-002", name: "Sarah Kamusiime", tin: "1002345678", nssf: "2002345678" },
+    { id: 5, username: 'admin', password: '123', role: 'Admin', staffFileNo: "PE-004", name: "Nyiiro Tarsis Ibrahim", tin: "1004567890", nssf: "2004567890" },
+    { id: 6, username: 'storemanager', password: '123', role: 'Store Manager', staffFileNo: "PE-005", name: "Ngota Steven", tin: "1005678901", nssf: "2005678901" },
+    { id: 7, username: 'fieldops', password: '123', role: 'Field Operational Officer', name: 'Frank Field' },
+    { id: 8, username: 'media', password: '123', role: 'Media and Communication Officer', name: 'Mona Media' },
+    { id: 11, username: 'auditor', password: '123', role: 'Auditor', name: 'Audi Aguilar' },
 ];
+
 
 export const initialInventory: InventoryItem[] = [
   {
@@ -311,7 +304,7 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
 export const mockPayrollData: PayrollRecord[] = [
     {
         id: 1,
-        staffId: 12,
+        staffId: 3,
         month: 'July',
         year: 2024,
         basicPay: 5000000,
@@ -321,7 +314,7 @@ export const mockPayrollData: PayrollRecord[] = [
     },
     {
         id: 2,
-        staffId: 13,
+        staffId: 4,
         month: 'July',
         year: 2024,
         basicPay: 7000000,
@@ -593,7 +586,7 @@ export const mockScheduledPosts: ScheduledPost[] = [
 export const mockLeaveRequests: LeaveRequest[] = [
     {
         id: 1,
-        userId: 12, // Busingye Shilla Allen
+        userId: 3, 
         leaveType: "Annual",
         startDate: "2024-09-10",
         endDate: "2024-09-15",
@@ -605,7 +598,7 @@ export const mockLeaveRequests: LeaveRequest[] = [
     },
     {
         id: 2,
-        userId: 13, // Sarah Kamusiime
+        userId: 4, 
         leaveType: "Sick",
         startDate: "2024-08-28",
         endDate: "2024-08-29",
@@ -615,7 +608,7 @@ export const mockLeaveRequests: LeaveRequest[] = [
     },
     {
         id: 3,
-        userId: 16, // Ngota Steven
+        userId: 6,
         leaveType: "Compassionate",
         startDate: "2024-08-25",
         endDate: "2024-08-27",
@@ -627,7 +620,7 @@ export const mockLeaveRequests: LeaveRequest[] = [
     },
      {
         id: 4,
-        userId: 15, // Nyiiro Tarsis Ibrahim
+        userId: 5,
         leaveType: "Annual",
         startDate: "2024-10-01",
         endDate: "2024-10-10",
@@ -671,6 +664,50 @@ export const mockJobOpenings: JobOpening[] = [
     },
 ];
 
+export const mockExitProcesses: ExitProcess[] = [
+  {
+    id: 1,
+    userId: 6, // Ngota Steven
+    exitDate: "2024-09-30",
+    status: "Ongoing",
+    clearance: [
+      {
+        department: "Store",
+        status: "Cleared",
+        items: [
+          { id: "store-1", name: "Handover store keys", cleared: true },
+          { id: "store-2", name: "Final stock-take report", cleared: true },
+        ],
+      },
+      {
+        department: "IT",
+        status: "Cleared",
+        items: [
+          { id: "it-1", name: "Return company laptop & charger", cleared: true },
+          { id: "it-2", name: "Disable system accounts", cleared: true },
+        ],
+      },
+      {
+        department: "HR",
+        status: "In Progress",
+        items: [
+          { id: "hr-1", name: "Conduct exit interview", cleared: true },
+          { id: "hr-2", name: "Sign final paperwork", cleared: false },
+          { id: "hr-3", name: "Confirm final pay details", cleared: false },
+        ],
+      },
+      {
+        department: "Finance",
+        status: "Pending",
+        items: [
+          { id: "fin-1", name: "Settle any outstanding advances", cleared: false },
+          { id: "fin-2", name: "Process final payout", cleared: false },
+        ],
+      },
+    ],
+  },
+];
+
 
 export { mockFieldStaff } from './mock-field-staff';
 
@@ -679,5 +716,6 @@ export { mockFieldStaff } from './mock-field-staff';
     
 
     
+
 
 
