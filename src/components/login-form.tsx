@@ -45,7 +45,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: "it",
+      username: "hr",
       password: "123",
     },
   });
@@ -60,8 +60,8 @@ export function LoginForm() {
         return "/dashboard/finance";
       case "HR/Admin":
         return "/dashboard/hr";
-      case "IT Managers":
-        return "/dashboard/it";
+      case "Admin":
+        return "/dashboard/admin";
       case "Store Manager":
         return "/dashboard/store";
       case "Field Operational Officer":
