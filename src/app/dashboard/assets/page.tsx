@@ -15,6 +15,7 @@ import {
   QrCode,
   Camera,
   PackageX,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ import {
   USERS,
 } from "@/lib/mock-data";
 import type { InventoryItem } from "@/types";
+import dynamic from "next/dynamic";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -64,7 +66,17 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { QrScanner } from "@/components/dashboard/qr-scanner";
+
+const QrScanner = dynamic(() => import('@/components/dashboard/qr-scanner').then(mod => mod.QrScanner), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-40 items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+      <p className="ml-2">Loading Scanner...</p>
+    </div>
+  ),
+});
+
 
 type StatusFilter = "All" | "Available" | "Issued" | "Under Repair";
 
@@ -331,10 +343,12 @@ export default function AssetsPage() {
                     Use your camera to scan an equipment QR code, or enter the ID manually.
                 </DialogDescription>
             </DialogHeader>
-            <QrScanner 
-                onScanSuccess={handleScanSuccess}
-                onClose={() => setIsScannerOpen(false)}
-            />
+            {isScannerOpen && (
+              <QrScanner 
+                  onScanSuccess={handleScanSuccess}
+                  onClose={() => setIsScannerOpen(false)}
+              />
+            )}
         </DialogContent>
       </Dialog>
 
