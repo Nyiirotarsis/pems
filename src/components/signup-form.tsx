@@ -97,7 +97,7 @@ export function SignupForm() {
                 <FormItem>
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} autoComplete="email" />
+                    <Input placeholder="name@example.com" {...field} autoComplete="email" suppressHydrationWarning />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -115,6 +115,7 @@ export function SignupForm() {
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         autoComplete="new-password"
+                        suppressHydrationWarning
                         {...field}
                       />
                     </FormControl>

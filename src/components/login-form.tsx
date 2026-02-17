@@ -130,7 +130,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., storemanager" {...field} autoComplete="username" />
+                    <Input placeholder="e.g., storemanager" {...field} autoComplete="username" suppressHydrationWarning />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -148,6 +148,7 @@ export function LoginForm() {
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         autoComplete="current-password"
+                        suppressHydrationWarning
                         {...field}
                       />
                     </FormControl>
