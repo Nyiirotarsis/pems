@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -50,22 +51,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { assetCategories, CONDITIONS } from "@/lib/mock-data";
+import { assetFormSchema } from "@/lib/schemas";
 
-
-const assetFormSchema = z.object({
-  assetName: z.string().min(2, "Asset name is required."),
-  category: z.string().min(1, "Please select a category."),
-  location: z.string().min(2, "Location is required."),
-  purchaseDate: z.date(),
-  condition: z.string().min(1, "Please select a condition."),
-  serialNumber: z.string().optional(),
-  engravedNumber: z.string().optional(),
-  image: z.any().optional(),
-});
 
 type AssetFormValues = z.infer<typeof assetFormSchema>;
 
@@ -77,10 +75,67 @@ export default function NewAssetPage() {
       assetName: "",
       location: "",
       purchaseDate: new Date(),
+      image: "",
     },
   });
 
-  const imageFileRef = form.register("image");
+  const [isCameraOpen, setIsCameraOpen] = React.useState(false);
+  const [capturedImage, setCapturedImage] = React.useState<string | null>(null);
+  const [stream, setStream] = React.useState<MediaStream | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const enableCamera = async () => {
+        if(isCameraOpen) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                setStream(stream);
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                toast({
+                    variant: "destructive",
+                    title: "Camera Error",
+                    description: "Could not access camera. Please check permissions."
+                });
+                setIsCameraOpen(false);
+            }
+        } else {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                setStream(null);
+            }
+        }
+    };
+    enableCamera();
+
+    return () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCameraOpen]);
+  
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const dataUrl = canvas.toDataURL('image/png');
+        setCapturedImage(dataUrl);
+        form.setValue('image', dataUrl);
+        setIsCameraOpen(false);
+    }
+  };
+
 
   function onSubmit(data: AssetFormValues) {
     console.log(data);
@@ -255,23 +310,49 @@ export default function NewAssetPage() {
                     control={form.control}
                     name="image"
                     render={({ field }) => (
-                        <FormItem>
+                      <FormItem>
                         <FormLabel>Asset Image</FormLabel>
                         <FormControl>
-                            <div className="relative">
-                                <Camera className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input 
-                                    type="file" 
-                                    accept="image/*"
-                                    className="pl-10"
-                                    {...imageFileRef}
-                                />
+                          <div className="flex items-center gap-4">
+                            <div className="w-32 h-32 border rounded-md flex items-center justify-center bg-muted">
+                              {capturedImage ? (
+                                <Image src={capturedImage} alt="Asset preview" width={128} height={128} className="object-contain rounded-md" />
+                              ) : (
+                                <Camera className="h-8 w-8 text-muted-foreground" />
+                              )}
                             </div>
+                            <div className="flex flex-col gap-2">
+                              <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                                Upload Image
+                              </Button>
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      const dataUrl = reader.result as string;
+                                      setCapturedImage(dataUrl);
+                                      field.onChange(dataUrl);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                              <Button type="button" variant="outline" onClick={() => setIsCameraOpen(true)}>
+                                Take Photo
+                              </Button>
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
-                        </FormItem>
+                      </FormItem>
                     )}
-                />
+                  />
             </CardContent>
             <CardFooter>
                  <AlertDialog>
@@ -298,6 +379,23 @@ export default function NewAssetPage() {
           </form>
         </Form>
       </Card>
+      
+      <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>Take Photo</DialogTitle>
+              </DialogHeader>
+              <div className="relative">
+                  <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
+                  <canvas ref={canvasRef} className="hidden" />
+              </div>
+              <DialogFooter>
+                  <Button variant="ghost" onClick={() => setIsCameraOpen(false)}>Cancel</Button>
+                  <Button onClick={handleCapture}>Capture</Button>
+              </DialogFooter>
+          </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
