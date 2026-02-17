@@ -327,7 +327,7 @@ export default function UsersPage() {
                 {selectedUser ? `Editing details for ${selectedUser.username}.` : "Fill in the form to create a new user account."}
             </DialogDescription>
             </DialogHeader>
-            <UserForm user={selectedUser} onSave={handleSaveUser} onFinished={() => setIsFormОpen(false)} />
+            <UserForm user={selectedUser} onSave={handleSaveUser} onFinished={() => setIsFormOpen(false)} />
         </DialogContent>
     </Dialog>
   );
