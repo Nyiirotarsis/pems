@@ -1,19 +1,18 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Html5Qrcode,
-  Html5QrcodeScanner,
   Html5QrcodeError,
   Html5QrcodeResult,
+  Html5QrcodeSupportedFormats,
 } from "html5-qrcode";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { CameraOff } from "lucide-react";
-import { useForm } from "react-hook-form";
 
 type QrScannerProps = {
   onScanSuccess: (decodedText: string) => void;
@@ -23,55 +22,62 @@ type QrScannerProps = {
 export function QrScanner({ onScanSuccess, onClose }: QrScannerProps) {
   const [manualId, setManualId] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const readerId = "qr-reader"; // Static ID for the element
 
   useEffect(() => {
-    let scanner: Html5QrcodeScanner | null = null;
+    let html5QrCode: Html5Qrcode | null = null;
     let didCancel = false;
+    
+    // Ensure the element is in the DOM
+    const readerElement = document.getElementById(readerId);
+    if (!readerElement) {
+        return;
+    }
 
-    Html5Qrcode.getCameras()
-      .then((cameras) => {
-        if (didCancel || !cameras || cameras.length === 0) {
-          setError("No cameras found. Please use manual entry.");
-          return;
+    html5QrCode = new Html5Qrcode(readerId, {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      verbose: false,
+    });
+
+    const qrCodeSuccessCallback = (
+      decodedText: string,
+      decodedResult: Html5QrcodeResult
+    ) => {
+      if (!didCancel) {
+        onScanSuccess(decodedText);
+      }
+    };
+
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+    const startScanning = async () => {
+      try {
+        await html5QrCode!.start(
+          { facingMode: "environment" },
+          config,
+          qrCodeSuccessCallback,
+          undefined
+        );
+      } catch (err: any) {
+        console.error("QR Code scanning failed to start.", err);
+        if (err.name === "NotAllowedError") {
+          setError(
+            "Camera access was denied. Please enable camera permissions in your browser settings and refresh the page."
+          );
+        } else {
+          setError(
+            "Could not start camera. Please check if another application is using it or if a camera is connected."
+          );
         }
+      }
+    };
 
-        scanner = new Html5QrcodeScanner(
-          "reader",
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          false // verbose
-        );
-
-        const handleSuccess = (
-          decodedText: string,
-          result: Html5QrcodeResult
-        ) => {
-          scanner?.clear();
-          onScanSuccess(decodedText);
-        };
-
-        const handleError = (
-          errorMessage: string,
-          error: Html5QrcodeError
-        ) => {
-          // Ignore common errors, but log others
-          if (!errorMessage.includes("No QR code found")) {
-            console.error("QR Scanner Error:", errorMessage, error);
-          }
-        };
-
-        scanner.render(handleSuccess, handleError);
-      })
-      .catch((err) => {
-        console.error("Camera permission error:", err);
-        setError(
-          "Could not get camera permissions. Please check your browser settings and use manual entry."
-        );
-      });
+    startScanning();
 
     return () => {
       didCancel = true;
-      if (scanner) {
-        scanner.clear().catch((err) => console.error("Failed to clear scanner", err));
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch((err) => console.error("Failed to stop QR scanner.", err));
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,14 +98,13 @@ export function QrScanner({ onScanSuccess, onClose }: QrScannerProps) {
       </TabsList>
       <TabsContent value="camera">
         <div className="mt-4">
-          {error ? (
-            <Alert variant="destructive">
+          <div id={readerId} style={{ width: "100%" }}></div>
+          {error && (
+            <Alert variant="destructive" className="mt-4">
               <CameraOff className="h-4 w-4" />
               <AlertTitle>Camera Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
-          ) : (
-            <div id="reader" style={{ width: "100%" }}></div>
           )}
         </div>
       </TabsContent>
