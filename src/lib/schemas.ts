@@ -280,3 +280,10 @@ export const leaveRequestFormSchema = z.object({
   message: "End date cannot be before start date.",
   path: ["endDate"],
 });
+
+export const jobOpeningFormSchema = z.object({
+  title: z.string().min(3, "Job title must be at least 3 characters."),
+  department: z.string().min(1, "Please select a department."),
+  status: z.enum(["Open", "Closed", "Draft"]),
+  description: z.string().min(20, "Please provide a detailed job description."),
+});

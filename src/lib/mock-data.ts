@@ -1,6 +1,6 @@
 
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType, LeaveRequest } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType, LeaveRequest, JobOpening, Applicant } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "Admin", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -637,6 +637,40 @@ export const mockLeaveRequests: LeaveRequest[] = [
     }
 ];
 
+export const mockApplicants: Applicant[] = [
+    { id: 1, jobId: 'JOB-001', name: 'John Doe', email: 'john.doe@example.com', phone: '077111222', appliedDate: '2024-08-01', status: 'Interview', resumeUrl: '#' },
+    { id: 2, jobId: 'JOB-001', name: 'Jane Smith', email: 'jane.smith@example.com', phone: '078222333', appliedDate: '2024-08-03', status: 'Screening' },
+    { id: 3, jobId: 'JOB-002', name: 'Peter Jones', email: 'peter.jones@example.com', phone: '079333444', appliedDate: '2024-08-05', status: 'Applied' },
+    { id: 4, jobId: 'JOB-001', name: 'Emily White', email: 'emily.white@example.com', phone: '075444555', appliedDate: '2024-08-10', status: 'Offer' },
+];
+
+export const mockJobOpenings: JobOpening[] = [
+    {
+        id: 'JOB-001',
+        title: 'Senior Sound Engineer',
+        department: 'Operations',
+        status: 'Open',
+        postedDate: '2024-07-20',
+        applicants: mockApplicants.filter(a => a.jobId === 'JOB-001'),
+    },
+    {
+        id: 'JOB-002',
+        title: 'HR Assistant',
+        department: 'Human Resources',
+        status: 'Open',
+        postedDate: '2024-08-01',
+        applicants: mockApplicants.filter(a => a.jobId === 'JOB-002'),
+    },
+    {
+        id: 'JOB-003',
+        title: 'Intern, Media & Communications',
+        department: 'Media',
+        status: 'Closed',
+        postedDate: '2024-06-01',
+        applicants: [],
+    },
+];
+
 
 export { mockFieldStaff } from './mock-field-staff';
 
@@ -645,4 +679,5 @@ export { mockFieldStaff } from './mock-field-staff';
     
 
     
+
 

@@ -384,3 +384,26 @@ export interface LeaveRequest {
   reviewedBy?: string;
   reviewDate?: string;
 }
+
+export type ApplicantStatus = "Applied" | "Screening" | "Interview" | "Offer" | "Hired" | "Rejected";
+
+export interface Applicant {
+    id: number;
+    jobId: string;
+    name: string;
+    email: string;
+    phone: string;
+    appliedDate: string;
+    status: ApplicantStatus;
+    resumeUrl?: string;
+    notes?: string;
+}
+
+export interface JobOpening {
+    id: string;
+    title: string;
+    department: string;
+    status: "Open" | "Closed" | "Draft";
+    postedDate: string;
+    applicants: Applicant[];
+}
