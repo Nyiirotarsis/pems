@@ -40,7 +40,7 @@ const moduleCards = [
     title: "Content Calendar",
     icon: Calendar,
     description: "Plan and visualize your content strategy.",
-    href: "#",
+    href: "/dashboard/media/calendar",
   },
 ];
 

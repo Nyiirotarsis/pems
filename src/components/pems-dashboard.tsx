@@ -162,7 +162,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   'media-gallery': { label: "Media Gallery", icon: Clapperboard, href: "/dashboard/album-show" },
   'media-youtube': { label: 'YouTube Dashboard', icon: Youtube, href: '/dashboard/media/youtube' },
   'media-press': { label: "Press Releases", icon: Newspaper, href: "#" },
-  'media-calendar': { label: "Content Calendar", icon: CalendarIcon, href: "#" },
+  'media-calendar': { label: "Content Calendar", icon: CalendarIcon, isPage: true, href: "/dashboard/media/calendar" },
 };
 
 
@@ -555,9 +555,33 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/media')} isActive={pathname === '/dashboard/media'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
             
             <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push(navItems['media-youtube'].href!)} isActive={pathname.startsWith(navItems['media-youtube'].href!)}>
+                    <Youtube /><span>YouTube Dashboard</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push(navItems['media-gallery'].href!)} isActive={pathname.startsWith(navItems['media-gallery'].href!)}>
+                    <Clapperboard /><span>Media Gallery</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push(navItems['media-calendar'].href!)} isActive={pathname.startsWith(navItems['media-calendar'].href!)}>
+                    <CalendarIcon /><span>Content Calendar</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => router.push(navItems['media-press'].href!)} isActive={pathname.startsWith(navItems['media-press'].href!)}>
+                    <Newspaper /><span>Press Releases</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
                 <Collapsible className="w-full">
                     <CollapsibleTrigger asChild>
-                        <SidebarMenuButton className="justify-between" isActive={false}><div className="flex items-center gap-2"><Rss /><span>Social Media</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                        <SidebarMenuButton className="justify-between" isActive={false}>
+                            <div className="flex items-center gap-2"><Rss /><span>Social Media</span></div>
+                            <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                        </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                         <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
@@ -597,17 +621,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                     </CollapsibleContent>
                 </Collapsible>
             </SidebarMenuItem>
-
-            {Object.keys(navItems).filter(k => k.startsWith('media-') && k !== 'media-social').map(key => {
-                const Icon = navItems[key].icon;
-                return (
-                    <SidebarMenuItem key={key}>
-                        <SidebarMenuButton onClick={() => router.push(navItems[key].href!)} isActive={pathname.startsWith(navItems[key].href!)}>
-                            <Icon /><span>{navItems[key].label}</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                );
-            })}
         </>
     );
     
