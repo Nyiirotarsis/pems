@@ -60,10 +60,19 @@ function MaintenanceLogForm({ onSave }: { onSave: (data: MaintenanceLogValues) =
   const form = useForm<MaintenanceLogValues>({
     resolver: zodResolver(maintenanceLogSchema),
     defaultValues: {
+      itemName: "",
+      serialNumber: "",
       quantity: 1,
+      issueDescription: "",
+      cause: "",
       hardware: false,
       software: false,
+      unitCost: 0,
+      totalCost: 0,
       status: "Pending",
+      technicianName: "",
+      contact: "",
+      remarks: "",
     },
   });
 
@@ -91,8 +100,8 @@ function MaintenanceLogForm({ onSave }: { onSave: (data: MaintenanceLogValues) =
         serialNumber: '',
         issueDescription: '',
         cause: '',
-        unitCost: undefined,
-        totalCost: undefined,
+        unitCost: 0,
+        totalCost: 0,
         technicianName: '',
         contact: '',
         remarks: '',
