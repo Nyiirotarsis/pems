@@ -54,6 +54,7 @@ function LanguageDropdown() {
 }
 
 function UserDropdown({ onLogout }: { onLogout: () => void }) {
+    const router = useRouter();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -71,11 +72,11 @@ function UserDropdown({ onLogout }: { onLogout: () => void }) {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
                     </DropdownMenuItem>
@@ -122,8 +123,8 @@ export function AppContent({
                       return "/dashboard/finance";
                     case "HR/Admin":
                       return "/dashboard/hr";
-                    case "IT Managers":
-                      return "/dashboard/it";
+                    case "Admin":
+                      return "/dashboard/admin";
                     case "Store Manager":
                       return "/dashboard/store";
                     case "Field Operational Officer":
