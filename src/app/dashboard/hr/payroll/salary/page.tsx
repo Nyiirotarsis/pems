@@ -465,7 +465,13 @@ export default function SalaryListPage() {
           <div className="flex justify-center py-4">
             {selectedRecordForQr && (
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`PayrollID:${selectedRecordForQr.id},Staff:${selectedRecordForQr.staff?.name},Amount:${selectedRecordForQr.netPay}`)}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                    `Staff: ${selectedRecordForQr.staff?.name}\n` +
+                    `Period: ${selectedRecordForQr.month} ${selectedRecordForQr.year}\n` +
+                    `Net Pay: UGX ${selectedRecordForQr.netPay.toLocaleString()}\n` +
+                    `Gross Pay: UGX ${selectedRecordForQr.grossPay.toLocaleString()}\n` +
+                    `Deductions: UGX ${selectedRecordForQr.totalDeductions.toLocaleString()}`
+                )}`}
                 alt={`QR code for payroll record ${selectedRecordForQr.id}`}
                 width={250}
                 height={250}
@@ -482,5 +488,3 @@ export default function SalaryListPage() {
     </PEMSDashboard>
   );
 }
-
-    
