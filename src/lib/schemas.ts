@@ -231,4 +231,8 @@ export const deviceFormSchema = z.object({
   userId: z.string().min(1, "Please select a user."),
   deviceName: z.string().min(3, "Device name is required."),
   deviceType: z.string().min(1, "Please select a device type."),
+  email: z.string().email("Please enter a valid email.").optional().or(z.literal('')),
+  phone: z.string().optional(),
 });
+
+    

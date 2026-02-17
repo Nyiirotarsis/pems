@@ -101,8 +101,12 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
             userId: device.userId.toString(),
             deviceName: device.deviceName,
             deviceType: device.deviceType,
+            email: device.email || '',
+            phone: device.phone || '',
         } : {
             deviceName: "",
+            email: "",
+            phone: "",
         },
     });
 
@@ -153,6 +157,30 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
                         </FormItem>
                     )}
                 />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Contact Email for OTP</FormLabel>
+                                <FormControl><Input placeholder="user@example.com" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Contact Phone for OTP</FormLabel>
+                                <FormControl><Input placeholder="e.g., 0771234567" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
                     <Button type="submit">Save Device</Button>
@@ -195,6 +223,8 @@ export default function ScanningDevicesPage() {
                 userId: parseInt(data.userId),
                 deviceName: data.deviceName,
                 deviceType: data.deviceType as DeviceType,
+                email: data.email || undefined,
+                phone: data.phone || undefined,
                 identifier: `uuid-${Math.random().toString(36).substr(2, 9)}`,
                 status: 'pending',
                 verifiedByOTP: false,
@@ -254,6 +284,8 @@ export default function ScanningDevicesPage() {
                                 <TableRow>
                                     <TableHead>Device</TableHead>
                                     <TableHead>User</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Phone</TableHead>
                                     <TableHead>OTP Verified</TableHead>
                                     <TableHead>Registered</TableHead>
                                     <TableHead>Last Used</TableHead>
@@ -273,6 +305,8 @@ export default function ScanningDevicesPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>{user?.username || 'Unknown User'}</TableCell>
+                                            <TableCell>{device.email || 'N/A'}</TableCell>
+                                            <TableCell>{device.phone || 'N/A'}</TableCell>
                                             <TableCell>
                                                 {device.verifiedByOTP ? 
                                                     <Badge variant="default" className="bg-green-500">Yes</Badge> : 
@@ -341,3 +375,5 @@ export default function ScanningDevicesPage() {
         </PEMSDashboard>
     );
 }
+
+    

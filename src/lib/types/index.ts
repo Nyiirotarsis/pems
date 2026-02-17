@@ -1,5 +1,6 @@
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -321,15 +322,50 @@ export interface EventRegistry {
   status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
 }
 
+export type DeviceType = 'Smartphone' | 'Tablet' | 'Desktop' | 'Laser Scan Gun';
+export type DeviceStatus = 'pending' | 'verified' | 'approved' | 'blocked';
+
 export interface Device {
   id: string;
   userId: number;
   deviceName: string;
-  deviceType: 'mobile' | 'desktop' | 'scanner';
+  deviceType: DeviceType;
   identifier: string;
-  status: 'pending' | 'verified' | 'approved' | 'blocked';
+  status: DeviceStatus;
   verifiedByOTP: boolean;
   approvedByAdmin: boolean;
   createdAt: string;
   lastUsedAt: string;
+  email?: string;
+  phone?: string;
 }
+
+export interface Album {
+  id: string;
+  title: string;
+  client: string;
+  date: string;
+  photoCount: number;
+  views: number;
+  coverImageUrl: string;
+}
+
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  views: number;
+  likes: number;
+  publishedDate: string;
+  thumbnailUrl: string;
+  youtubeId: string;
+}
+
+export interface ScheduledPost {
+  id: string;
+  platform: 'YouTube' | 'TikTok' | 'Instagram' | 'X' | 'LinkedIn';
+  content: string;
+  scheduledDate: string; // ISO String
+  status: 'Draft' | 'Scheduled' | 'Published';
+}
+
+    

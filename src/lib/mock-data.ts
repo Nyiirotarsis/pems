@@ -406,6 +406,8 @@ export const mockDevices: Device[] = [
         approvedByAdmin: true,
         createdAt: '2024-08-01T10:00:00Z',
         lastUsedAt: '2024-09-04T14:00:00Z',
+        email: 'it@pacificevents.com',
+        phone: '0771234567'
     },
     {
         id: 'dev-002',
@@ -418,6 +420,8 @@ export const mockDevices: Device[] = [
         approvedByAdmin: true,
         createdAt: '2024-08-05T11:00:00Z',
         lastUsedAt: '2024-09-03T18:00:00Z',
+        email: 'storemanager@pacificevents.com',
+        phone: '0772345678'
     },
     {
         id: 'dev-003',
@@ -430,6 +434,8 @@ export const mockDevices: Device[] = [
         approvedByAdmin: false,
         createdAt: '2024-09-01T09:00:00Z',
         lastUsedAt: '2024-09-01T09:05:00Z',
+        email: 'fieldops@pacificevents.com',
+        phone: '0773456789'
     },
     {
         id: 'dev-004',
@@ -442,6 +448,8 @@ export const mockDevices: Device[] = [
         approvedByAdmin: false,
         createdAt: '2024-08-20T15:00:00Z',
         lastUsedAt: '2024-08-20T15:00:00Z',
+        email: 'fieldops-tablet@pacificevents.com',
+        phone: '0774567890'
     },
     {
         id: 'dev-005',
@@ -454,6 +462,8 @@ export const mockDevices: Device[] = [
         approvedByAdmin: false,
         createdAt: '2024-09-05T10:00:00Z',
         lastUsedAt: '2024-09-05T10:00:00Z',
+        email: '',
+        phone: ''
     },
 ];
 
@@ -552,5 +562,7 @@ export const mockScheduledPosts: ScheduledPost[] = [
 
 
 export { mockFieldStaff } from './mock-field-staff';
+
+    
 
     
