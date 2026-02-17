@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, MoreVertical, Smartphone, Tablet, Monitor, X, CircleHelp, UserPlus, Edit, Trash2, ShieldCheck, Mail } from "lucide-react";
+import { ArrowLeft, Check, MoreVertical, Smartphone, Tablet, Monitor, X, CircleHelp, UserPlus, Edit, Trash2, ShieldCheck, Mail, ShieldAlert } from "lucide-react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -69,12 +69,13 @@ import { mockDevices, USERS, DEVICE_TYPES } from "@/lib/mock-data";
 import { deviceFormSchema } from "@/lib/schemas";
 import type { Device, DeviceStatus, DeviceType } from "@/types";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
 const statusConfig: Record<DeviceStatus, { color: string; label: string; icon: React.ElementType }> = {
     pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending", icon: CircleHelp },
     verified: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "Verified", icon: ShieldCheck },
-    approved: { color: "bg-green-100 text-green-800 border-green-200", label: "Approved", icon: Check },
-    blocked: { color: "bg-red-100 text-red-800 border-red-200", label: "Blocked", icon: X },
+    approved: { color: "bg-green-100 text-green-800 border-green-200", label: "Approved", icon: ShieldCheck },
+    blocked: { color: "bg-red-100 text-red-800 border-red-200", label: "Blocked", icon: ShieldAlert },
 };
 
 const deviceIcons: Record<DeviceType, React.ElementType> = {
@@ -101,10 +102,12 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
             userId: device.userId.toString(),
             deviceName: device.deviceName,
             deviceType: device.deviceType,
+            imei: device.identifier,
             email: device.email || '',
             phone: device.phone || '',
         } : {
             deviceName: "",
+            imei: "",
             email: "",
             phone: "",
         },
@@ -139,6 +142,17 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
                         <FormItem>
                             <FormLabel>Device Name</FormLabel>
                             <FormControl><Input placeholder="e.g., John's iPhone 14" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="imei"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>IMEI</FormLabel>
+                            <FormControl><Input placeholder="e.g., 3545..." {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -180,6 +194,11 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
                             </FormItem>
                         )}
                     />
+                </div>
+                 <div className="space-y-1">
+                    <Label>IP Address</Label>
+                    <Input value="192.168.1.100 (auto-captured)" readOnly disabled />
+                    <p className="text-xs text-muted-foreground">The device's IP address is captured automatically.</p>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
@@ -226,7 +245,7 @@ export default function ScanningDevicesPage() {
     const handleUpdateStatus = (deviceId: string, newStatus: DeviceStatus) => {
         const deviceToUpdate = devices.find(d => d.id === deviceId);
         if (!deviceToUpdate) return;
-
+        
         setDevices(prevDevices => 
             prevDevices.map(device => 
                 device.id === deviceId ? { ...device, status: newStatus } : device
@@ -250,7 +269,7 @@ export default function ScanningDevicesPage() {
                         : device
                 )
             );
-
+            
             toast({
                 title: `Device Verified`,
                 description: `Device "${deviceForOtp.deviceName}" is now verified and awaits admin approval.`,
@@ -270,7 +289,7 @@ export default function ScanningDevicesPage() {
     const handleSaveDevice = (data: z.infer<typeof deviceFormSchema>, deviceId?: string) => {
         if (deviceId) {
             // Update existing device
-            setDevices(devices.map(d => d.id === deviceId ? { ...d, ...data, userId: parseInt(data.userId), deviceType: data.deviceType as DeviceType } : d));
+            setDevices(devices.map(d => d.id === deviceId ? { ...d, ...data, userId: parseInt(data.userId), deviceType: data.deviceType as DeviceType, identifier: data.imei } : d));
             toast({ title: 'Device Updated', description: `Device "${data.deviceName}" has been updated.` });
         } else {
             // Add new device
@@ -279,9 +298,10 @@ export default function ScanningDevicesPage() {
                 userId: parseInt(data.userId),
                 deviceName: data.deviceName,
                 deviceType: data.deviceType as DeviceType,
+                identifier: data.imei,
+                ipAddress: '192.168.1.100', // Mock IP
                 email: data.email || undefined,
                 phone: data.phone || undefined,
-                identifier: `uuid-${Math.random().toString(36).substr(2, 9)}`,
                 status: 'pending',
                 verifiedByOTP: false,
                 approvedByAdmin: false,
@@ -289,7 +309,7 @@ export default function ScanningDevicesPage() {
                 lastUsedAt: new Date().toISOString(),
             };
             setDevices(prev => [newDevice, ...prev]);
-            toast({ title: 'Device Added', description: `Device "${data.deviceName}" has been added and is pending verification.` });
+            toast({ title: 'Device Added & OTP Sent', description: `Device "${data.deviceName}" is pending verification. An OTP has been sent to ${data.email || data.phone}.` });
         }
     };
     
@@ -340,6 +360,7 @@ export default function ScanningDevicesPage() {
                                 <TableRow>
                                     <TableHead>Device</TableHead>
                                     <TableHead>User</TableHead>
+                                    <TableHead>IMEI / IP Address</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Phone</TableHead>
                                     <TableHead>OTP Verified</TableHead>
@@ -361,6 +382,10 @@ export default function ScanningDevicesPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>{user?.username || 'Unknown User'}</TableCell>
+                                            <TableCell>
+                                                <div className="font-mono text-xs">{device.identifier}</div>
+                                                <div className="text-xs text-muted-foreground">{device.ipAddress}</div>
+                                            </TableCell>
                                             <TableCell>{device.email || 'N/A'}</TableCell>
                                             <TableCell>{device.phone || 'N/A'}</TableCell>
                                             <TableCell>
@@ -454,6 +479,8 @@ export default function ScanningDevicesPage() {
         </PEMSDashboard>
     );
 }
+
+    
 
     
 

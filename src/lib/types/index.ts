@@ -1,6 +1,7 @@
 
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -331,6 +332,7 @@ export interface Device {
   deviceName: string;
   deviceType: DeviceType;
   identifier: string;
+  ipAddress?: string;
   status: DeviceStatus;
   verifiedByOTP: boolean;
   approvedByAdmin: boolean;
@@ -367,5 +369,7 @@ export interface ScheduledPost {
   scheduledDate: string; // ISO String
   status: 'Draft' | 'Scheduled' | 'Published';
 }
+
+    
 
     

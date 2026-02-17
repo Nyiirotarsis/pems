@@ -401,6 +401,7 @@ export const mockDevices: Device[] = [
         deviceName: "Admin's MacBook Pro",
         deviceType: 'Desktop',
         identifier: 'uuid-abc-123',
+        ipAddress: '192.168.1.101',
         status: 'approved',
         verifiedByOTP: true,
         approvedByAdmin: true,
@@ -415,6 +416,7 @@ export const mockDevices: Device[] = [
         deviceName: "Store's Zebra Scanner",
         deviceType: 'Laser Scan Gun',
         identifier: 'uuid-def-456',
+        ipAddress: '192.168.1.102',
         status: 'approved',
         verifiedByOTP: true,
         approvedByAdmin: true,
@@ -429,6 +431,7 @@ export const mockDevices: Device[] = [
         deviceName: "Sarah's iPhone 13",
         deviceType: 'Smartphone',
         identifier: 'uuid-ghi-789',
+        ipAddress: '192.168.1.103',
         status: 'verified',
         verifiedByOTP: true,
         approvedByAdmin: false,
@@ -443,6 +446,7 @@ export const mockDevices: Device[] = [
         deviceName: "Field Team's Tablet",
         deviceType: 'Tablet',
         identifier: 'uuid-jkl-012',
+        ipAddress: '192.168.1.104',
         status: 'blocked',
         verifiedByOTP: false,
         approvedByAdmin: false,
@@ -457,6 +461,7 @@ export const mockDevices: Device[] = [
         deviceName: "New Android Phone",
         deviceType: 'Smartphone',
         identifier: 'uuid-mno-345',
+        ipAddress: '192.168.1.105',
         status: 'pending',
         verifiedByOTP: false,
         approvedByAdmin: false,
@@ -562,6 +567,8 @@ export const mockScheduledPosts: ScheduledPost[] = [
 
 
 export { mockFieldStaff } from './mock-field-staff';
+
+    
 
     
 
