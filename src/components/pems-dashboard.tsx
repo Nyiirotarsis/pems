@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -45,11 +46,16 @@ import {
   Rss,
   Newspaper,
   ShieldCheck,
+  Youtube,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { initialInventory, ROLES, mockUsers, mockVisitors } from "@/lib/mock-data";
+import { initialInventory, ROLES, USERS, mockVisitors } from "@/lib/mock-data";
 import type { UserRole, InventoryItem, AppNotification, Kpi, Visitor } from "@/types";
 import { PacificEventsLogo } from "@/components/icons";
 
@@ -546,7 +552,60 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     const mediaNav = (
         <>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push('/dashboard/media')} isActive={pathname === '/dashboard/media'}><Home /><span>Dashboard</span></SidebarMenuButton></SidebarMenuItem>
-            {Object.keys(navItems).filter(k => k.startsWith('media-')).map(key => {
+            
+            <SidebarMenuItem>
+                <Collapsible className="w-full">
+                    <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="justify-between" isActive={false}><div className="flex items-center gap-2"><Rss /><span>Social Media</span></div><ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" /></SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="https://www.youtube.com/@PACIFICEVENTSLTD-x9j" target="_blank" rel="noopener noreferrer">
+                                        <Youtube />
+                                        <span>YouTube</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="https://www.tiktok.com/@pacific.events.li" target="_blank" rel="noopener noreferrer">
+                                        <LinkIcon />
+                                        <span>TikTok</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                               <SidebarMenuButton asChild>
+                                    <a href="https://www.instagram.com/pacificeventslimited/" target="_blank" rel="noopener noreferrer">
+                                        <Instagram />
+                                        <span>Instagram</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="https://x.com/PacificEventUg_" target="_blank" rel="noopener noreferrer">
+                                        <Twitter />
+                                        <span>X (Twitter)</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                             <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="#" target="_blank" rel="noopener noreferrer">
+                                        <Linkedin />
+                                        <span>LinkedIn</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
+
+            {Object.keys(navItems).filter(k => k.startsWith('media-') && k !== 'media-social').map(key => {
                 const Icon = navItems[key].icon;
                 return (
                     <SidebarMenuItem key={key}>
