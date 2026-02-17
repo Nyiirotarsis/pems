@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, MoreVertical, Smartphone, Tablet, Monitor, X, CircleHelp, UserPlus, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, MoreVertical, Smartphone, Tablet, Monitor, X, CircleHelp, UserPlus, Edit, Trash2, ShieldCheck, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,7 +62,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import PEMSDashboard from "@/components/pems-dashboard";
 import { mockDevices, USERS, DEVICE_TYPES } from "@/lib/mock-data";
@@ -72,7 +72,7 @@ import { cn } from "@/lib/utils";
 
 const statusConfig: Record<DeviceStatus, { color: string; label: string; icon: React.ElementType }> = {
     pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-200", label: "Pending", icon: CircleHelp },
-    verified: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "Verified", icon: Check },
+    verified: { color: "bg-blue-100 text-blue-800 border-blue-200", label: "Verified", icon: ShieldCheck },
     approved: { color: "bg-green-100 text-green-800 border-green-200", label: "Approved", icon: Check },
     blocked: { color: "bg-red-100 text-red-800 border-red-200", label: "Blocked", icon: X },
 };
@@ -190,11 +190,38 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
     );
 }
 
+function OtpForm({ onVerify, onFinished }: { onVerify: (otp: string) => void, onFinished: () => void }) {
+    const [otp, setOtp] = React.useState("");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onVerify(otp);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+            <Input 
+                placeholder="Enter 6-digit OTP" 
+                value={otp} 
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+                autoFocus
+            />
+            <DialogFooter>
+                <Button variant="ghost" type="button" onClick={onFinished}>Cancel</Button>
+                <Button type="submit">Verify Device</Button>
+            </DialogFooter>
+        </form>
+    );
+}
+
 export default function ScanningDevicesPage() {
     const { toast } = useToast();
     const [devices, setDevices] = React.useState<Device[]>(mockDevices);
     const [isFormOpen, setIsFormOpen] = React.useState(false);
     const [selectedDevice, setSelectedDevice] = React.useState<Device | null>(null);
+    const [isOtpDialogOpen, setIsOtpDialogOpen] = React.useState(false);
+    const [deviceForOtp, setDeviceForOtp] = React.useState<Device | null>(null);
 
     const handleUpdateStatus = (deviceId: string, newStatus: DeviceStatus) => {
         setDevices(prevDevices => {
@@ -204,11 +231,38 @@ export default function ScanningDevicesPage() {
                         title: `Device ${newStatus}`,
                         description: `Device "${device.deviceName}" has been ${newStatus}.`,
                     });
-                    return { ...device, status: newStatus, approvedByAdmin: newStatus === 'approved' };
+                    return { ...device, status: newStatus };
                 }
                 return device;
             });
         });
+    };
+
+    const handleVerifyDevice = (otp: string) => {
+        if (!deviceForOtp) return;
+        // In a real app, we'd validate the OTP. For this prototype, any 6-digit code is fine.
+        if (otp.length === 6 && /^\d+$/.test(otp)) {
+             setDevices(prevDevices => {
+                return prevDevices.map(device => {
+                    if (device.id === deviceForOtp.id) {
+                        toast({
+                            title: `Device Verified`,
+                            description: `Device "${device.deviceName}" is now verified and awaits admin approval.`,
+                        });
+                        return { ...device, status: 'verified', verifiedByOTP: true };
+                    }
+                    return device;
+                });
+            });
+            setIsOtpDialogOpen(false);
+            setDeviceForOtp(null);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Invalid OTP",
+                description: "Please enter a valid 6-digit OTP.",
+            });
+        }
     };
 
     const handleSaveDevice = (data: z.infer<typeof deviceFormSchema>, deviceId?: string) => {
@@ -309,8 +363,8 @@ export default function ScanningDevicesPage() {
                                             <TableCell>{device.phone || 'N/A'}</TableCell>
                                             <TableCell>
                                                 {device.verifiedByOTP ? 
-                                                    <Badge variant="default" className="bg-green-500">Yes</Badge> : 
-                                                    <Badge variant="destructive">No</Badge>
+                                                    <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">Yes</Badge> : 
+                                                    <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">No</Badge>
                                                 }
                                             </TableCell>
                                             <TableCell>{format(new Date(device.createdAt), "PPP")}</TableCell>
@@ -325,16 +379,23 @@ export default function ScanningDevicesPage() {
                                                         <DropdownMenuItem onSelect={() => { setSelectedDevice(device); setIsFormOpen(true); }}>
                                                             <Edit className="mr-2 h-4 w-4" /> Edit
                                                         </DropdownMenuItem>
-                                                        {device.status !== 'approved' && (
+                                                        <DropdownMenuSeparator />
+                                                        {device.status === 'pending' && !device.verifiedByOTP && (
+                                                            <DropdownMenuItem onSelect={() => { setDeviceForOtp(device); setIsOtpDialogOpen(true); }}>
+                                                                <Mail className="mr-2 h-4 w-4" /> Send & Verify OTP
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {device.status === 'verified' && (
                                                             <DropdownMenuItem onClick={() => handleUpdateStatus(device.id, 'approved')}>
                                                                 <Check className="mr-2 h-4 w-4" /> Approve
                                                             </DropdownMenuItem>
                                                         )}
                                                         {device.status !== 'blocked' && (
-                                                            <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={() => handleUpdateStatus(device.id, 'blocked')}>
+                                                            <DropdownMenuItem className="text-orange-500 focus:text-orange-500" onClick={() => handleUpdateStatus(device.id, 'blocked')}>
                                                                 <X className="mr-2 h-4 w-4" /> Block
                                                             </DropdownMenuItem>
                                                         )}
+                                                        <DropdownMenuSeparator />
                                                          <AlertDialog>
                                                             <AlertDialogTrigger asChild>
                                                                 <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500 focus:text-red-500">
@@ -372,8 +433,26 @@ export default function ScanningDevicesPage() {
                     <DeviceForm device={selectedDevice} onSave={handleSaveDevice} onFinished={() => setIsFormOpen(false)} />
                 </DialogContent>
             </Dialog>
+
+            <Dialog open={isOtpDialogOpen} onOpenChange={(open) => {
+                if (!open) setDeviceForOtp(null);
+                setIsOtpDialogOpen(open);
+            }}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Verify Device: {deviceForOtp?.deviceName}</DialogTitle>
+                        <DialogDescription>
+                            An OTP would be sent to {deviceForOtp?.email || deviceForOtp?.phone}. 
+                            Enter the code below to complete verification. (For demo, any 6 digits work).
+                        </DialogDescription>
+                    </DialogHeader>
+                    <OtpForm onVerify={handleVerifyDevice} onFinished={() => setIsOtpDialogOpen(false)} />
+                </DialogContent>
+            </Dialog>
         </PEMSDashboard>
     );
 }
+
+    
 
     
