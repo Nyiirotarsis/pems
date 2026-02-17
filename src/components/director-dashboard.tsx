@@ -39,10 +39,10 @@ const moduleCards = [
     href: "/dashboard/hr",
   },
   {
-    title: "IT & Security",
+    title: "Admin & Security",
     icon: Shield,
     description: "Monitor systems, security, and user access.",
-    href: "/dashboard/it",
+    href: "/dashboard/admin",
   },
   {
     title: "Reports & Analytics",

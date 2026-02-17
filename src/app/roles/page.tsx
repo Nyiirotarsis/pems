@@ -51,9 +51,9 @@ export default function RolesPage() {
             </p>
           </div>
           <div>
-            <h3 className="font-semibold text-lg">IT Manager</h3>
+            <h3 className="font-semibold text-lg">Admin</h3>
             <p className="text-muted-foreground mt-1">
-              The IT Manager is responsible for maintaining the operational, technical, and security integrity of the PEMS platform. This role oversees user access control, system performance, data protection, and infrastructure reliability. The IT Manager ensures the platform runs efficiently, remains secure against threats, and supports the continuous growth and functionality of the organization.
+              The Admin is responsible for maintaining the operational, technical, and security integrity of the PEMS platform. This role oversees user access control, system performance, data protection, and infrastructure reliability. The Admin ensures the platform runs efficiently, remains secure against threats, and supports the continuous growth and functionality of the organization.
             </p>
           </div>
         </CardContent>

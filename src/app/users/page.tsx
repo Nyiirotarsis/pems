@@ -34,7 +34,7 @@ export default function UsersPage() {
               <li><strong>Field Operational Officer:</strong> Oversees all on-site activities, manages crew, handles logistics requisitions, makes equipment requests to the store manager, and approves operational tasks.</li>
               <li><strong>Store Manager:</strong> Responsible for inventory and asset management, including issuing, returning, and tracking all physical equipment.</li>
               <li><strong>HR/Admin:</strong> Manages all human resources functions, such as employee records, attendance, payroll, leave, and recruitment.</li>
-              <li><strong>IT Managers:</strong> Oversee system health, security, user management, and provide technical support across the platform.</li>
+              <li><strong>Admin:</strong> Oversee system health, security, user management, and provide technical support across the platform.</li>
             </ul>
           </div>
         </CardContent>
