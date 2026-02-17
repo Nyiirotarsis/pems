@@ -102,12 +102,10 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
             userId: device.userId.toString(),
             deviceName: device.deviceName,
             deviceType: device.deviceType,
-            imei: device.identifier,
             email: device.email || '',
             phone: device.phone || '',
         } : {
             deviceName: "",
-            imei: "",
             email: "",
             phone: "",
         },
@@ -142,17 +140,6 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
                         <FormItem>
                             <FormLabel>Device Name</FormLabel>
                             <FormControl><Input placeholder="e.g., John's iPhone 14" {...field} /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={form.control}
-                    name="imei"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>IMEI</FormLabel>
-                            <FormControl><Input placeholder="e.g., 3545..." {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -195,10 +182,17 @@ function DeviceForm({ device, onSave, onFinished }: { device?: Device | null, on
                         )}
                     />
                 </div>
-                 <div className="space-y-1">
-                    <Label>IP Address</Label>
-                    <Input value="192.168.1.100 (auto-captured)" readOnly disabled />
-                    <p className="text-xs text-muted-foreground">The device's IP address is captured automatically.</p>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <Label>IMEI</Label>
+                        <Input value={device?.identifier || "(auto-captured on save)"} readOnly disabled />
+                        <p className="text-xs text-muted-foreground">The device's unique IMEI is captured automatically.</p>
+                    </div>
+                    <div className="space-y-1">
+                        <Label>IP Address</Label>
+                        <Input value={device?.ipAddress || "192.168.1.100 (auto-captured)"} readOnly disabled />
+                        <p className="text-xs text-muted-foreground">The device's IP address is captured automatically.</p>
+                    </div>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
@@ -289,7 +283,7 @@ export default function ScanningDevicesPage() {
     const handleSaveDevice = (data: z.infer<typeof deviceFormSchema>, deviceId?: string) => {
         if (deviceId) {
             // Update existing device
-            setDevices(devices.map(d => d.id === deviceId ? { ...d, ...data, userId: parseInt(data.userId), deviceType: data.deviceType as DeviceType, identifier: data.imei } : d));
+            setDevices(devices.map(d => d.id === deviceId ? { ...d, ...data, userId: parseInt(data.userId), deviceType: data.deviceType as DeviceType } : d));
             toast({ title: 'Device Updated', description: `Device "${data.deviceName}" has been updated.` });
         } else {
             // Add new device
@@ -298,7 +292,7 @@ export default function ScanningDevicesPage() {
                 userId: parseInt(data.userId),
                 deviceName: data.deviceName,
                 deviceType: data.deviceType as DeviceType,
-                identifier: data.imei,
+                identifier: `imei-${Date.now().toString().slice(-8)}`, // Automatically generate a mock IMEI
                 ipAddress: '192.168.1.100', // Mock IP
                 email: data.email || undefined,
                 phone: data.phone || undefined,
