@@ -99,7 +99,7 @@ type View =
   | "field-payments" | "recruitment" | "exit-management" | "leave-management" | "employees" | "visitors"
   | "kpi" | "attendance" | "payroll"
   | "systems" | "security" | "users" | "settings"
-  | "album-show" | "field-ops" | "media" | "sustainability" | "ceo";
+  | "album-show" | "field-ops" | "media" | "sustainability" | "ceo" | "profile";
 
 const navItems: Record<string, { label: string; icon: React.ElementType; isPage?: boolean; href?: string }> = {
   director: { label: "Director Dashboard", icon: Home, isPage: true, href: "/dashboard/director" },
@@ -113,6 +113,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   sustainability: { label: "Sustainability (ESMS)", icon: ShieldCheck, isPage: true, href: "/dashboard/sustainability" },
   reports: { label: "Reports", icon: FileText, isPage: true, href: "/dashboard/reports" },
   notifications: { label: "Notifications", icon: Bell, isPage: true, href: "/dashboard/notifications" },
+  profile: { label: "Profile", icon: User, isPage: true, href: "/dashboard/profile"},
 
   // Store Sub-items
   inventory: { label: "Inventory", icon: PackageSearch, isPage: true, href: "/dashboard/store/inventory" },
@@ -701,11 +702,11 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
               <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
                       <Cog className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                   </DropdownMenuItem>

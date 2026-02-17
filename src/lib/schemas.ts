@@ -166,7 +166,7 @@ export const userFormSchema = z.object({
 });
 
 
-const requisitionItemSchema = z.object({
+export const requisitionItemSchema = z.object({
   itemName: z.string().min(1, "Item name is required."),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
 });
@@ -233,8 +233,31 @@ export const deviceFormSchema = z.object({
   deviceType: z.string().min(1, "Please select a device type."),
   email: z.string().email("Please enter a valid email.").optional().or(z.literal('')),
   phone: z.string().optional(),
+  identifier: z.string().optional(), // IMEI
+  ipAddress: z.string().optional(),
 });
 
+export const profileFormSchema = z.object({
+    name: z.string().min(2, "Name is required."),
+    email: z.string().email("Please enter a valid email address."),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
+    avatar: z.any().optional(),
+})
+.refine(data => {
+    if (data.password && !data.confirmPassword) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Please confirm your new password.",
+    path: ["confirmPassword"],
+})
+.refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+});
     
 
     
+
