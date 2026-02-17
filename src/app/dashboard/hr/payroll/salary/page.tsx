@@ -33,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreVertical, CheckCircle, XCircle, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, MoreVertical, CheckCircle, XCircle, Edit, Trash2, QrCode } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -265,6 +265,7 @@ export default function SalaryListPage() {
     const [payrollRecords, setPayrollRecords] = useState(mockPayrollData);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<(PayrollRecord & { staff?: User }) | null>(null);
+    const [selectedRecordForQr, setSelectedRecordForQr] = useState<any | null>(null);
     const [role, setRole] = React.useState<UserRole | null>(null);
 
     React.useEffect(() => {
@@ -303,6 +304,10 @@ export default function SalaryListPage() {
     const handleUpdateStatus = (id: number, status: 'Approved' | 'Rejected') => {
         setPayrollRecords(prev => prev.map(rec => rec.id === id ? { ...rec, status } : rec));
         toast({ title: `Payroll record ${status.toLowerCase()}.` });
+    }
+    
+    const handlePrint = () => {
+        window.print();
     }
 
     const fullPayrollData = useMemo(() => {
@@ -393,6 +398,10 @@ export default function SalaryListPage() {
                                     <DropdownMenuContent>
                                         <DropdownMenuItem>View Details</DropdownMenuItem>
                                         {canCreate && <DropdownMenuItem onSelect={() => { setSelectedRecord(record); setIsFormOpen(true); }}><Edit className="mr-2"/>Edit</DropdownMenuItem>}
+                                        <DropdownMenuItem onSelect={() => setSelectedRecordForQr(record)}>
+                                            <QrCode className="mr-2 h-4 w-4" />
+                                            View QR Code
+                                        </DropdownMenuItem>
                                         {canApprove && record.status === 'Pending' && (
                                             <>
                                                 <DropdownMenuItem onClick={() => handleUpdateStatus(record.id, 'Approved')}>
@@ -441,6 +450,32 @@ export default function SalaryListPage() {
                 </DialogDescription>
             </DialogHeader>
             <PayrollForm payrollRecord={selectedRecord} onSave={handleSaveRecord} onFinished={() => setIsFormOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+       <Dialog open={!!selectedRecordForQr} onOpenChange={(isOpen) => !isOpen && setSelectedRecordForQr(null)}>
+        <DialogContent className="printable-area">
+          <DialogHeader>
+            <DialogTitle>QR Code for Payroll Record</DialogTitle>
+            <DialogDescription>
+              Payroll for: {selectedRecordForQr?.staff?.name} ({selectedRecordForQr?.month} {selectedRecordForQr?.year})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center py-4">
+            {selectedRecordForQr && (
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`PayrollID:${selectedRecordForQr.id},Staff:${selectedRecordForQr.staff?.name},Amount:${selectedRecordForQr.netPay}`)}`}
+                alt={`QR code for payroll record ${selectedRecordForQr.id}`}
+                width={250}
+                height={250}
+                data-ai-hint="QR code"
+              />
+            )}
+          </div>
+          <DialogFooter className="no-print">
+              <Button variant="outline" onClick={() => setSelectedRecordForQr(null)}>Close</Button>
+              <Button onClick={handlePrint}>Print QR Code</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </PEMSDashboard>
