@@ -226,3 +226,9 @@ export const scheduledPostSchema = z.object({
   scheduledDate: z.date(),
   scheduledTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
 });
+
+export const deviceFormSchema = z.object({
+  userId: z.string().min(1, "Please select a user."),
+  deviceName: z.string().min(3, "Device name is required."),
+  deviceType: z.string().min(1, "Please select a device type."),
+});

@@ -3,6 +3,7 @@
 
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -324,13 +325,16 @@ export interface EventRegistry {
   status: "Planned" | "Ongoing" | "Completed" | "Delivered" | "Archived" | "Cancelled";
 }
 
+export type DeviceType = 'Smartphone' | 'Tablet' | 'Desktop' | 'Laser Scan Gun';
+export type DeviceStatus = 'pending' | 'verified' | 'approved' | 'blocked';
+
 export interface Device {
   id: string;
   userId: number;
   deviceName: string;
-  deviceType: 'mobile' | 'desktop' | 'scanner';
+  deviceType: DeviceType;
   identifier: string;
-  status: 'pending' | 'verified' | 'approved' | 'blocked';
+  status: DeviceStatus;
   verifiedByOTP: boolean;
   approvedByAdmin: boolean;
   createdAt: string;
