@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+import { ArrowLeft, Calendar as CalendarIcon, PlusCircle, Camera } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,8 @@ const assetFormSchema = z.object({
   purchaseDate: z.date(),
   condition: z.string().min(1, "Please select a condition."),
   serialNumber: z.string().optional(),
+  engravedNumber: z.string().optional(),
+  image: z.any().optional(),
 });
 
 type AssetFormValues = z.infer<typeof assetFormSchema>;
@@ -77,6 +79,8 @@ export default function NewAssetPage() {
       purchaseDate: new Date(),
     },
   });
+
+  const imageFileRef = form.register("image");
 
   function onSubmit(data: AssetFormValues) {
     console.log(data);
@@ -120,19 +124,34 @@ export default function NewAssetPage() {
                     </FormItem>
                   )}
                 />
-                 <FormField
-                  control={form.control}
-                  name="serialNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Serial Number / Engraved ID</FormLabel>
-                       <FormControl>
-                        <Input placeholder="e.g., SN-12345XYZ" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="serialNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Serial Number</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., SN-12345XYZ" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="engravedNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Engraved Number</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., PE-LAP-001" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -232,6 +251,27 @@ export default function NewAssetPage() {
                         )}
                         />
                  </div>
+                  <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Asset Image</FormLabel>
+                        <FormControl>
+                            <div className="relative">
+                                <Camera className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="pl-10"
+                                    {...imageFileRef}
+                                />
+                            </div>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
             </CardContent>
             <CardFooter>
                  <AlertDialog>
