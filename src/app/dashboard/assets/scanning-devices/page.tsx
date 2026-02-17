@@ -224,36 +224,38 @@ export default function ScanningDevicesPage() {
     const [deviceForOtp, setDeviceForOtp] = React.useState<Device | null>(null);
 
     const handleUpdateStatus = (deviceId: string, newStatus: DeviceStatus) => {
-        setDevices(prevDevices => {
-            return prevDevices.map(device => {
-                if (device.id === deviceId) {
-                    toast({
-                        title: `Device ${newStatus}`,
-                        description: `Device "${device.deviceName}" has been ${newStatus}.`,
-                    });
-                    return { ...device, status: newStatus };
-                }
-                return device;
-            });
+        const deviceToUpdate = devices.find(d => d.id === deviceId);
+        if (!deviceToUpdate) return;
+
+        setDevices(prevDevices => 
+            prevDevices.map(device => 
+                device.id === deviceId ? { ...device, status: newStatus } : device
+            )
+        );
+
+        toast({
+            title: `Device ${newStatus}`,
+            description: `Device "${deviceToUpdate.deviceName}" has been ${newStatus}.`,
         });
     };
 
     const handleVerifyDevice = (otp: string) => {
         if (!deviceForOtp) return;
-        // In a real app, we'd validate the OTP. For this prototype, any 6-digit code is fine.
+        
         if (otp.length === 6 && /^\d+$/.test(otp)) {
-             setDevices(prevDevices => {
-                return prevDevices.map(device => {
-                    if (device.id === deviceForOtp.id) {
-                        toast({
-                            title: `Device Verified`,
-                            description: `Device "${device.deviceName}" is now verified and awaits admin approval.`,
-                        });
-                        return { ...device, status: 'verified', verifiedByOTP: true };
-                    }
-                    return device;
-                });
+            setDevices(prevDevices => 
+                prevDevices.map(device => 
+                    device.id === deviceForOtp.id 
+                        ? { ...device, status: 'verified', verifiedByOTP: true } 
+                        : device
+                )
+            );
+
+            toast({
+                title: `Device Verified`,
+                description: `Device "${deviceForOtp.deviceName}" is now verified and awaits admin approval.`,
             });
+            
             setIsOtpDialogOpen(false);
             setDeviceForOtp(null);
         } else {
@@ -452,6 +454,8 @@ export default function ScanningDevicesPage() {
         </PEMSDashboard>
     );
 }
+
+    
 
     
 
