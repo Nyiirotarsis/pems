@@ -56,6 +56,7 @@ export const initialInventory: InventoryItem[] = [
     returnDate: null,
     addedBy: "UID_OF_IT_MANAGER",
     createdAt: new Date().toISOString(),
+    imageURL: "https://picsum.photos/seed/mic-kit/400/400",
   },
   {
     id: "LED-55-2025-001",
@@ -77,7 +78,8 @@ export const initialInventory: InventoryItem[] = [
     dateIssued: null,
     returnDate: null,
     addedBy: "UID_OF_IT_MANAGER",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    imageURL: "https://picsum.photos/seed/led-screen/400/400",
   },
   {
     id: "CAM-DSLR-2024-005",
@@ -99,7 +101,8 @@ export const initialInventory: InventoryItem[] = [
     dateIssued: null,
     returnDate: null,
     addedBy: "UID_OF_IT_MANAGER",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    imageURL: "https://picsum.photos/seed/camera/400/400",
   },
   {
     id: "TENT-10X10-2023-015",
@@ -400,7 +403,7 @@ export const mockDevices: Device[] = [
         userId: 5, // Admin
         deviceName: "Admin's MacBook Pro",
         deviceType: 'Desktop',
-        identifier: 'uuid-abc-123',
+        identifier: 'imei-auto-12345',
         ipAddress: '192.168.1.101',
         status: 'approved',
         verifiedByOTP: true,
@@ -416,7 +419,7 @@ export const mockDevices: Device[] = [
         userId: 6, // Store Manager
         deviceName: "Store's Zebra Scanner",
         deviceType: 'Laser Scan Gun',
-        identifier: 'uuid-def-456',
+        identifier: 'imei-auto-67890',
         ipAddress: '192.168.1.102',
         status: 'approved',
         verifiedByOTP: true,
@@ -432,7 +435,7 @@ export const mockDevices: Device[] = [
         userId: 7, // Field Ops
         deviceName: "Sarah's iPhone 13",
         deviceType: 'Smartphone',
-        identifier: 'uuid-ghi-789',
+        identifier: 'imei-auto-13579',
         ipAddress: '192.168.1.103',
         status: 'verified',
         verifiedByOTP: true,
@@ -448,7 +451,7 @@ export const mockDevices: Device[] = [
         userId: 7, // Field Ops
         deviceName: "Field Team's Tablet",
         deviceType: 'Tablet',
-        identifier: 'uuid-jkl-012',
+        identifier: 'imei-auto-24680',
         ipAddress: '192.168.1.104',
         status: 'blocked',
         verifiedByOTP: false,
@@ -464,7 +467,7 @@ export const mockDevices: Device[] = [
         userId: 7, // Field Ops
         deviceName: "New Android Phone",
         deviceType: 'Smartphone',
-        identifier: 'uuid-mno-345',
+        identifier: 'imei-auto-97531',
         ipAddress: '192.168.1.105',
         status: 'pending',
         verifiedByOTP: false,
@@ -480,7 +483,7 @@ export const mockDevices: Device[] = [
         userId: 6, // Store Manager
         deviceName: "Old Samsung Tablet",
         deviceType: 'Tablet',
-        identifier: 'uuid-pqr-678',
+        identifier: 'imei-auto-86420',
         ipAddress: '192.168.1.106',
         status: 'approved',
         verifiedByOTP: true,

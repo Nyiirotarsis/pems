@@ -143,12 +143,19 @@ export default function AssetsPage() {
 
   const handleScanSuccess = (decodedText: string) => {
     setIsScannerOpen(false);
-    toast({
-        title: "Scan Successful",
-        description: `Scanned value: ${decodedText}. Looking up equipment...`
-    });
-    // Here you would typically look up the equipment by the decodedText
-    // and then open an issue/return form.
+
+    try {
+        const url = new URL(decodedText);
+        if (url.origin === window.location.origin && url.pathname.startsWith('/dashboard/assets/verify/')) {
+            router.push(decodedText);
+            return;
+        }
+    } catch (_) {
+        // Not a valid URL, likely a raw ID
+    }
+
+    // If it's just an ID, navigate to the verification page
+    router.push(`/dashboard/assets/verify/${decodedText}`);
   }
 
   const handleExport = () => {
@@ -320,7 +327,7 @@ export default function AssetsPage() {
           <div className="flex justify-center py-4">
             {selectedAssetForQr && (
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(selectedAssetForQr.id)}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`${window.location.origin}/dashboard/assets/verify/${selectedAssetForQr.id}`)}`}
                 alt={`QR code for ${selectedAssetForQr.itemName}`}
                 width={250}
                 height={250}

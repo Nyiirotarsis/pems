@@ -1,8 +1,5 @@
 
 
-
-
-
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "Admin" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -341,6 +338,7 @@ export interface Device {
   lastUsedAt: string;
   email?: string;
   phone?: string;
+  scanCount: number;
 }
 
 export interface Album {
