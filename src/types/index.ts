@@ -1,6 +1,7 @@
 
 
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "IT Managers" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -343,5 +344,15 @@ export interface Album {
   photoCount: number;
   views: number;
   coverImageUrl: string;
+}
+
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  views: number;
+  likes: number;
+  publishedDate: string;
+  thumbnailUrl: string;
+  youtubeId: string;
 }
     

@@ -1,5 +1,5 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album } from "@/types";
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "IT Managers", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -479,6 +479,54 @@ export const mockAlbums: Album[] = [
         photoCount: 450, 
         views: 3100,
         coverImageUrl: 'https://picsum.photos/seed/album4/600/400'
+    }
+];
+
+export const mockYouTubeVideos: YouTubeVideo[] = [
+    {
+        id: 'vid-001',
+        title: 'Judiciary Annual Conference 2024 Highlights',
+        views: 12500,
+        likes: 750,
+        publishedDate: '2024-08-20',
+        thumbnailUrl: 'https://picsum.photos/seed/yt1/480/270',
+        youtubeId: 'dQw4w9WgXcQ'
+    },
+    {
+        id: 'vid-002',
+        title: 'Behind the Scenes: TechCorp AGM Setup',
+        views: 8200,
+        likes: 420,
+        publishedDate: '2024-08-05',
+        thumbnailUrl: 'https://picsum.photos/seed/yt2/480/270',
+        youtubeId: 'dQw4w9WgXcQ'
+    },
+    {
+        id: 'vid-003',
+        title: 'Innovate Inc. Product Launch | Full Presentation',
+        views: 25000,
+        likes: 1200,
+        publishedDate: '2024-09-18',
+        thumbnailUrl: 'https://picsum.photos/seed/yt3/480/270',
+        youtubeId: 'dQw4w9WgXcQ'
+    },
+    {
+        id: 'vid-004',
+        title: 'Expert Interview: The Future of Event Technology',
+        views: 5300,
+        likes: 310,
+        publishedDate: '2024-07-10',
+        thumbnailUrl: 'https://picsum.photos/seed/yt4/480/270',
+        youtubeId: 'dQw4w9WgXcQ'
+    },
+    {
+        id: 'vid-005',
+        title: 'Our Top 5 Event Management Tips for 2025',
+        views: 18000,
+        likes: 980,
+        publishedDate: '2024-10-01',
+        thumbnailUrl: 'https://picsum.photos/seed/yt5/480/270',
+        youtubeId: 'dQw4w9WgXcQ'
     }
 ];
 

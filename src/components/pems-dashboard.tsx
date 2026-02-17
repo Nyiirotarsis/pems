@@ -160,6 +160,7 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
   // Media Sub-items
   'media-social': { label: "Social Media", icon: Rss, href: "#" },
   'media-gallery': { label: "Media Gallery", icon: Clapperboard, href: "/dashboard/album-show" },
+  'media-youtube': { label: 'YouTube Dashboard', icon: Youtube, href: '/dashboard/media/youtube' },
   'media-press': { label: "Press Releases", icon: Newspaper, href: "#" },
   'media-calendar': { label: "Content Calendar", icon: CalendarIcon, href: "#" },
 };
@@ -560,14 +561,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                         <SidebarMenu className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5">
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <a href="https://www.youtube.com/@PACIFICEVENTSLTD-x9j" target="_blank" rel="noopener noreferrer">
-                                        <Youtube />
-                                        <span>YouTube</span>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <a href="https://www.tiktok.com/@pacific.events.li" target="_blank" rel="noopener noreferrer">
