@@ -1,4 +1,5 @@
 
+
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "Admin" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -366,4 +367,63 @@ export interface ScheduledPost {
   content: string;
   scheduledDate: string; // ISO String
   status: 'Draft' | 'Scheduled' | 'Published';
+}
+
+export type LeaveType = "Annual" | "Sick" | "Maternity" | "Paternity" | "Unpaid" | "Compassionate";
+export type LeaveStatus = "Pending" | "Approved" | "Rejected";
+
+export interface LeaveRequest {
+  id: number;
+  userId: number;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: LeaveStatus;
+  requestedDate: string;
+  reviewedBy?: string;
+  reviewDate?: string;
+}
+
+export type ApplicantStatus = "Applied" | "Screening" | "Interview" | "Offer" | "Hired" | "Rejected";
+
+export interface Applicant {
+    id: number;
+    jobId: string;
+    name: string;
+    email: string;
+    phone: string;
+    appliedDate: string;
+    status: ApplicantStatus;
+    resumeUrl?: string;
+    notes?: string;
+}
+
+export interface JobOpening {
+    id: string;
+    title: string;
+    department: string;
+    status: "Open" | "Closed" | "Draft";
+    postedDate: string;
+    applicants: Applicant[];
+}
+
+export interface ClearanceItem {
+  id: string;
+  name: string;
+  cleared: boolean;
+}
+
+export interface DepartmentClearance {
+  department: "IT" | "Finance" | "HR" | "Store";
+  status: "Pending" | "In Progress" | "Cleared";
+  items: ClearanceItem[];
+}
+
+export interface ExitProcess {
+  id: number;
+  userId: number;
+  exitDate: string;
+  status: "Ongoing" | "Completed";
+  clearance: DepartmentClearance[];
 }
