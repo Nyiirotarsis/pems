@@ -368,3 +368,19 @@ export interface ScheduledPost {
   scheduledDate: string; // ISO String
   status: 'Draft' | 'Scheduled' | 'Published';
 }
+
+export type LeaveType = "Annual" | "Sick" | "Maternity" | "Paternity" | "Unpaid" | "Compassionate";
+export type LeaveStatus = "Pending" | "Approved" | "Rejected";
+
+export interface LeaveRequest {
+  id: number;
+  userId: number;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: LeaveStatus;
+  requestedDate: string;
+  reviewedBy?: string;
+  reviewDate?: string;
+}

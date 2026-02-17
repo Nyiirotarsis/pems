@@ -1,4 +1,5 @@
 
+
 import { z } from "zod";
 
 export const issueItemSchema = z.object({
@@ -84,8 +85,8 @@ export const maintenanceLogSchema = z.object({
   itemName: z.string().min(1, "Item Name is required."),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
   issueDescription: z.string().min(5, "Issue description is required."),
-  hardware: z.boolean(),
-  software: z.boolean(),
+  hardware: z.boolean().optional(),
+  software: z.boolean().optional(),
   cause: z.string().min(3, "Cause of damage/fault is required."),
   unitCost: z.coerce.number().optional(),
   totalCost: z.coerce.number().optional(),
@@ -267,4 +268,15 @@ export const assetFormSchema = z.object({
   serialNumber: z.string().optional(),
   engravedNumber: z.string().optional(),
   image: z.string().optional(),
+});
+
+export const leaveRequestFormSchema = z.object({
+  userId: z.string().min(1, "Please select an employee."),
+  leaveType: z.enum(["Annual", "Sick", "Maternity", "Paternity", "Unpaid", "Compassionate"]),
+  startDate: z.date(),
+  endDate: z.date(),
+  reason: z.string().min(5, "Please provide a brief reason for your leave."),
+}).refine(data => data.endDate >= data.startDate, {
+  message: "End date cannot be before start date.",
+  path: ["endDate"],
 });

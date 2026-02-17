@@ -1,5 +1,6 @@
 
-import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType } from "@/types";
+
+import type { UserRole, Condition, InventoryItem, User, Quotation, LPO, Invoice, Payment, Kpi, AttendanceRecord, FieldPaymentRequest, Visitor, MaintenanceLog, InventoryIssue, Requisition, PayrollRecord, EventRegistry, Device, Album, YouTubeVideo, ScheduledPost, DeviceType, LeaveRequest } from "@/types";
 import { mockFieldStaff } from "./mock-field-staff";
 
 export const ROLES: UserRole[] = ["Store Manager", "Admin", "CEO", "Director", "Finance Manager", "HR/Admin", "Field Operational Officer", "Media and Communication Officer", "Auditor"];
@@ -589,6 +590,53 @@ export const mockScheduledPosts: ScheduledPost[] = [
     { id: 'post-3', platform: 'LinkedIn', content: 'We are proud to have provided full technical support for the National Health Summit. A look at how we ensured a seamless virtual and physical experience for all attendees.', scheduledDate: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(), status: 'Draft' },
 ];
 
+export const mockLeaveRequests: LeaveRequest[] = [
+    {
+        id: 1,
+        userId: 12, // Busingye Shilla Allen
+        leaveType: "Annual",
+        startDate: "2024-09-10",
+        endDate: "2024-09-15",
+        reason: "Personal vacation.",
+        status: "Approved",
+        requestedDate: "2024-08-20",
+        reviewedBy: "CEO",
+        reviewDate: "2024-08-21"
+    },
+    {
+        id: 2,
+        userId: 13, // Sarah Kamusiime
+        leaveType: "Sick",
+        startDate: "2024-08-28",
+        endDate: "2024-08-29",
+        reason: "Feeling unwell, doctor's appointment.",
+        status: "Pending",
+        requestedDate: "2024-08-28"
+    },
+    {
+        id: 3,
+        userId: 16, // Ngota Steven
+        leaveType: "Compassionate",
+        startDate: "2024-08-25",
+        endDate: "2024-08-27",
+        reason: "Family emergency.",
+        status: "Approved",
+        requestedDate: "2024-08-25",
+        reviewedBy: "HR/Admin",
+        reviewDate: "2024-08-25"
+    },
+     {
+        id: 4,
+        userId: 15, // Nyiiro Tarsis Ibrahim
+        leaveType: "Annual",
+        startDate: "2024-10-01",
+        endDate: "2024-10-10",
+        reason: "Planned trip.",
+        status: "Pending",
+        requestedDate: "2024-08-15"
+    }
+];
+
 
 export { mockFieldStaff } from './mock-field-staff';
 
@@ -597,3 +645,4 @@ export { mockFieldStaff } from './mock-field-staff';
     
 
     
+
