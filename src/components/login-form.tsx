@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -67,6 +68,8 @@ export function LoginForm() {
         return "/dashboard/field-ops";
       case "Media and Communication Officer":
         return "/dashboard/media";
+      case "Auditor":
+        return "/dashboard/sustainability";
       default:
         return "/dashboard";
     }
@@ -85,6 +88,10 @@ export function LoginForm() {
 
         const result = await response.json();
 
+        if (!response.ok) {
+          throw new Error(result.error || "An unexpected error occurred.");
+        }
+
         if (result.success && result.user) {
           localStorage.setItem("userRole", result.user.role);
 
@@ -96,17 +103,17 @@ export function LoginForm() {
           const dashboardUrl = getDashboardUrlForRole(result.user.role);
           router.replace(dashboardUrl);
         } else {
-          toast({
+           toast({
             variant: "destructive",
             title: "Login Failed",
             description: result.error || "Invalid username or password.",
           });
         }
-      } catch (error) {
+      } catch (error: any) {
          toast({
             variant: "destructive",
             title: "Login Failed",
-            description: "An unexpected error occurred. Please try again.",
+            description: error.message || "An unexpected error occurred. Please try again.",
           });
       }
     });
