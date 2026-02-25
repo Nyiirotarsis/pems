@@ -86,11 +86,22 @@ export function LoginForm() {
           body: JSON.stringify(values),
         });
 
-        const result = await response.json();
+        const contentType = response.headers.get('content-type');
 
         if (!response.ok) {
-          throw new Error(result.error || "An unexpected error occurred.");
+          let errorMsg = `Login failed with status: ${response.status}`;
+          if (contentType && contentType.includes('application/json')) {
+            const errorResult = await response.json();
+            errorMsg = errorResult.error || errorMsg;
+          }
+          throw new Error(errorMsg);
         }
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error("Received an invalid response from the server. Please check the server configuration.");
+        }
+
+        const result = await response.json();
 
         if (result.success && result.user) {
           localStorage.setItem("userRole", result.user.role);
