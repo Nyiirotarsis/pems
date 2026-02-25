@@ -6,6 +6,28 @@ import type { SuggestOutsourcingOptionsInput } from '@/ai/flows/suggest-outsourc
 import { USERS, mockInvoices } from '@/lib/mock-data';
 import type { User, Invoice, UserRole } from '@/types';
 
+export async function handleLogin(data: {username: string; password: string}): Promise<{success: boolean; user?: Partial<User>; error?: string}> {
+  try {
+    const { username, password } = data;
+
+    if (!username || !password) {
+      return { success: false, error: 'Username and password are required' };
+    }
+
+    const user = USERS.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      const userToReturn: Partial<User> = { id: user.id, username: user.username, role: user.role };
+      return { success: true, user: userToReturn };
+    } else {
+      return { success: false, error: 'Invalid credentials' };
+    }
+  } catch (error) {
+    // In a real app, you'd want to log this error.
+    return { success: false, error: 'An internal server error occurred' };
+  }
+}
+
 export async function handleSuggestOutsourcing(input: SuggestOutsourcingOptionsInput) {
   try {
     const result = await suggestOutsourcingOptions(input);

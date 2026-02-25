@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { PacificEventsLogo } from "@/components/icons";
 import { UserRole } from "@/types";
+import { handleLogin } from "@/app/actions";
 
 const loginFormSchema = z.object({
   username: z.string().min(1, "Please enter your username."),
@@ -78,40 +79,17 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
       try {
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-
-        const contentType = response.headers.get('content-type');
-
-        if (!response.ok) {
-          let errorMsg = `Login failed with status: ${response.status}`;
-          if (contentType && contentType.includes('application/json')) {
-            const errorResult = await response.json();
-            errorMsg = errorResult.error || errorMsg;
-          }
-          throw new Error(errorMsg);
-        }
-        
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error("Received an invalid response from the server. Please check the server configuration.");
-        }
-
-        const result = await response.json();
+        const result = await handleLogin(values);
 
         if (result.success && result.user) {
-          localStorage.setItem("userRole", result.user.role);
+          localStorage.setItem("userRole", result.user.role!);
 
           toast({
             title: "Login Successful",
             description: `Welcome back, ${result.user?.role}!`,
           });
 
-          const dashboardUrl = getDashboardUrlForRole(result.user.role);
+          const dashboardUrl = getDashboardUrlForRole(result.user.role!);
           router.replace(dashboardUrl);
         } else {
            toast({
@@ -124,7 +102,7 @@ export function LoginForm() {
          toast({
             variant: "destructive",
             title: "Login Failed",
-            description: error.message || "An unexpected error occurred. Please try again.",
+            description: "An unexpected error occurred. Please try again.",
           });
       }
     });
