@@ -76,6 +76,10 @@ export default function NewAssetPage() {
       location: "",
       purchaseDate: new Date(),
       image: "",
+      serialNumber: "",
+      engravedNumber: "",
+      category: "",
+      condition: "",
     },
   });
 
