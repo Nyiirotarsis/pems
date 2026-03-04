@@ -78,50 +78,24 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
-      try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
+      const result = await handleLogin(values);
+
+      if (result.success && result.user) {
+        localStorage.setItem("userRole", result.user.role!);
+
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${result.user?.role}!`,
         });
 
-        if (!response.ok) {
-          throw new Error(`Login failed with status: ${response.status}`);
-        }
-
-        // Check if the response is JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Received non-JSON response from server. Please check server configuration.");
-        }
-
-        const result = await response.json();
-
-        if (result.success && result.user) {
-          localStorage.setItem("userRole", result.user.role!);
-
-          toast({
-            title: "Login Successful",
-            description: `Welcome back, ${result.user?.role}!`,
-          });
-
-          const dashboardUrl = getDashboardUrlForRole(result.user.role!);
-          router.replace(dashboardUrl);
-        } else {
-           toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: result.error || "Invalid username or password.",
-          });
-        }
-      } catch (error: any) {
-         toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: error.message || "An unexpected error occurred. Please try again.",
-          });
+        const dashboardUrl = getDashboardUrlForRole(result.user.role!);
+        router.replace(dashboardUrl);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: result.error || "Invalid username or password.",
+        });
       }
     });
   }
