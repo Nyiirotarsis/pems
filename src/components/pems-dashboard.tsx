@@ -176,6 +176,9 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
   const [role, setRole] = React.useState<UserRole | null>(initialRole);
   const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
   const [visitors, setVisitors] = React.useState<Visitor[]>(mockVisitors);
+  const isClient = !!(typeof window !== 'undefined' && window.document);
+  const [dashboardHome, setDashboardHome] = React.useState('/dashboard');
+
   
   React.useEffect(() => {
     const newVisitorName = searchParams.get('new_visitor');
@@ -240,6 +243,37 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
     localStorage.removeItem("userRole");
     router.push("/login");
   };
+  
+  React.useEffect(() => {
+    if (isClient) {
+        const getDashboardHome = () => {
+            const role = localStorage.getItem("userRole") as UserRole;
+            if (role) {
+                switch (role) {
+                    case "CEO":
+                    case "Director":
+                      return "/dashboard/director";
+                    case "Finance Manager":
+                      return "/dashboard/finance";
+                    case "HR/Admin":
+                      return "/dashboard/hr";
+                    case "Admin":
+                      return "/dashboard/admin";
+                    case "Store Manager":
+                        return "/dashboard/store/inventory";
+                    case "Field Operational Officer":
+                        return "/dashboard/field-ops";
+                    case "Media and Communication Officer":
+                        return "/dashboard/media";
+                    default:
+                      return "/dashboard";
+                }
+            }
+          return "/dashboard";
+        }
+        setDashboardHome(getDashboardHome());
+    }
+  }, [pathname, isClient]);
   
   if (!role) {
     return (
@@ -640,7 +674,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             return financeNav;
         case 'HR/Admin':
             return hrNav;
-        case 'IT Managers':
+        case 'Admin':
             return itNav;
         case 'Store Manager':
             return storeNav;

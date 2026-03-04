@@ -64,7 +64,7 @@ export function LoginForm() {
       case "Admin":
         return "/dashboard/admin";
       case "Store Manager":
-        return "/dashboard/store";
+        return "/dashboard/store/inventory";
       case "Field Operational Officer":
         return "/dashboard/field-ops";
       case "Media and Communication Officer":
@@ -79,7 +79,25 @@ export function LoginForm() {
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     startTransition(async () => {
       try {
-        const result = await handleLogin(values);
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Login failed with status: ${response.status}`);
+        }
+
+        // Check if the response is JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Received non-JSON response from server. Please check server configuration.");
+        }
+
+        const result = await response.json();
 
         if (result.success && result.user) {
           localStorage.setItem("userRole", result.user.role!);
@@ -102,7 +120,7 @@ export function LoginForm() {
          toast({
             variant: "destructive",
             title: "Login Failed",
-            description: "An unexpected error occurred. Please try again.",
+            description: error.message || "An unexpected error occurred. Please try again.",
           });
       }
     });
@@ -125,7 +143,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., storemanager" {...field} autoComplete="username" suppressHydrationWarning />
+                    <Input placeholder="e.g., storemanager" {...field} suppressHydrationWarning autoComplete="username" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,8 +160,8 @@ export function LoginForm() {
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
-                        autoComplete="current-password"
                         suppressHydrationWarning
+                        autoComplete="current-password"
                         {...field}
                       />
                     </FormControl>
