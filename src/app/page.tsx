@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/context/language-context';
+import { Language } from '@/lib/translations';
 import { 
   Building2, 
   Lightbulb, 
@@ -16,18 +18,18 @@ import {
   Users,
   ShieldCheck,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Globe2
 } from 'lucide-react';
 
 export default function Home() {
-  // IMPORTANT: Since Google Photos links cannot be used directly as raw image sources, 
-  // please replace these Unsplash placeholder URLs with direct '.jpg' or '.png' links
-  // to your photos, or download your Google Photos and place them in the 'public' folder 
-  // (e.g., '/hero1.jpg').
+  const { t, language, setLanguage } = useLanguage();
+
   const heroImages = [
-    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=2000",
-    "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?auto=format&fit=crop&q=80&w=2000",
-    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=2000"
+    "/hero1.jpg",
+    "/hero2.jpg",
+    "/hero3.jpg",
+    "/hero4.jpg"
   ];
 
   const [currentImage, setCurrentImage] = useState(0);
@@ -35,25 +37,57 @@ export default function Home() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % heroImages.length);
-    }, 5000); // Change image every 5 seconds
+    }, 5000); 
     return () => clearInterval(timer);
   }, [heroImages.length]);
 
   const services = [
-    { title: "Audio & Visual Production", icon: <Video className="h-6 w-6" /> },
-    { title: "Ambient Lighting", icon: <Lightbulb className="h-6 w-6" /> },
-    { title: "Event Planning & Management", icon: <Building2 className="h-6 w-6" /> },
-    { title: "Live Streaming", icon: <Globe className="h-6 w-6" /> },
-    { title: "Trade Marketing", icon: <Target className="h-6 w-6" /> },
-    { title: "Conferencing Equipment", icon: <Mic2 className="h-6 w-6" /> },
-    { title: "Videography & Photography", icon: <Camera className="h-6 w-6" /> },
-    { title: "Public Address System", icon: <Speaker className="h-6 w-6" /> },
+    { title: t.srvAudio, icon: <Video className="h-6 w-6" /> },
+    { title: t.srvLight, icon: <Lightbulb className="h-6 w-6" /> },
+    { title: t.srvPlan, icon: <Building2 className="h-6 w-6" /> },
+    { title: t.srvStream, icon: <Globe className="h-6 w-6" /> },
+    { title: t.srvTrade, icon: <Target className="h-6 w-6" /> },
+    { title: t.srvConf, icon: <Mic2 className="h-6 w-6" /> },
+    { title: t.srvVideo, icon: <Camera className="h-6 w-6" /> },
+    { title: t.srvPA, icon: <Speaker className="h-6 w-6" /> },
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-background font-sans selection:bg-primary/20">
+      
+      {/* Navbar with Language Switcher */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-white/10">
+        <div className="container px-4 md:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-white text-lg tracking-wide hidden sm:block">Pacific Events</span>
+            <span className="font-bold text-white text-lg tracking-wide sm:hidden">PEMS</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary/50 transition-all">
+              <Globe2 className="h-4 w-4 text-gray-300" />
+              <select 
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as Language)}
+                className="bg-transparent text-sm font-medium text-white outline-none cursor-pointer [&>option]:text-black"
+                aria-label="Select language"
+              >
+                <option value="en">English</option>
+                <option value="sw">Swahili</option>
+                <option value="lg">Luganda</option>
+                <option value="soga">Lusoga</option>
+                <option value="intl">International</option>
+              </select>
+            </div>
+            <Button asChild size="sm" className="rounded-full bg-primary text-white hover:bg-primary/90">
+              <Link href="/login">{t.loginButton}</Link>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="relative w-full py-32 md:py-48 lg:py-64 overflow-hidden flex flex-col items-center justify-center bg-black">
+      <section className="relative w-full py-32 md:py-48 lg:py-64 overflow-hidden flex flex-col items-center justify-center bg-black pt-40">
         {/* Background Slide Carousel */}
         {heroImages.map((src, index) => (
           <div 
@@ -73,19 +107,19 @@ export default function Home() {
         <div className="container px-4 md:px-6 flex flex-col items-center text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
           <div className="space-y-6">
             <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold focus:outline-none border-primary/50 bg-black/50 text-white backdrop-blur-md mx-auto tracking-wide">
-              Pacific Events Management System
+              {t.homeTitle}
             </div>
             <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-white drop-shadow-lg leading-tight uppercase relative inline-block">
-              Crafting <span className="text-primary drop-shadow-[0_0_15px_rgba(0,128,128,0.5)]">Exceptional</span> Events
+              {t.heroTitle1} <span className="text-primary drop-shadow-[0_0_15px_rgba(0,128,128,0.5)]">{t.heroTitle2}</span> {t.heroTitle3}
             </h1>
             <p className="mx-auto max-w-[800px] text-gray-200 md:text-xl lg:text-2xl font-medium leading-relaxed drop-shadow-md">
-              We deliver cutting-edge event experiences across Africa that captivate, inspire, and empower communities.
+              {t.heroDesc}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
             <Button asChild size="lg" className="rounded-full px-10 h-14 text-lg shadow-lg hover:shadow-primary/50 transition-all hover:-translate-y-1 bg-primary text-primary-foreground hover:bg-primary/90">
               <Link href="/login">
-                Access System <ArrowRight className="ml-2 h-5 w-5" />
+                {t.accessSystem} <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>
@@ -108,10 +142,10 @@ export default function Home() {
       <section className="w-full py-24 bg-background relative">
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-foreground">Our Expertise</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-foreground">{t.expertiseTitle}</h2>
             <div className="h-1 w-20 bg-primary rounded-full mt-4"></div>
             <p className="max-w-[800px] text-muted-foreground md:text-xl/relaxed mt-4">
-              Comprehensive event solutions tailored to create unforgettable experiences.
+              {t.expertiseDesc}
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -148,10 +182,10 @@ export default function Home() {
                 <Target size={32} />
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight relative z-10 text-foreground">
-                Vision Statement
+                {t.visionTitle}
               </h2>
               <p className="text-lg leading-relaxed text-muted-foreground relative z-10">
-                To be the leading Events Management & Communications company in AFRICA, renowned for elegance, creativity, innovation and excellence in delivering unforgettable experiences that inspire, connect and empower communities.
+                {t.visionDesc}
               </p>
             </div>
             
@@ -164,10 +198,10 @@ export default function Home() {
                 <Zap size={32} />
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight relative z-10 text-foreground">
-                Mission Statement
+                {t.missionTitle}
               </h2>
               <p className="text-lg leading-relaxed text-muted-foreground relative z-10">
-                To curate and execute exceptional events and communications strategies that celebrate the rich diversity, heritage and potential of Africa. We are committed to foster meaningful connections, amplifying voices and driving positive change through our events and communication initiatives. By leveraging our expertise, creativity and local insights, we aim to exceed our client's expectations and make a lasting impact on the continent and beyond.
+                {t.missionDesc}
               </p>
             </div>
           </div>
@@ -181,10 +215,10 @@ export default function Home() {
         
         <div className="container px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">Our Core Values</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">{t.coreValuesTitle}</h2>
             <div className="h-1 w-20 bg-primary rounded-full mt-4"></div>
             <p className="max-w-[800px] text-gray-400 md:text-xl/relaxed mt-4">
-              The principles that guide our work and define our commitment to excellence in everything we do.
+              {t.coreValuesDesc}
             </p>
           </div>
           
@@ -193,9 +227,9 @@ export default function Home() {
               <div className="p-4 rounded-full bg-primary/20 group-hover:bg-primary transition-colors">
                 <Zap className="h-10 w-10 text-primary group-hover:text-white" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-white">Innovation</h3>
+              <h3 className="text-xl font-bold tracking-tight text-white">{t.valInnovation}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                We constantly push boundaries to deliver cutting-edge event experiences that captivate and inspire.
+                {t.valInnovationDesc}
               </p>
             </div>
             
@@ -203,9 +237,9 @@ export default function Home() {
               <div className="p-4 rounded-full bg-primary/20 group-hover:bg-primary transition-colors">
                 <Users className="h-10 w-10 text-primary group-hover:text-white" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-white">Customer-Centric</h3>
+              <h3 className="text-xl font-bold tracking-tight text-white">{t.valCustomer}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                Our clients' success is our priority. We listen, understand, and deliver beyond expectations.
+                {t.valCustomerDesc}
               </p>
             </div>
             
@@ -213,9 +247,9 @@ export default function Home() {
               <div className="p-4 rounded-full bg-primary/20 group-hover:bg-primary transition-colors">
                 <ShieldCheck className="h-10 w-10 text-primary group-hover:text-white" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-white">Integrity</h3>
+              <h3 className="text-xl font-bold tracking-tight text-white">{t.valIntegrity}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                We operate with transparency, honesty, and ethical practices in all our business relationships.
+                {t.valIntegrityDesc}
               </p>
             </div>
             
@@ -223,9 +257,9 @@ export default function Home() {
               <div className="p-4 rounded-full bg-primary/20 group-hover:bg-primary transition-colors">
                 <Briefcase className="h-10 w-10 text-primary group-hover:text-white" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-white">Teamwork</h3>
+              <h3 className="text-xl font-bold tracking-tight text-white">{t.valTeamwork}</h3>
               <p className="text-gray-400 leading-relaxed text-sm">
-                Collaboration and partnership drive our success, both internally and with our valued clients.
+                {t.valTeamworkDesc}
               </p>
             </div>
           </div>
@@ -241,7 +275,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-6">
             <Link href="/login" className="font-medium hover:text-primary transition-colors flex items-center gap-2 border border-white/20 px-4 py-2 rounded-full hover:border-primary">
-              System Login <ArrowRight size={14} />
+              {t.loginButton} <ArrowRight size={14} />
             </Link>
           </div>
         </div>

@@ -70,13 +70,22 @@ export interface Requisition {
     eventName: string;
     eventDate: string;
     requestedBy: UserRole | string;
-    status: "Pending" | "Approved" | "Rejected" | "Processed";
+    status: "Pending" | "Approved" | "Rejected" | "Processed" | "Issued";
     items: {
         itemName: string;
         quantity: number;
         status: "Available" | "Not Available" | "Partially Available";
     }[];
     createdAt: string;
+    // Logistics Metadata
+    logisticsType?: "Bodaboda" | "TukTuk" | "Truck" | "Company Vehicle" | "Other";
+    vehicleNumberPlate?: string;
+    transporterName?: string;
+    transporterPhone?: string;
+    transporterResidence?: string;
+    companyEscort?: string;
+    deliveryVenue?: string;
+    issuedDate?: string;
 }
 
 export interface RepairLog {

@@ -82,6 +82,11 @@ export default function RequisitionPage() {
     name: "items",
   });
 
+  // Filter out any equipment that is damaged or under repair.
+  const deployableEquipment = initialInventory.filter(
+    (item) => item.condition === "Good" || item.condition === "New"
+  );
+
   function onSubmit(data: RequisitionFormValues) {
     console.log(data);
     toast({
@@ -189,10 +194,20 @@ export default function RequisitionPage() {
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
-                                    <Input
-                                      placeholder="e.g., Wireless Microphone"
-                                      {...field}
-                                    />
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select Equipment..." />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        {deployableEquipment.map(equipment => (
+                                          <SelectItem key={equipment.id} value={equipment.itemName}>
+                                            {equipment.itemName} (Available: {equipment.quantityAvailable})
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>

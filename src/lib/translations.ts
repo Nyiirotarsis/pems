@@ -1,4 +1,3 @@
-
 const en = {
   navHome: 'Home',
   navUsers: 'Users',
@@ -11,38 +10,130 @@ const en = {
   homeSubtitle: 'Streamline your event operations from inventory to finance, all in one powerful platform.',
   getStartedButton: 'Get Started',
   footerText: 'Pacific Events Management System. All Rights Reserved.',
+
+  heroTitle1: "Crafting",
+  heroTitle2: "Exceptional",
+  heroTitle3: "Events",
+  heroDesc: "We deliver cutting-edge event experiences across Africa that captivate, inspire, and empower communities.",
+  accessSystem: "Access System",
+  expertiseTitle: "Our Expertise",
+  expertiseDesc: "Comprehensive event solutions tailored to create unforgettable experiences.",
+  visionTitle: "Vision Statement",
+  visionDesc: "To be the leading Events Management & Communications company in AFRICA, renowned for elegance, creativity, innovation and excellence in delivering unforgettable experiences that inspire, connect and empower communities.",
+  missionTitle: "Mission Statement",
+  missionDesc: "To curate and execute exceptional events and communications strategies that celebrate the rich diversity, heritage and potential of Africa. We are committed to foster meaningful connections, amplifying voices and driving positive change through our events and communication initiatives.",
+  coreValuesTitle: "Our Core Values",
+  coreValuesDesc: "The principles that guide our work and define our commitment to excellence in everything we do.",
+  valInnovation: "Innovation",
+  valInnovationDesc: "We constantly push boundaries to deliver cutting-edge event experiences that captivate and inspire.",
+  valCustomer: "Customer-Centric",
+  valCustomerDesc: "Our clients' success is our priority. We listen, understand, and deliver beyond expectations.",
+  valIntegrity: "Integrity",
+  valIntegrityDesc: "We operate with transparency, honesty, and ethical practices in all our business relationships.",
+  valTeamwork: "Teamwork",
+  valTeamworkDesc: "Collaboration and partnership drive our success, both internally and with our valued clients.",
+
+  srvAudio: "Audio & Visual Production",
+  srvLight: "Ambient Lighting",
+  srvPlan: "Event Planning & Management",
+  srvStream: "Live Streaming",
+  srvTrade: "Trade Marketing",
+  srvConf: "Conferencing Equipment",
+  srvVideo: "Videography & Photography",
+  srvPA: "Public Address System"
 };
 
-const fr = {
-  navHome: 'Accueil',
-  navUsers: 'Utilisateurs',
-  navRoles: 'Rôles',
-  navPolicies: 'Politiques',
-  navHelp: 'Aide',
-  navContact: 'Contact',
-  loginButton: 'Connexion',
-  homeTitle: 'Système de Gestion d\'Événements Pacific',
-  homeSubtitle: 'Rationalisez vos opérations événementielles, de l\'inventaire à la finance, sur une seule plateforme puissante.',
-  getStartedButton: 'Commencer',
-  footerText: 'Système de Gestion d\'Événements Pacific. Tous droits réservés.',
+const sw = {
+  ...en,
+  navHome: 'Nyumbani',
+  loginButton: 'Ingia',
+  heroTitle1: "Kutengeneza",
+  heroTitle2: "Matukio Ya",
+  heroTitle3: "Kipekee",
+  heroDesc: "Tunatoa uzoefu wa matukio ya hali ya juu kote Afrika ambao unavutia, kuhamasisha, na kuwezesha jamii.",
+  accessSystem: "Fikia Mfumo",
+  expertiseTitle: "Utaalam Wetu",
+  expertiseDesc: "Suluhisho kamili za matukio zilizoundwa kuleta uzoefu usiosahaulika.",
+  visionTitle: "Dira",
+  visionDesc: "Kuwa kampuni inayoongoza kwa Usimamizi wa Matukio na Mawasiliano barani AFRIKA, inayojulikana kwa umaridadi, ubunifu, na ubora katika kutoa uzoefu usiosahaulika.",
+  missionTitle: "Dhumuni",
+  missionDesc: "Kuratibu na kutekeleza matukio ya kipekee na mikakati ya mawasiliano inayosherehekea utofauti na urithi wa Afrika. Tunalenga kuzidi matarajio ya wateja wetu.",
+  coreValuesTitle: "Maadili Yetu",
+  coreValuesDesc: "Kanuni zinazoongoza kazi yetu na kufafanua dhamira yetu ya ubora katika kila jambo tunalofanya.",
+  valInnovation: "Ubunifu",
+  valInnovationDesc: "Tunasukuma mipaka kutoa uzoefu wa kisasa unaovutia na kuhamasisha.",
+  valCustomer: "Kijali Wateja",
+  valCustomerDesc: "Mafanikio ya wateja wetu ndio kipaumbele chetu. Tunasikiliza na kuvuka matarajio.",
+  valIntegrity: "Uadilifu",
+  valIntegrityDesc: "Tunafanya kazi kwa uwazi, uaminifu, na maadili katika mahusiano yetu yote ya biashara.",
+  valTeamwork: "Kazi Pamoja",
+  valTeamworkDesc: "Ushirikiano unaendesha mafanikio yetu, ndani na pamoja na wateja wetu wanaothaminiwa.",
+  srvAudio: "Sauti na Video",
+  srvLight: "Taa za Mazingira",
+  srvPlan: "Upangaji wa Matukio",
+  srvStream: "Matangazo Ya Moja kwa Moja",
+  srvTrade: "Masoko",
+  srvConf: "Vifaa Vya Mikutano",
+  srvVideo: "Kupiga Picha na Video",
+  srvPA: "Mfumo wa Sauti kwa Umma"
 };
 
-// Placeholder translations - they will show English text.
-const sw = { ...en, navHome: 'Nyumbani' };
-const ar = { ...en, navHome: 'الرئيسية' };
-const lg = { ...en, navHome: 'Enyumba' };
-const ny = { ...en, navHome: 'Ahabw\'enju' };
-const soga = { ...en, navHome: 'Aka' };
+const lg = {
+  ...en,
+  navHome: 'Ewaka',
+  loginButton: 'Yingira',
+  heroTitle1: "Okukola",
+  heroTitle2: "Emikolo",
+  heroTitle3: "Egitagambika",
+  heroDesc: "Tukuleetera emikolo egikyamula, egihhaamya mu Africa yonna egigatta n'okuyamba ebitundu.",
+  accessSystem: "Yingira mu Sisitiimu",
+  expertiseTitle: "Kyetukola",
+  expertiseDesc: "Tukola ku mikolo egyabulijjo ne giteekebwamu obwangu okuleetawo ebijjukirwa.",
+  visionTitle: "Okwolesebwa Kwaffe",
+  visionDesc: "Okubeera kampuni esinga mu kuddukanya emikolo n'ebyempuliziganya mu AFRICA, emanyiddwa olw'obulungi, obupya n'okukola obulungi ennyo.",
+  missionTitle: "Ekigendererwa Kyaffe",
+  missionDesc: "Okuteekateeka n'okutambuza emikolo egisinga n'enkola z'empuliziganya ezooleka obugagga bwa Africa. Tumaliridde okunywenza enkolagana.",
+  coreValuesTitle: "Empisa Zaffe",
+  coreValuesDesc: "Amateeka agatulungamya mu mirimu gyaffe n'okulaga obumalirivu bwaffe eri obulungi mu buli kyetukola.",
+  valInnovation: "Obupya",
+  valInnovationDesc: "Tuleetawo endowooza empya era tukola ebintu ebinyumira okusanyusa.",
+  valCustomer: "Kaasitoma ku Mwanjo",
+  valCustomerDesc: "Obuwanguzi bwa ba kaasitoma baffe kyekisinga obukulu. Tuwuliriza bulungi era tusingawo nekyebasuubira.",
+  valIntegrity: "Amazima",
+  valIntegrityDesc: "Tukola mu lwatu, n'amazima era mu bulambulukufu mu nkolagana zaffe zonna.",
+  valTeamwork: "Okolera Awamu",
+  valTeamworkDesc: "Okolera awamu n'obumu kyekituwa obuwanguzi wamu ne ba kaasitoma baffe.",
+  srvAudio: "Sauti n'Ebifananyi",
+  srvLight: "Amataala Amabala",
+  srvPlan: "Okuteekateeka Emikolo",
+  srvStream: "Okulaga obutereevu ku Mutimbagano",
+  srvTrade: "Okutunda Ebintu",
+  srvConf: "Ebikozesebwa mu Nkiiko",
+  srvVideo: "Okukuba Vidiyo n'Ebifananyi",
+  srvPA: "Ebyuma by'Amaloboozi"
+};
 
+const soga = {
+  ...lg,
+  heroTitle1: "Okhukolha",
+  heroTitle2: "Emiikolo",
+  heroTitle3: "Emikulu",
+  accessSystem: "Yingira mu Ndabirira",
+  visionTitle: "Okwolesebwa Kwaitu",
+  missionTitle: "Ekigendererwa Kwaitu",
+  valCustomer: "Kasitoma Ku Mwanjo",
+  valTeamwork: "Okhukolera Awamu",
+  srvPlan: "Okhuteekateeka Emiikolo"
+};
+
+const intl = en;
 
 export const translations = {
   en,
-  fr,
   sw,
-  ar,
   lg,
-  ny,
   soga,
+  intl
 };
 
 export type Language = keyof typeof translations;

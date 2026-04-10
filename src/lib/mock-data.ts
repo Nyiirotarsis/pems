@@ -175,6 +175,45 @@ export const mockRequisitions: Requisition[] = [
             { itemName: "5KVA Diesel Generator", quantity: 1, status: "Not Available" },
         ],
         createdAt: "2024-08-01T10:00:00Z"
+    },
+    {
+        id: "REQ-002",
+        eventName: "TechCorp AGM",
+        eventDate: "2024-08-20",
+        requestedBy: "Field Operational Officer",
+        status: "Issued",
+        items: [
+            { itemName: "LED Display Screen 55inch", quantity: 1, status: "Available" },
+            { itemName: "Event Tent 10x10m", quantity: 2, status: "Available" },
+        ],
+        createdAt: "2024-08-05T09:00:00Z",
+        logisticsType: "Bodaboda",
+        vehicleNumberPlate: "UFA 345M",
+        transporterName: "Kato Joseph",
+        transporterPhone: "0771234567",
+        transporterResidence: "Kira Town",
+        companyEscort: "Ngota Steven",
+        deliveryVenue: "Kampala Serena Hotel",
+        issuedDate: "2024-08-19T08:30:00Z"
+    },
+    {
+        id: "REQ-003",
+        eventName: "Music Festival Setup",
+        eventDate: "2024-08-25",
+        requestedBy: "Field Operational Officer",
+        status: "Issued",
+        items: [
+            { itemName: "Wireless Microphone Kit", quantity: 2, status: "Available" },
+        ],
+        createdAt: "2024-08-10T11:00:00Z",
+        logisticsType: "Truck",
+        vehicleNumberPlate: "UBJ 123X",
+        transporterName: "Ssali Logistics Ltd",
+        transporterPhone: "0759998888",
+        transporterResidence: "Namanve Industrial Area",
+        companyEscort: "Sarah Kamusiime",
+        deliveryVenue: "Lugogo Cricket Oval",
+        issuedDate: "2024-08-24T06:00:00Z"
     }
 ];
 

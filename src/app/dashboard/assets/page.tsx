@@ -141,6 +141,26 @@ export default function AssetsPage() {
     return user ? user.role : username;
   }
 
+  const handleUpdateCondition = (id: string, newCondition: string) => {
+    // 1. Update the local component state for instant visual feedback
+    setAssets(prevAssets => 
+      prevAssets.map(asset => 
+        asset.id === id ? { ...asset, condition: newCondition as any } : asset
+      )
+    );
+
+    // 2. Update the singleton mock array so the state persists across portals (e.g. Field Ops)
+    const targetAsset = initialInventory.find(a => a.id === id);
+    if (targetAsset) {
+      targetAsset.condition = newCondition as any;
+    }
+
+    toast({
+      title: "Equipment Condition Updated",
+      description: `The condition for ${id} is now ${newCondition}.`,
+    });
+  };
+
   const handleScanSuccess = (decodedText: string) => {
     setIsScannerOpen(false);
 
@@ -281,7 +301,28 @@ export default function AssetsPage() {
                   <TableCell>{getAssignedToName(asset.issuedTo)}</TableCell>
                   <TableCell>{asset.datePurchased}</TableCell>
                   <TableCell>
-                     <Badge variant={asset.condition === 'Good' || asset.condition === 'New' ? 'default' : 'destructive'}>{asset.condition}</Badge>
+                    <Select
+                      value={asset.condition}
+                      onValueChange={(val) => handleUpdateCondition(asset.id, val)}
+                    >
+                      <SelectTrigger 
+                        className={cn("w-[130px] h-8 text-xs font-medium border-0 shadow-sm", 
+                          ['Good', 'New'].includes(asset.condition) ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" :
+                          asset.condition === 'Fair' ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" :
+                          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                        )}
+                      >
+                        <SelectValue placeholder="Condition" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="New">New</SelectItem>
+                        <SelectItem value="Good">Good</SelectItem>
+                        <SelectItem value="Fair">Fair</SelectItem>
+                        <SelectItem value="Damaged">Damaged</SelectItem>
+                        <SelectItem value="Under Repair">Under Repair</SelectItem>
+                        <SelectItem value="Faulty">Faulty</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={asset.status} />
