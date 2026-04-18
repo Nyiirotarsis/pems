@@ -1,4 +1,3 @@
-
 "use client";
 import React from "react";
 import {
@@ -11,6 +10,8 @@ import {
   Landmark,
   UserCheck,
   ClipboardCheck,
+  ArrowRightLeft,
+  AlertTriangle
 } from "lucide-react";
 import {
   Bar,
@@ -41,6 +42,9 @@ import {
 
 import type { InventoryItem, ReportsViewProps, FinancialStatus, AttendanceStatus, KpiStatus } from "@/types";
 import { assetCategories } from "@/lib/mock-data";
+import type { Requisition } from "@/types";
+import { Interval } from "date-fns";
+import { CheckCircle2 } from "lucide-react";
 
 import {
   Card,
@@ -60,6 +64,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { Button } from "../ui/button";
+import { Badge } from "@/components/ui/badge";
 
 type TimeFilter = "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
 
@@ -72,7 +77,8 @@ export function ReportsView({
   payments,
   kpis,
   attendance,
-}: ReportsViewProps) {
+  requisitions, // Added requisitions prop
+}: ReportsViewProps & { requisitions: Requisition[] }) {
   const [timeFilter, setTimeFilter] = React.useState<TimeFilter>("monthly");
 
   const getInventoryTotals = (item: InventoryItem) => {
@@ -235,6 +241,9 @@ export function ReportsView({
                 <UserCheck className="mr-2" /> HR
             </TabsTrigger>
           )}
+          <TabsTrigger value="logistics">
+              <ArrowRightLeft className="mr-2" /> Logistics & Returns
+          </TabsTrigger>
         </TabsList>
       </div>
 
@@ -431,18 +440,7 @@ export function ReportsView({
                     <TableCell>{item.faulty}</TableCell>
                     <TableCell>{item.total}</TableCell>
                     <TableCell>
-                      <div className="h-2.5 w-full rounded-full bg-secondary">
-                        <div
-                          className="h-2.5 rounded-full bg-primary"
-                          style={{
-                            width: `${
-                              item.total > 0
-                                ? (item.available / item.total) * 100
-                                : 0
-                            }%`,
-                          }}
-                        />
-                      </div>
+                      <div className="progress-bar" />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -667,6 +665,83 @@ export function ReportsView({
                 </ChartContainer>
               </CardContent>
             </Card>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="logistics">
+        <div className="grid gap-6">
+           <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="font-headline">Post-Event Reverse Logistics Report</CardTitle>
+                    <CardDescription>Track events that have safely returned all equipment, along with any damages incurred.</CardDescription>
+                  </div>
+                  <Button variant="outline" onClick={() => window.print()}>Print Logistics Report</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {requisitions.filter(r => r.status === "Returned/Cleared").length === 0 ? (
+                    <div className="text-center py-10 text-muted-foreground border-2 border-dashed rounded-lg">
+                        <ArrowRightLeft className="h-10 w-10 mx-auto mb-4 opacity-50" />
+                        <p>No post-event returns have been cleared yet.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {requisitions.filter(r => r.status === "Returned/Cleared").map(req => {
+                           // Tally items
+                           const totalItems = req.items.length;
+                           const damagedItems = req.items.filter(i => i.returnCondition && i.returnCondition !== "Good");
+
+                           return (
+                              <div key={req.id} className="border border-border/60 rounded-xl p-5 bg-card relative shadow-sm">
+                                  <div className="flex justify-between items-start mb-4">
+                                      <div>
+                                         <h3 className="text-lg font-bold flex items-center gap-2">
+                                            {req.eventName}
+                                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Safely Returned</Badge>
+                                         </h3>
+                                         <p className="text-sm text-muted-foreground mt-1">Cleared on {req.clearedDate ? format(new Date(req.clearedDate), "PPP") : 'Unknown Date'} • {req.returnVehiclePlate || "No Vehicle Recorded"}</p>
+                                      </div>
+                                      <div className="text-right">
+                                         <p className="text-xs font-mono text-muted-foreground bg-muted p-1 px-2 rounded">ID: {req.id}</p>
+                                      </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div className="bg-muted/30 rounded p-3 text-sm">
+                                          <h4 className="font-semibold mb-1 text-muted-foreground">General Delivery Summary</h4>
+                                          <p>Total Item Categories Deployed: <strong>{totalItems}</strong></p>
+                                          <p>Logistics Handled By: <strong>{req.returnTransporterName}</strong></p>
+                                      </div>
+                                      
+                                      <div className={`rounded p-3 text-sm border-l-4 ${damagedItems.length > 0 ? 'bg-red-50/50 border-red-500' : 'bg-green-50/50 border-green-500'}`}>
+                                          <h4 className="font-semibold mb-1 flex items-center gap-1 text-muted-foreground">
+                                              {damagedItems.length > 0 ? <AlertTriangle className="w-4 h-4 text-red-500"/> : <CheckCircle2 className="w-4 h-4 text-green-500"/>}
+                                              Incident Report
+                                          </h4>
+                                          {damagedItems.length > 0 ? (
+                                              <ul className="space-y-1 mt-2">
+                                                 {damagedItems.map((di, i) => (
+                                                     <li key={i} className="flex gap-2">
+                                                        <span className="text-red-700 font-medium whitespace-nowrap">[{di.returnCondition}]</span>
+                                                        <span className="truncate">{di.itemName}</span>
+                                                        <span className="text-xs text-muted-foreground italic truncate block">({di.damageNotes || "No notes"})</span>
+                                                     </li>
+                                                 ))}
+                                              </ul>
+                                          ) : (
+                                              <p className="text-green-700 font-medium">100% of equipment returned in 'Good' or 'New' condition. No damages incurred at this event.</p>
+                                          )}
+                                      </div>
+                                  </div>
+                              </div>
+                           );
+                        })}
+                    </div>
+                )}
+              </CardContent>
+           </Card>
         </div>
       </TabsContent>
     </Tabs>

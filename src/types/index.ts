@@ -1,5 +1,3 @@
-
-
 export type UserRole = "Store Manager" | "Finance Manager" | "HR/Admin" | "CEO" | "Director" | "Admin" | "Field Operational Officer" | "Media and Communication Officer" | "Auditor";
 
 export type Condition = "New" | "Good" | "Fair" | "Damaged" | "Under Repair" | "Faulty";
@@ -70,12 +68,17 @@ export interface Requisition {
     eventName: string;
     eventDate: string;
     requestedBy: UserRole | string;
-    status: "Pending" | "Approved" | "Rejected" | "Processed";
+    status: "Pending" | "Approved" | "Rejected" | "Processed" | "Returned/Cleared";
     items: {
         itemName: string;
         quantity: number;
         status: "Available" | "Not Available" | "Partially Available";
+        returnCondition?: "Good" | "Damaged";
+        damageNotes?: string;
     }[];
+    clearedDate?: string;
+    returnVehiclePlate?: string;
+    returnTransporterName?: string;
     createdAt: string;
 }
 

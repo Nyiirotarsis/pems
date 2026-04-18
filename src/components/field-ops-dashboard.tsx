@@ -36,10 +36,10 @@ const moduleCards = [
     href: "/dashboard/field-ops/requisition",
   },
   {
-    title: "Manage Equipments at Site",
+    title: "Post-Event Equipment Returns",
     icon: ArrowRightLeft,
-    description: "Issue and return equipment for events.",
-    href: "/dashboard/store/transactions",
+    description: "Issue return logic, evaluate on-site conditions, and reverse logistics.",
+    href: "/dashboard/field-ops/returns",
   },
   {
     title: "Manage Crew",

@@ -1,7 +1,7 @@
-
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import {
   Package,
   ArrowRightLeft,
@@ -168,6 +168,14 @@ const navItems: Record<string, { label: string; icon: React.ElementType; isPage?
 
 
 export default function PEMSDashboard({ children, initialRole }: { children: React.ReactNode, initialRole: UserRole | null }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ActualPEMSDashboard children={children} initialRole={initialRole} />
+    </Suspense>
+  );
+}
+
+function ActualPEMSDashboard({ children, initialRole }: { children: React.ReactNode, initialRole: UserRole | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -190,7 +198,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             [visitedPerson as UserRole]
         );
         
-        // Also add a new visitor to the state for simulation
         const newVisitor: Visitor = {
             id: visitors.length + 1,
             name: newVisitorName,
@@ -198,14 +205,8 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             timeIn: new Date().toISOString(),
             personVisiting: visitedPerson as UserRole
         };
-        setVisitors(prev => [newVisitor, ...prev]);
-
-        toast({
-            title: "Visitor Registered",
-            description: `${newVisitorName} has been registered. The ${visitedPerson} has been notified.`
-        })
+        setVisitors(prev => [...prev, newVisitor]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   
@@ -451,7 +452,7 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['finance-payments'].href!)} isActive={pathname.startsWith(navItems['finance-payments'].href!)}><DollarSign /><span>Payments</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem><SidebarMenuButton onClick={() => router.push(navItems['reports'].href!)} isActive={pathname === navItems['reports'].href}><FileText /><span>Reports</span></SidebarMenuButton></SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname === '/dashboard/notifications'}>
+              <SidebarMenuButton onClick={() => router.push('/dashboard/notifications')} isActive={pathname.startsWith('/dashboard/notifications')}>
                   <Bell /><span>Notifications</span>
                   {unreadCount > 0 && <Badge className="ml-auto">{unreadCount}</Badge>}
               </SidebarMenuButton>
@@ -691,79 +692,6 @@ export default function PEMSDashboard({ children, initialRole }: { children: Rea
 
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-3 px-3">
-            <PacificEventsLogo className="size-10" />
-            <div className="flex flex-col">
-              <h2 className="font-headline text-lg font-semibold">Pacific Events</h2>
-              <p className="text-xs text-muted-foreground">Event Management System</p>
-            </div>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            {renderNavForRole(role)}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <div className="flex items-center gap-3 rounded-lg border p-2">
-            <Avatar>
-              <AvatarImage src={`https://i.pravatar.cc/150?u=${role.replace(/\s/g, "")}`} />
-              <AvatarFallback>{role.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col text-sm flex-1">
-                <Select value={role} onValueChange={(v) => handleRoleChange(v as UserRole)}>
-                  <SelectTrigger className="border-0 p-0 h-auto focus:ring-0 shadow-none font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROLES.map((r) => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              <span className="text-xs text-muted-foreground">Viewing as {role}</span>
-            </div>
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0">
-                  <MoreVertical className="size-4" />
-                  <span className="sr-only">User Menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-                      <Cog className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                  </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <div className="p-4 sm:p-6 lg:p-8 flex-1">
-          <header className="flex items-center justify-between mb-6 md:hidden">
-             <SidebarTrigger />
-          </header>
-          <main>
-            {children}
-          </main>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <div>{children}</div>
   );
 }

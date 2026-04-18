@@ -65,19 +65,23 @@ export interface InventoryIssue {
   receivedBy?: UserRole | string;
 }
 
+export interface RequisitionItem {
+    itemName: string;
+    quantity: number;
+    status: "Available" | "Not Available" | "Partially Available";
+    returnCondition?: "Good" | "Fair" | "Damaged" | "Lost";
+    damageNotes?: string;
+}
+
 export interface Requisition {
     id: string;
     eventName: string;
     eventDate: string;
     requestedBy: UserRole | string;
-    status: "Pending" | "Approved" | "Rejected" | "Processed" | "Issued";
-    items: {
-        itemName: string;
-        quantity: number;
-        status: "Available" | "Not Available" | "Partially Available";
-    }[];
+    status: "Pending" | "Approved" | "Rejected" | "Processed" | "Issued" | "Pending Return" | "Returned/Cleared";
+    items: RequisitionItem[];
     createdAt: string;
-    // Logistics Metadata
+    // Logistics Metadata (Outbound)
     logisticsType?: "Bodaboda" | "TukTuk" | "Truck" | "Company Vehicle" | "Other";
     vehicleNumberPlate?: string;
     transporterName?: string;
@@ -86,6 +90,14 @@ export interface Requisition {
     companyEscort?: string;
     deliveryVenue?: string;
     issuedDate?: string;
+    // Reverse Logistics Metadata (Inbound / Return)
+    eventEndDate?: string;
+    returnLogisticsType?: "Bodaboda" | "TukTuk" | "Truck" | "Company Vehicle" | "Other";
+    returnVehiclePlate?: string;
+    returnTransporterName?: string;
+    returnTransporterPhone?: string;
+    returnEscort?: string;
+    clearedDate?: string;
 }
 
 export interface RepairLog {
@@ -268,6 +280,7 @@ export interface ReportsViewProps {
     payments: Payment[];
     kpis: Kpi[];
     attendance: AttendanceRecord[];
+    requisitions: Requisition[];
 }
 
 // Maintenance Log Types

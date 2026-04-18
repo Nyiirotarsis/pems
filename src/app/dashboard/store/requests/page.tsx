@@ -10,7 +10,8 @@ import {
   UserCheck,
   Calendar,
   MapPin,
-  ClipboardList
+  ClipboardList,
+  AlertTriangle
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -82,6 +83,7 @@ export default function StoreRequestsInbox() {
 
   const pendingReqs = requisitions.filter(r => r.status === "Pending");
   let issuedReqs = requisitions.filter(r => r.status === "Issued");
+  const pendingReturnReqs = requisitions.filter(r => r.status === "Pending Return");
 
   // Apply Filters to Issued Requisitions
   if (filterVenue) {
@@ -156,6 +158,42 @@ export default function StoreRequestsInbox() {
     setCompanyEscort("");
   };
 
+  const handleClearReturn = (req: Requisition) => {
+    // Determine condition changes to apply to global inventory
+    req.items.forEach(reqItem => {
+      if (reqItem.returnCondition && reqItem.returnCondition !== "Good") {
+        // If it's a damaged or lost item, find it in inventory and update status
+        // Note: For mock simplicity, we are blindly updating the condition of any matching item name.
+        // In a real database, this would match by exact serial number or item ID.
+        import("@/lib/mock-data").then(({ initialInventory }) => {
+            const targetInventoryItem = initialInventory.find(inv => inv.itemName === reqItem.itemName);
+            if (targetInventoryItem) {
+               targetInventoryItem.condition = reqItem.returnCondition as any;
+               if (reqItem.returnCondition === "Lost") {
+                 targetInventoryItem.status = "Out"; // Or a new "Lost" status
+                 targetInventoryItem.quantityAvailable -= reqItem.quantity;
+               }
+            }
+        });
+      }
+    });
+
+    const clearedReq = {
+      ...req,
+      status: "Returned/Cleared" as any,
+      clearedDate: new Date().toISOString()
+    };
+
+    setRequisitions(prev => prev.map(r => r.id === req.id ? clearedReq : r));
+    const mockRef = mockRequisitions.find(r => r.id === req.id);
+    if (mockRef) Object.assign(mockRef, clearedReq);
+
+    toast({
+      title: "Return Cleared",
+      description: `Requisition ${req.id} cleared. Global inventory limits and conditions updated.`,
+    });
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div>
@@ -166,7 +204,7 @@ export default function StoreRequestsInbox() {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md h-12">
+        <TabsList className="grid w-full grid-cols-3 max-w-2xl h-12">
           <TabsTrigger value="pending" className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
             Pending Requests
@@ -175,7 +213,12 @@ export default function StoreRequestsInbox() {
           <TabsTrigger value="issued" className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
             Issued & Deployed
-            <Badge variant="secondary" className="ml-2 bg-green-500/20 text-green-700">{issuedReqs.length}</Badge>
+            <Badge variant="secondary" className="ml-2 bg-blue-500/20 text-blue-700">{issuedReqs.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="returns" className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            Pending Returns
+            <Badge variant="secondary" className="ml-2 bg-orange-500/20 text-orange-700">{pendingReturnReqs.length}</Badge>
           </TabsTrigger>
         </TabsList>
 
@@ -335,6 +378,76 @@ export default function StoreRequestsInbox() {
                 </Table>
               </div>
 
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* PENDING RETURNS TAB */}
+        <TabsContent value="returns" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Inbound Equipment Returns</CardTitle>
+              <CardDescription>Verify returning equipment from Field Ops. Clearing these items auto-updates global conditions.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingReturnReqs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-48 text-muted-foreground border-2 border-dashed rounded-lg">
+                  <ClipboardList className="w-8 h-8 mb-4 opacity-50" />
+                  <p>No equipment is currently marked for return.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {pendingReturnReqs.map(req => (
+                    <div key={req.id} className="border-2 border-orange-500/50 p-6 rounded-xl relative overflow-hidden bg-orange-50/50 dark:bg-orange-950/10 transition-all">
+                      <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">RETURN ARRIVING</div>
+                      <div className="flex flex-col md:flex-row justify-between mb-6">
+                        <div>
+                          <h3 className="font-semibold text-lg">{req.eventName}</h3>
+                          <div className="text-sm text-muted-foreground flex gap-4 mt-2">
+                            <span className="flex items-center gap-1"><Calendar className="w-4 h-4"/> Ended: {req.eventEndDate ? format(new Date(req.eventEndDate), "MMM dd, HH:mm") : 'N/A'}</span>
+                          </div>
+                        </div>
+                        <div className="mt-4 md:mt-0 text-right">
+                          <p className="text-sm font-semibold">Reverse Transport: <span className="text-primary">{req.returnLogisticsType}</span></p>
+                          <p className="text-xs text-muted-foreground">{req.returnVehiclePlate} • Driver: {req.returnTransporterName}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Escort: {req.returnEscort}</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white dark:bg-black/40 border border-border rounded-lg p-4 mb-6 shadow-sm">
+                        <h4 className="text-sm font-bold mb-3 pb-2 border-b flex items-center justify-between">
+                           Field Ops Condition Report
+                           <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">Needs Verification</Badge>
+                        </h4>
+                        <ul className="space-y-3">
+                          {req.items.map((item, i) => (
+                            <li key={i} className="flex flex-col justify-between text-sm py-1 border-b last:border-0 last:pb-0">
+                              <div className="flex justify-between w-full">
+                                <span className="font-medium">{item.itemName} <span className="text-muted-foreground text-xs ml-2">x{item.quantity}</span></span>
+                                <Badge variant={item.returnCondition === 'Good' ? 'outline' : 'destructive'} className="w-24 justify-center shadow-sm">
+                                  {item.returnCondition || "Unknown"}
+                                </Badge>
+                              </div>
+                              {item.damageNotes && (
+                                <div className="mt-2 text-xs bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-300 p-2 rounded border border-red-100">
+                                  <strong>Damage Note:</strong> {item.damageNotes}
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-4 border-t border-border">
+                        <p className="text-xs text-muted-foreground italic">Clicking clear will permanently apply condition states to inventory.</p>
+                        <Button onClick={() => handleClearReturn(req)} className="bg-green-600 hover:bg-green-700 text-white font-medium px-8 w-full sm:w-auto shadow-md">
+                          Clear Items & Restock
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

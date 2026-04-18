@@ -10,7 +10,8 @@ import {
     mockInvoices, 
     mockPayments, 
     mockKpis, 
-    mockAttendance 
+    mockAttendance,
+    mockRequisitions 
 } from "@/lib/mock-data";
 import type { UserRole } from "@/types";
 
@@ -35,6 +36,7 @@ export default function ReportsPage() {
                 payments={mockPayments}
                 kpis={mockKpis}
                 attendance={mockAttendance}
+                requisitions={mockRequisitions}
             />
         </PEMSDashboard>
     );
